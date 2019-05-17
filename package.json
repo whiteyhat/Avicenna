@@ -2,7 +2,9 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "db": "cd packages/front && adonis migration:run && cd .. && cd .."
+    "db": "cd packages/front && adonis migration:run && cd .. && cd ..",
+    "start": "lerna exec npm start --parallel",
+    "dep": "lerna exec npm install --parallel"
   },
   "devDependencies": {
     "lerna": "^3.14.1"
