@@ -1,8 +1,8 @@
 ### Download Dependencies
-`lerna run install`
+`npm run dep`
 
 ## Start front + back
-`lerna run start`
+`npm start`
 
 ## migrate DB
 `npm run db`
