@@ -7,6 +7,80 @@ const LightningService = use('App/Services/LightningService')
 class UserController {
 
     /**
+     * Controller to log out from the auth middleware
+     * @param auth middleware provider for authentication
+     */
+    async logout({auth}) {
+        try {
+          await auth.logout()
+        } catch (error) {
+        }
+      }
+
+    /**
+     * Controller to deletet a user only if the admin 
+     * is sending the request
+     * @param auth middleware provider for authentication
+     * @param request http request from the client
+     * @param response http response from the server
+     */
+    async deleteAccount({auth, response, request}) {
+        // Get the user to delete id from the request
+        const {id} = request.all()
+        let msg = "You do not have the right permsisions"
+        let type = "error"
+        try {
+
+            // If the admins is the client sending the request
+          if (auth.user.admin) {
+
+            // Delete the authentication token from the DB
+            await Database
+            .table('tokens')
+            .where('user_id', id)
+            .delete()
+    
+            // Delete the user from the DB
+            await Database
+            .table('users')
+            .where('id', id)
+            .delete()
+
+
+            // Add a successful message
+            msg = "User deleted"
+            type = "success"
+
+            // If the admin is not sending the request
+          } else {
+
+              // If the user is trying to remove himself
+            if (auth.user.id == id) {
+            // Delete the authentication token from the DB
+              await Database
+              .table('tokens')
+              .where('user_id', auth.user.id)
+              .delete()
+
+            // Delete the user from the DB
+              await Database
+              .table('users')
+              .where('id', auth.user.id)
+              .delete()
+
+            // Add a successful message
+              msg = "User deleted"
+              type = "success"
+            }
+          }
+        //   Send the response
+          response.send({type, msg})
+        } catch (error) {
+          Logger.error(error)
+        }
+      }
+
+    /**
      * Controller to create new users only if the admin
      * is sending the request
      * @param auth middleware provider for authentication
