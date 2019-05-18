@@ -1,4 +1,6 @@
-//using the infura.io node, otherwise ipfs requires you to run a daemon on your own computer/server. See IPFS.io docs
+// Using the infura.io node, otherwise ipfs requires you to run a daemon on your own computer/server.
+// IPFS docs: https://docs.ipfs.io/s
+// Infura.io docs: https://infura.io/docs/
 const IPFS = require('ipfs-http-client')
 const ipfs = new IPFS({
   host: 'ipfs.infura.io',
@@ -6,7 +8,7 @@ const ipfs = new IPFS({
   protocol: 'https'
 })
 
-//run with local daemon
+// Run with local daemon
 // const IPFS = require('ipfs-api');
 // const ipfs = new IPFS('localhost', '5001', {
 //   protocol: 'http'
