@@ -10,10 +10,13 @@ class UserController {
      * Controller to log out from the auth middleware
      * @param auth middleware provider for authentication
      */
-    async logout({auth}) {
+    async logout({auth, reponse}) {
         try {
           await auth.logout()
+          response.send({type:"info", msg:"Bye!"})
         } catch (error) {
+            Logger.error(error)
+            response.send({type:"error", msg:"We had an error logging you off"})
         }
       }
 
@@ -125,7 +128,7 @@ class UserController {
 
     /**
      * Controller to send a random nonce when users which
-     * are indentified in the DB send a request to log in
+     * are identified in the DB send a request to log in
      * @param auth middleware provider for authentication
      * @param request http request from the client
      * @param response http response from the server
@@ -134,7 +137,7 @@ class UserController {
     try {
     
     // Get the public ket from the client using the webln provider
-      const {public_key: publicKey} = request.all()
+      const {publicKey} = request.all()
 
     //  Create a random big integer  
       const nonce = Math.floor(Math.random() * 10000)
@@ -184,9 +187,12 @@ class UserController {
         user.nonce = nonce
         await user.save()
 
-        // Send the random nonce whihchh has bene just created to the user to sign it
+        msg = "Please, sign a random nonce generated randomly by us to verify your identity"
+        type = "info"
+
+        // Send the random nonce which has been just created to the user to sign it
         response.send({
-          nonce: user.nonce
+          nonce: user.nonce, msg, type
         })
       }
     } catch (error) {
