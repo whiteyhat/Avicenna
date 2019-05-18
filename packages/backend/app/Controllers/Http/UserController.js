@@ -156,7 +156,7 @@ class UserController {
         let msg = ""
         let type = ""
         const query = await Database.select('*').from('users')
-
+        let jwt = null
         // If there is no user in the DB, create a new user with admin permissions
         if (!query[0]) {
           const user = await User.create({
@@ -166,6 +166,7 @@ class UserController {
           })
 
         //   Create an auth token to remember the user
+        jwt = await auth.generate(user)
           await auth.remember(true).login(user)
 
         //   Add an info message in the response
@@ -179,7 +180,7 @@ class UserController {
         }
 
         // Send the response body
-        response.send({type,msg,nonce})
+        response.send({type,msg,nonce, jwt})
 
         // If a user was found in the DB replace the old nonce by a new random nonce to add
         // more security
@@ -222,6 +223,7 @@ class UserController {
     try {
         let msg = ""
         let type = ""
+        let jwt = null
     // Find the user by his public key
       const user = await User.findBy('public_key', publicKey)
 
@@ -232,6 +234,7 @@ class UserController {
       if (LightningService.verifyDigitalSignature(data)) {
 
         //   Create an auth token to login and remember the user
+        jwt = await auth.generate(user)
         await auth.remember(true).login(user)
 
         // Add an informative successful message
@@ -245,7 +248,7 @@ class UserController {
         msg = "We could not verify your digital signature"
         type = "error"
       }
-      response.send({type,msg})
+      response.send({type,msg, jwt})
     } catch (error) {
       Logger.error(error)
     }
