@@ -10,13 +10,13 @@ class UserController {
      * Controller to log out from the auth middleware
      * @param auth middleware provider for authentication
      */
-    async logout({auth, reponse}) {
+    async logout({auth, response}) {
         try {
           await auth.logout()
-          response.send({type:"info", msg:"Bye!"})
+          return response.send({type:"info", msg:"Bye!"})
         } catch (error) {
             Logger.error(error)
-            response.send({type:"error", msg:"We had an error logging you off"})
+            return response.send({type:"error", msg:"We had an error logging you off"})
         }
       }
 
