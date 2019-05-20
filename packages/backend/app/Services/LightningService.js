@@ -77,20 +77,25 @@ class LightningService {
       if (data.user.nonce) {
 
         // Replicate the message signature with the same random nonce signed by the client
-        const msg = 'I am signing my one-time nonce: ' + data.user.nonce
+        const message = 'I am signing a secret number ('+data.user.nonce+') to log in Satoshis.Games platform'
 
-        // Get the public key from the signed message and the signature 
-        // https://github.com/alexbosworth/ln-service/blob/master/verifyMessage.js
-        const publicKey = await lnService.verifyMessage(this.getLndInstance, msg, data.signature)
+        // const publicKey = await  lnService.verifyMessage(LndService.getLndInstance(), msg, data.signature)
 
+        return new Promise((resolve, reject) => {
+          
+          try {
+            lnService.verifyMessage({lnd: LndService.getLndInstance(), message, signature: data.signature}, (err, pubkey) => {                
 
-        // The signature verification is successful if the public key found with
-        // lnService.verifyMessage matches the initial public key
-        if (publicKey.toLowerCase() === data.user.publicKey.toLowerCase()) {
-          return true
-        } else {
-          return false
-        }
+              if (pubkey) {
+                resolve({
+                  pubkey
+                })
+              }
+            })
+          } catch (error) {
+            Logger.error(error)
+          }
+        });
       } else {
         return false
       }
