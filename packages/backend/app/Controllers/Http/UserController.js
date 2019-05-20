@@ -230,25 +230,30 @@ class UserController {
     // Create a data object with the user and the signature
       const data = {user,signature}
 
-    //   If the signature is verified
-      if (LightningService.verifyDigitalSignature(data)) {
+      await LightningService.verifyDigitalSignature(data).then(async function(result){
+        if (result.pubkey.signed_by.toLowerCase() === user.unique_key) {
 
-        //   Create an auth token to login and remember the user
-        jwt = await auth.generate(user)
-        await auth.remember(true).login(user)
+            // make sure other session are logged off
+            await auth.logout()
 
-        // Add an informative successful message
-        msg = "Welcomee back"
-        type = "info"
+            //   Create an auth token to login and remember the user
+            jwt = await auth.generate(user)
+            await auth.remember(true).login(user)
+            
+            // Add an informative successful message
+            msg = "Welcome back"
+            type = "success"
 
-        // If the signature fails the verification process
-      } else {
-    
-         // Add an error message
-        msg = "We could not verify your digital signature"
-        type = "error"
+            // send response with JWT auth token
+          return response.send({type,msg, jwt})
+        } else {
+            
+              // Add an error message
+            msg = "We could not verify your digital signature"
+            type = "error"
+            return response.send({type,msg})
       }
-      response.send({type,msg, jwt})
+    })
     } catch (error) {
       Logger.error(error)
     }
