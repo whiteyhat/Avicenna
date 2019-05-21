@@ -1,40 +1,56 @@
 import React from 'react'
+import Link from 'next/link';
 import Head from 'next/head'
-import Header from './header'
+import { Layout, Menu, Breadcrumb } from 'antd';
 
-const Layout = props => (
-  <React.Fragment>
-    <Head>
-      <title>Lightning Hackaton 2019</title>
-    </Head>
-    <style jsx global>{`
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-      }
 
-      body {
-        margin: 0;
-        color: #333;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          'Helvetica Neue', Arial, Noto Sans, sans-serif, 'Apple Color Emoji',
-          'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-      }
+class CustomLayout extends React.Component {
 
-      .container {
-        max-width: 65rem;
-        margin: 1.5rem auto;
-        padding-left: 1rem;
-        padding-right: 1rem;
-      }
-    `}</style>
-    <Header />
+  constructor(props){
+    super(props)
+  }
 
-    <main>
-      <div className='container'>{props.children}</div>
-    </main>
-  </React.Fragment>
-)
+  render() {
+    const { Header, Content, Footer } = Layout;
+    return (
+      <React.Fragment>
+        <Head>
+          <title>Lightning Hackaton 2019</title>
+        </Head>
 
-export default Layout
+        <Layout className="layout">
+          <Header>
+            <div className="logo" />
+            <Menu
+              theme="dark"
+              mode="horizontal"
+              defaultSelectedKeys={['2']}
+              style={{ lineHeight: '64px', textAlign: 'right' }}
+            >
+              <Menu.Item key="1"><Link href="/"><a>Home</a></Link></Menu.Item>
+              <Menu.Item key="2"><Link href="/create-passport"><a>Create passport</a></Link></Menu.Item>
+              <Menu.Item key="3"><Link href="/"><a>Logout</a></Link></Menu.Item>
+            </Menu>
+          </Header>
+          <Content style={{ padding: '0 50px' }}>
+            <Breadcrumb style={{ margin: '16px 0' }}>
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item>List</Breadcrumb.Item>
+              <Breadcrumb.Item>App</Breadcrumb.Item>
+            </Breadcrumb>
+            <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+              <main>
+                <div className='container'>{this.props.children}</div>
+              </main>
+            </div>
+          </Content>
+          <Footer style={{ textAlign: 'center' }}>Lightning Hackaton 2019</Footer>
+        </Layout>
+
+
+      </React.Fragment>
+    )
+  }
+}
+
+export default CustomLayout
