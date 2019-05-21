@@ -8,7 +8,6 @@ class PartOne extends React.Component {
     }
 
     normFile = e => {
-        console.log('Upload event:', e);
         if (Array.isArray(e)) {
             return e
         }
@@ -64,49 +63,8 @@ class PartOne extends React.Component {
                     )}
                 </Form.Item>
             </>
-
-            // <Scope path="details">
-            //     <div className="form-group row">
-            //         <label htmlFor="details.picture" className="col-sm-2 col-form-label">Patient Picture</label>
-            //         <Input name="picture" id="picture" type="file" />
-            //     </div>
-            //     <div className="form-group row">
-            //         <label htmlFor="details.dna" className="col-sm-2 col-form-label">DNA Sequence</label>
-            //         <Input className="form-control col-sm-10" name="dna" type="text" />
-            //     </div>
-            //     <div className="form-group row">
-            //         <label htmlFor="details.bloodType" className="col-sm-2 col-form-label">Blood Type</label>
-            //         <Input className="form-control col-sm-10" name="bloodType" type="text" />
-            //     </div>
-            //     <div className="form-group row">
-            //         <label htmlFor="details.fullName" className="col-sm-2 col-form-label">Full Name</label>
-            //         <Input className="form-control col-sm-10" name="fullName" type="text" />
-            //     </div>
-            //     <div className="form-group row">
-            //         <label htmlFor="details.birth" className="col-sm-2 col-form-label">Date of Birth</label>
-            //         <Input className="form-control col-sm-10" name="birth" type="date" />
-            //     </div>
-            //     <div className="form-group row">
-            //         <label htmlFor="details.sexe" className="col-sm-2 col-form-label">Sexe</label>
-            //         <Select className="form-control col-sm-10" name="sexe" options={this.getSexeValues()} />
-            //     </div>
-            // </Scope>
         )
     }
-
-    getSexeValues = () => {
-        return [
-            {
-                id: "male",
-                title: "Male"
-            },
-            {
-                id: "female",
-                title: "Female"
-            }
-        ];
-    }
-
 }
 
 export default PartOne
