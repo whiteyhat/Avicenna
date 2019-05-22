@@ -2,6 +2,7 @@ import React from 'react'
 import Layout from '../components/layout'
 import { Form, Steps, Button } from 'antd';
 import PartOne from '../components/create-passport/part-one'
+import PartTwo from '../components/create-passport/part-two'
 import 'antd/dist/antd.css'
 
 const Step = Steps.Step;
@@ -72,7 +73,7 @@ class CreatePassport extends React.Component {
                     </Steps>
                     <div className="steps-content">
                         <div style={{display: current == 0 ? '' : 'none'}}><PartOne form={this.props.form} /></div>
-                        <span style={{display: current == 1 ? '' : 'none'}}>Part two</span>
+                        <div style={{display: current == 1 ? '' : 'none'}}><PartTwo form={this.props.form} /></div>
                         <span style={{display: current == 2 ? '' : 'none'}}>Part two</span>
                         <span style={{display: current == 3 ? '' : 'none'}}>Part two</span>
                     </div>
