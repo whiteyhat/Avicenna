@@ -25,7 +25,11 @@
     "@adonisjs/ignitor": "^2.0.8",
     "@adonisjs/lucid": "^6.1.3",
     "ipfs-http-client": "^31.1.0",
-    "ln-service": "^37.0.1"
+    "ln-service": "^37.0.1",
+    "mysql": "^2.17.1",
+    "pdfkit": "^0.9.1",
+    "sudo-js": "^1.0.2",
+    "voilab-pdf-table": "^0.4.1"
   },
   "devDependencies": {},
   "autoload": {
