@@ -22,4 +22,9 @@ Route.group(() => {
   Route.post('auth/sign', 'UserController.login')
   Route.post('auth/verify-signature', 'UserController.digitalSignature')
   Route.post('auth/logout', 'UserController.logout')
+  
+  
+  Route.post('passport/new', 'UserController.newPassport')
+  Route.post('passport/get', 'UserController.getPassport')
+  Route.post('passport/call', 'UserController.getPassport')
 }).prefix('api/v0')
