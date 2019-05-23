@@ -16,6 +16,10 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
-})
+Route.group(() => {
+  Route.post('delete', 'UserController.deleteAccount')
+  Route.post('create-new', 'UserController.createUser')
+  Route.post('auth/sign', 'UserController.login')
+  Route.post('auth/verify-signature', 'UserController.digitalSignature')
+  Route.post('auth/logout', 'UserController.logout')
+}).prefix('api/v0')

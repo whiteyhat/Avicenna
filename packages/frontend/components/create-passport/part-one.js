@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Icon, Input, Upload, Radio, Button } from 'antd';
+import { Form, Icon, Input, Upload, Radio, Button } from 'antd'
 
 class PartOne extends React.Component {
 
@@ -15,7 +15,7 @@ class PartOne extends React.Component {
     }
 
     render() {
-        const { getFieldDecorator } = this.props.form;
+        const { getFieldDecorator } = this.props.form
         return (
             <>
                 <Form.Item label="Patient picture">
