@@ -1,11 +1,11 @@
 import React from 'react'
 import Layout from '../components/layout'
-import { Form, Steps, Button } from 'antd';
+import { Form, Steps, Button } from 'antd'
 import PartOne from '../components/create-passport/part-one'
-import PartTwo from '../components/create-passport/part-two'
+import PartTwo from '../components/create-passport/part-two/part-two'
 import 'antd/dist/antd.css'
 
-const Step = Steps.Step;
+const Step = Steps.Step
 
 
 
@@ -19,23 +19,23 @@ class CreatePassport extends React.Component {
     }
 
     next() {
-        const current = this.state.current + 1;
-        this.setState({ current });
+        const current = this.state.current + 1
+        this.setState({ current })
     }
 
     prev() {
-        const current = this.state.current - 1;
-        this.setState({ current });
+        const current = this.state.current - 1
+        this.setState({ current })
     }
 
     handleSubmit = e => {
-        e.preventDefault();
+        e.preventDefault()
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                console.log('Received values of form: ', values)
             }
-        });
-    };
+        })
+    }
 
     render() {
         const formItemLayout = {
@@ -62,7 +62,7 @@ class CreatePassport extends React.Component {
             {
                 title: 'Create passport',
             }
-        ];
+        ]
         return (
             <Layout>
                 <Form {...formItemLayout} onSubmit={this.handleSubmit}>
@@ -71,7 +71,7 @@ class CreatePassport extends React.Component {
                             <Step key={item.title} title={item.title} />
                         ))}
                     </Steps>
-                    <div className="steps-content">
+                    <div className="steps-content" style={{ marginTop: '30px'}}>
                         <div style={{display: current == 0 ? '' : 'none'}}><PartOne form={this.props.form} /></div>
                         <div style={{display: current == 1 ? '' : 'none'}}><PartTwo form={this.props.form} /></div>
                         <span style={{display: current == 2 ? '' : 'none'}}>Part two</span>
@@ -101,9 +101,9 @@ class CreatePassport extends React.Component {
 
     componentDidMount() {
         // To disabled submit button at the beginning.
-        this.props.form.validateFields();
+        this.props.form.validateFields()
     }
 
 }
-const CreatePassportForm = Form.create({ name: 'create-passport' })(CreatePassport);
+const CreatePassportForm = Form.create({ name: 'create-passport' })(CreatePassport)
 export default CreatePassportForm

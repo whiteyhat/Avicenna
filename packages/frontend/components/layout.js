@@ -1,7 +1,7 @@
 import React from 'react'
-import Link from 'next/link';
+import Link from 'next/link'
 import Head from 'next/head'
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu, Breadcrumb } from 'antd'
 
 
 class CustomLayout extends React.Component {
@@ -11,7 +11,7 @@ class CustomLayout extends React.Component {
   }
 
   render() {
-    const { Header, Content, Footer } = Layout;
+    const { Header, Content, Footer } = Layout
     return (
       <React.Fragment>
         <Head>
