@@ -8,5 +8,8 @@
   },
   "devDependencies": {
     "lerna": "^3.14.1"
+  },
+  "dependencies": {
+    "axios": "^0.18.0"
   }
 }
