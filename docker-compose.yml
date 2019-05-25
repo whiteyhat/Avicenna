@@ -1,0 +1,25 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - database:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${DB_ALLOW_EMPTY_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+  web:
+    build: .
+    ports:
+      - "3333:3333"
+    restart: always
+    volumes:
+      - ./:/app
+    depends_on:
+      - mysql
+volumes:
+  database:
+    driver: "local"
