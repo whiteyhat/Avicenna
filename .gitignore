@@ -1,3 +1,20 @@
-node_modules/
+# Node modules
+node_modules
 package-lock.json
-packages/frontend/next.config.js
+
+# Adonis directory for storing tmp files
+tmp
+
+# Environment variables, never commit this file
+.env
+
+# The development sqlite file
+database/development.sqlite
+
+# VSCode & Webstorm history directories
+.history
+.idea
+.DS_Store
+*.pdf
+.vscode/
+.editorconfig
