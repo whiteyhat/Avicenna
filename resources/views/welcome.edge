@@ -1,0 +1,256 @@
+@layout('layouts.master')
+@section('content')
+@section('css')
+{{style('css/init')}}
+@endsection
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+</script>
+<div class="row jumbotron">
+  <div class="col-md-6">
+    <center>
+      <img src="/img/logo.png" alt="" style="width:35%; margin:4%">
+    </center>
+  </div>
+  <div class="col-md-6">
+    <h1>Welcome to Avicenna!</h1>
+    <p>Avicenna is an open, peer-to-peer and offline healthcare system backed by a distributed infrastructure
+      that solves frontline problems in healthcare for societies with limited resources by making use of Distributed
+      Ledger Technologies
+      (DLT's). </p>
+
+    <p> This project is presented in the Buidl Boston Hackathon.</p>
+    <p><a href="https://github.com/whiteyhat/Avicenna/wiki" class="btn btn-primary btn-lg" role="button" target="_blank">Learn more</a></p>
+
+  </div>
+</div>
+<div id="content" class="container">
+
+<br><br><br>
+  <div class="row">
+    <center>
+        <h1 style="font-size:50px; color:black">How it works?</h1>
+      <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+          <img style="margin: 20%" src="/img/offline.svg" alt="...">
+          <div class="caption">
+            <p>Digitize Health-care facilities allowing
+              notes to be recorded electronically - improving
+              quality, and reducing reliance on paper notes.</p>
+            <h1 style="font-size:80px">1</h1>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+          <img style="margin: 20%"src="/img/encryption.svg" alt="...">
+          <div class="caption">
+            <p>Create medical records to 
+              store sensitive data securely linked to  
+              a self-sovereign identity for patients based on the 
+              Ethereum Public Ledger  
+            </p>
+            <h1 style="font-size:80px">2</h1>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+          <img style="margin: 20%" src="/img/phone.svg" alt="...">
+          <div class="caption">
+            <p>Give every patient their own encrypted health
+                ‘passport’ that they can access offline from
+                any health-care facility in the network.</p>
+                <h1 style="font-size:80px">3</h1>
+              </div>
+        </div>
+      </div>
+  </div>
+  </center>
+
+</div>
+<br>
+  <div id="why-content" class=" no-padding lib-item" data-category="view">
+      <br><br>
+      <div class="lib-panel">
+          <div class="row box-shadow">
+              <div class="col-md-6">
+                  <img class="lib-img-show" src="https://images.unsplash.com/photo-1554796104-5c39d0551b52?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1301&q=80">
+              </div>
+              <div class="col-md-6">
+                  <div class="lib-row lib-header">
+                      <h1>Why Avicenna can bring high quality healthcare at no cost?</h1>
+                      <div class="lib-header-seperator"></div>
+                  </div>
+                  <div class="lib-row lib-desc">
+                      <p> More than 700 million people, or 11% of the world population, still live in extreme poverty and is struggling to fulfil the most basic needs such as education or health. Access to good health and well-being is a human right, and that is why Avicenna offers a new chance to ensure that everyone can access the highest standards of health and health care—not just the wealthiest.</p>
+
+                      <p>Avicenna provides a low cost, distributed technology able to aid in diagnosing patient illnesses based on past history and the patients’ complete health information. Medical records can also be created and updated to provide the last known information to the provider at the point of care. Avicenna provides a unique certification system to ensure each actual medical record is authentic, immutable and unhackable.</p>
+                      
+                      <p>Different from other Electronic Healthcare Records (EHR), Avicenna uses a hybrid mechanism to be able to work in communities with low technology or internet access. A typical patient’s medical record usually encompasses hundreds of pages and might even run into the thousands in the most extreme cases.</p>
+                      
+                      <p>Health-care facilities using Avicenna are able to generate a modular passport to patients or legal guardians to encompass identity, medical records and prescription in a single unfakable document developed by smart contracts and distributed technology.</p>       
+                    
+                      <legend></legend>
+                      <h3>Insight of a specific case | Paper Records</h3>
+                      <p>The Lebanese Association of the Order of Malta (LAKM) is the primary health provider via 4 mobile clinics for more than 200,000 individuals, including up to 40,000 in Akkar. The large majority of users (95%) are Syrian refugees, a disadvantaged and vulnerable group with highly complex medical and psychological needs - but have limited medical documentation. This makes it challenging for camp volunteers to provide the best possible care. The service faces several operational challenges:</p>
+                        <ul>
+                      <li style="font-size: 18px;"> Patients with complex medical needs.</li>
+                      <li style="font-size: 18px;"> Reliance on paper records.</li>
+                      <li style="font-size: 18px;"> Difficult to monitor clinical activity, expenses, and produce reports</li>
+                    </ul>
+                      <p> Paper records are only able to capture very limited clinical information. This factor slow the clinics down and impact the quality of care they are able to provide. Low-resolution data also affects the Order of Malta’s ability to track clinic activity, costs, and demands on the service. When data are transcribed, the information is grouped into broad categories only.</p>
+                    <p><b>Avicenna radically overcomes</b> all of the issues from the curent system based on paper records.</p>
+                    </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div id="features-content" class="container">
+      <br><br>
+      <div class="row">
+        <center>
+            <h1 style="font-size:50px; color:black">Features</h1>
+          <div title="Avicenna passport grants accurate, up-to-date, and complete information about patients or legal guardians at the point of care" data-placement="top" data-toggle="tooltip" class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+              <br><img style="height:200px" src="/img/passport.svg" alt="...">
+              <div class="caption">
+                  <h2>E-Medical Records</h2>
+              </div>
+            </div>
+          </div>
+          <div title="Avicenna passport produces a blockchain certification of the patient's data that can be proven using the Ethereum Public Ledger through the passport validation guidelines" data-placement="top" data-toggle="tooltip" class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+              <br><img style="height:200px" src="/img/data.svg" alt="...">
+              <div class="caption">
+                  <h2>Blockchain certification</h2>
+              </div>
+            </div>
+          </div>
+          <div title="Avicenna passport provides an self-sovereign identity module based on the Avicenna smart contract where patients or legal guardians can have access to a self-sovereign identity built on top of the Ethereum Public Ledger" data-placement="top" data-toggle="tooltip" class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+              <br><img style="height:200px" style="height:20%" src="/img/id.svg" alt="...">
+              <div class="caption">
+                  <h2>Self-Sovereign Identity</h2>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="row">
+          <center>
+              <div title="Avicenna passport contains a health-care program implemented by a physician or other qualified health care practitioner in the form of detailed instructions that govern the plan of care for an individual patient" data-placement="bottom" data-toggle="tooltip" class="col-sm-6 col-md-4">
+                  <div class="thumbnail">
+                    <br><img style="height:200px" src="/img/medicine.svg" alt="...">
+                    <div class="caption">
+                        <h2>Medical prescription</h2>
+                    </div>
+                  </div>
+                </div>
+            <div title="Avicenna passport is designed by core to in environments with low internet access or technological infrastructure. Healthcare practitioners can print in a paper the QR code of the encrypted passport where can be accessible offline" data-placement="bottom" data-toggle="tooltip" class="col-sm-6 col-md-4">
+              <div class="thumbnail">
+                <br><img style="height:200px" src="/img/wallet.svg" alt="...">
+                <div class="caption">
+                    <h2>Offline access </h2>
+                </div>
+              </div>
+            </div>
+            <div title="Avicenna passport is first encrypted and uploaded to IPFS. Then, from IPFS is encapsulated into a smart contract to remain immutable, safe and prove its authenticity using the passport validation guidelines" data-placement="bottom" data-toggle="tooltip" class="col-sm-6 col-md-4">
+              <div class="thumbnail">
+                <br><img style="height:200px" src="/img/security.svg" alt="...">
+                <div class="caption">
+                  <h2>Immutable - Encrypted</h2>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <p style="color:gray; font-size:18px"><i> 
+            Ensuring healthy lives and promoting wellbeing for all at all ages is important to building prosperous societies. 
+            However, despite great strides in improving people's health and wellbeing in recent years, inequalities in healthcare access still persist. 
+            Avicenna is designed by core to overcome such inequalities by providing a high quality healt-care management system at a minimum cost.
+        </i></p>
+      </center>
+    
+      <br>
+  </div>
+  <div id="demo-content" class="container">
+      <br><br>
+      <center>
+      <div class="row">
+            <h1 style="font-size:50px; color:black">Try a Demo</h1>
+            <br>
+            <div class="row row-margin-bottom">
+                <div class="col-md-5 no-padding lib-item" data-category="view">
+                    <div class="lib-panel">
+                        <div class="row box-shadow">
+                            <div class="col-md-6">
+                                <img class="lib-img-show" src="img/doctor.svg">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="lib-row lib-header">
+                                    <h3>Doctor</h3>
+                                    <div class="lib-header-seperator"></div>
+                                    <ul>
+                                      <li style="font-size:13px">Generate Passports</li>
+                                      <li style="font-size:13px">Review Passports validation guidelines</li>
+                                      <li style="font-size:13px">View other qualified staff</li>
+                                      <li style="font-size:13px">Update doctor profile</li>
+                                    </ul>
+                                </div>
+                                <div title="Start demo as a doctor user" data-placement="bottom" data-toggle="tooltip" class="lib-row lib-desc">
+                                    <div class="lib-header-seperator"></div>
+                                    <button id="start-doctor" class="btn btn-primary" style="width:100%">START <i style="display:none" id="doctor-loader" class="fa fa-spinner fa-spin"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-5 no-padding lib-item" data-category="ui">
+                    <div class="lib-panel">
+                        <div class="row box-shadow">
+                            <div class="col-md-6">
+                                <img class="lib-img" src="img/admin.svg">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="lib-row lib-header">
+                                    <h3>Admin</h3>
+                                    <div class="lib-header-seperator"></div>
+                                </div>
+                                <ul>
+                                    <li style="font-size:13px">Add users</li>
+                                    <li style="font-size:13px">Delete users</li>
+                                    <li style="font-size:13px">Review users</li>
+                                    <li style="font-size:13px">Review Passports validation guidelines</li>
+                                    <li style="font-size:13px">Deploy Smart Contract</li>
+                                  </ul>
+                                <div title="Start demo as an admin user" data-placement="bottom" data-toggle="tooltip" class="lib-row lib-desc">
+                                  <div class="lib-header-seperator"></div>
+                                  <button id="start-admin" class="btn btn-primary" style="width:100%">START <i style="display:none" id="admin-loader" class="fa fa-circle-o-notch fa-spin"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </center>
+  </div>
+  
+
+<script>
+  $(document).ready(function () {
+        //Wizard
+        $('#learnMore').click(function() {
+
+          $('html, body').animate({
+            scrollTop: $("#content").offset().top
+          }, 1500);
+        });
+
+      });
+    
+</script>
+@endsection
