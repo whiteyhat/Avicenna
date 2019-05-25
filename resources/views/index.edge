@@ -1,0 +1,694 @@
+@layout('layouts.master')
+@section('css')
+{{style('css/tab')}}
+@endsection
+@section('content')
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+</script>
+<div class="container" style="margin-top:2%">
+  <div class="row">
+    <section>
+      <div class="wizard">
+        <div class="wizard-inner">
+          <div class="connecting-line"></div>
+          <ul class="nav nav-tabs" role="tablist">
+
+            <li role="presentation" class="active">
+              <a href="#step1" data-toggle="tab" aria-controls="step1" role="tab" title="Patient Details">
+                <span class="round-tab">
+                  <i class="fas fa-user"></i> </span>
+              </a>
+            </li>
+
+            <li role="presentation" class="disabled">
+              <a href="#step2" data-toggle="tab" aria-controls="step2" role="tab" title="Patient Report">
+                <span class="round-tab">
+                  <i class="fas fa-notes-medical"></i> </span>
+              </a>
+            </li>
+            <li role="presentation" class="disabled">
+              <a href="#step3" data-toggle="tab" aria-controls="step3" role="tab" title="Medications">
+                <span class="round-tab">
+                  <i class="fas fa-pills"></i> </span>
+              </a>
+            </li>
+
+            <li role="presentation" class="disabled">
+              <a href="#complete" data-toggle="tab" aria-controls="complete" role="tab" title="Create Passport">
+                <span class="round-tab">
+                  <i class="fas fa-passport"></i> </span>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+
+        <form role="form">
+          <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="step1">
+              <center>
+                @if(!auth.user.name)
+                <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your full name in your <a href='/profile'>profile</a></div>
+                @elseif(!auth.user.email)
+                              <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your email in your <a href='/profile'>profile</a></div>
+  
+                @elseif(!auth.user.clinic)
+                               <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your clinic in your <a href='/profile'>profile</a></div>
+  
+                @elseif(!auth.user.phone)
+                               <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your phone number in your <a href='/profile'>profile</a></div>
+  
+                @elseif(!auth.user.address)
+                              <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your clinic address in your <a href='/profile'>profile</a></div>
+  
+                @elseif(!auth.user.role)
+                              <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your clinic role in your <a href='/profile'>profile</a></div>
+  
+                @endif
+              </center>
+              <h3>PATIENT DETAILS </h3>
+
+              <div class="form-group row">
+                  <label for="inputEmail3" class="col-sm-2 col-form-label">Patient Picture</label>
+                  <div class="col-sm-10">
+                      <input id="changePicture" type="file"><br>
+                      <img style="display:none" id="userPic" src="" height="200" alt="Patient Picture">                  
+                    </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputEmail3" class="col-sm-2 col-form-label">DNA Sequence</label>
+                  <div class="col-sm-10">
+                    <input type="name" class="form-control" id="DNA" placeholder="DNA Sequence">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputEmail3" class="col-sm-2 col-form-label">Blood Type</label>
+                  <div class="col-sm-10">
+                    <input type="name" class="form-control" id="blood" placeholder="Blood Type">
+                  </div>
+                </div>
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Full Name</label>
+                <div class="col-sm-10">
+                  <input type="name" class="form-control" id="name" placeholder="Patient Full Name">
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Date of Birth</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" id="dob" placeholder="DD/MM/YYYY">
+                </div>
+              </div>
+
+              <div class="form-group row">
+
+              <div class="col-md-2">
+                  <label class="checkbox"><input class="required" type="checkbox" name="male" id="male" value="Male" />Male</label>
+                  <label class="checkbox"><input class="required" type="checkbox" name="female" id="female" value="Male" />Female</label>
+              </div>
+            </div>
+
+              <br>
+
+              <ul class="list-inline pull-right">
+                @if(!auth.user.name)
+                <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
+                    continue</button></li>
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your full name in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.email)
+                <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
+                    continue</button></li>
+
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your email in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.clinic)
+                <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
+                    continue</button></li>
+
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your clinic name in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.phone)
+                <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
+                    continue</button></li>
+
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your phone number in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.address)
+                <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
+                    continue</button></li>
+
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your clinic full address in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.role)
+                <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
+                    continue</button></li>
+
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your clinic role in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @else
+                <li><button id="save1" type="button" class="btn btn-primary next-step">Save and continue</button></li>
+                @endif
+              </ul>
+            </div>
+            <div class="tab-pane" role="tabpanel" id="step2">
+              <h3>PATIENT REPORT </h3>
+              <div id="conditionblock" class="form-group row"></div>
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Condition</label>
+                <div class="col-sm-10">
+                  <select id="condition" class="custom-select">
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Recurrance">Recurrance</option>
+                    <option value="Remission">Remission</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Year</label>
+                <div class="col-sm-10">
+                  <input id="year" type="date" class="form-control" id="inputEmail3" placeholder="Eg: 2015">
+                </div>
+              </div>
+              <div class="form-group container-fluid">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1" class="text-muted">Additional Notes</label>
+                  <textarea class="form-control" placeholder="(Optional)" id="condition-notes" rows="3"></textarea>
+                </div>
+              </div>
+              <center><button id="add-condition" type="button" style="width:90%" class="btn btn-success">ADD</button>
+              </center>
+              <br>
+              <legend></legend>
+              <H3>ALLERGIES</H3>
+              
+              <div id="allergyblock" class="form-group row"></div>
+              <div class="form-group row">
+                <label for="Allergy" class="col-sm-2 col-form-label">Allergy</label>
+                <div class="col-sm-10">
+                  <input type="allergy" class="form-control" id="allergy-name" placeholder="Allergy name">
+                </div>
+              </div>
+              <label class="checkbox"><input type="checkbox" name="risk" id="risk" />High Risk</label>
+
+
+
+              <div class="form-group container-fluid">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1" class="text-muted">Additional Notes</label>
+                  <textarea class="form-control" id="allergy-notes" rows="3"></textarea>
+                </div>
+              </div>
+              <center><button id="add-allergy" type="button" style="width:90%" class="btn btn-success">ADD</button>
+              </center>
+              <br>
+              <legend></legend>
+              <h3>IMMUNISATIONS</h3>
+              <div id="immunisationblock" class="form-group row"></div>
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Add Immunisation</label>
+                <div class="col-sm-10">
+                  <input type="immunisation" class="form-control" id="immunisation-name" placeholder="Eg: Vaccine">
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="immunisation-date" class="col-sm-2 col-form-label">Date</label>
+                <div class="col-sm-10">
+                  <input id="immunisation-date" type="date" class="form-control" id="inputPassword3"
+                    placeholder="2018">
+                </div>
+              </div>
+              <center><button id="add-immunisation" type="button" style="width:90%" class="btn btn-success">ADD</button>
+              </center>
+              <br>
+              <legend></legend>
+
+              <h3>SOCIAL HISTORY</h3>
+              <div class="row">
+                <div class="col-md-2 col-md-offset-1">
+                  <h6>Mobility</h6>
+                  <div class="row container-fluid ">
+                    <form>
+                      <div class="col">
+                        <input class="form-check-input" type="radio" name="gridRadios" id="mobility-independent"
+                          value="Independent" checked>
+                        <label class="form-check-label" for="gridRadios1">
+                          Independent
+                        </label>
+                      </div>
+                      <div class="col">
+                        <input class="form-check-input" type="radio" name="gridRadios" id="mobility-stick"
+                          value="Walking Stick">
+                        <label class="form-check-label" for="gridRadios1">
+                          Walking Stick
+                        </label>
+                      </div>
+                      <div class="col">
+                        <input class="form-check-input" type="radio" name="gridRadios" id="mobility-frame"
+                          value="Frame">
+                        <label class="form-check-label" for="gridRadios1">
+                          Frame
+                        </label>
+                      </div>
+                      <div class="col">
+                        <input class="form-check-input" type="radio" name="gridRadios" id="mobility-wheelchair"
+                          value="Wheelchair">
+                        <label class="form-check-label" for="gridRadios1">
+                          Wheelchair
+                        </label>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <h6>Eating & Drinking</h6>
+                  <form id="formi">
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="eating-independent"
+                        value="independent" checked>
+                      <label class="form-check-label" for="gridRadios1">
+                        Independent
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="eating-help" value="some help">
+                      <label class="form-check-label" for="gridRadios1">
+                        Some Help
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="eating-dependent"
+                        value="dependent">
+                      <label class="form-check-label" for="gridRadios1">
+                        Dependent
+                      </label>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-md-2">
+                  <h6>Dressing</h6>
+                  <form>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="dressing-independent"
+                        value="independent" checked>
+                      <label class="form-check-label" for="gridRadios1">
+                        Independent
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="dressing-help"
+                        value="some help">
+                      <label class="form-check-label" for="gridRadios1">
+                        Some Help
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="dressing-dependent"
+                        value="dependent">
+                      <label class="form-check-label" for="gridRadios1">
+                        Dependent
+                      </label>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-md-2">
+                  <h6>Toileting</h6>
+                  <form>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="toileting-independent"
+                        value="independent" checked>
+                      <label class="form-check-label" for="gridRadios1">
+                        Independent
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="toileting-help"
+                        value="some help">
+                      <label class="form-check-label" for="gridRadios1">
+                        Some Help
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="toileting-dependent"
+                        value="dependent">
+                      <label class="form-check-label" for="gridRadios1">
+                        Dependent
+                      </label>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-md-2">
+                  <h6>Washing</h6>
+                  <form>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="washing-independent"
+                        value="independent" checked>
+                      <label class="form-check-label" for="gridRadios1">
+                        Independent
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="washing-help"
+                        value="some help">
+                      <label class="form-check-label" for="gridRadios1">
+                        Some Help
+                      </label>
+                    </div>
+                    <div class="col">
+                      <input class="form-check-input" type="radio" name="gridRadios" id="washing-dependent"
+                        value="dependent">
+                      <label class="form-check-label" for="gridRadios1">
+                        Dependent
+                      </label>
+                    </div>
+                  </form>
+                </div>
+                <br>
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlTextarea1" class="text-muted">Notes on functions and activies</label>
+                <textarea class="form-control" id="social-activity" rows="3"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="exampleFormControlTextarea1" class="text-muted">Behaviour</label>
+                <textarea class="form-control" id="social-behaviour" rows="3"></textarea>
+              </div>
+              <ul class="list-inline pull-right">
+                <li><button type="button" class="btn btn-default prev-step">Previous</button></li>
+                <li><button id="save2" type="button" class="btn btn-primary next-step">Save and continue</button></li>
+              </ul>
+            </div>
+            <legend></legend>
+            <br>
+            <div class="tab-pane" role="tabpanel" id="step3">
+              <h3>MEDICATIONS</h3>
+              <div id="medicationblock" class="form-group row"></div>
+              <div class="form-group row">
+                <div class="col-sm-6">
+                  <div class="col-sm-10">
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-addon" id="sizing-addon1">Medication</span>
+                      <input id="medication-name" type="text" id="medication-name" class="form-control" placeholder="Eg: Insulin"
+                        aria-describedby="sizing-addon1">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="col-sm-10">
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-addon" id="sizing-addon1">dose</span>
+                      <input id="medication-dose" type="text"  class="form-control" placeholder="Eg: 2gr."
+                        aria-describedby="sizing-addon1">
+                    </div>
+                  </div>
+                </div>
+                <br><br><br>
+                <div class="row">
+                  <center>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="monday" value="Monday">Monday
+                    </label>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="tuesday" value="Tuesday">Tuesday
+                    </label>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="wednesday" value="Wednesday">Wednesday
+                    </label>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="thursday" value="Thursday">Thursday
+                    </label>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="friday" value="Friday">Friday
+                    </label>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="saturday" value="Saturday">Saturday
+                    </label>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" id="sunday" value="Sunday">Sunday
+                    </label>
+                  </center>
+                </div>
+              </div>
+              <br>
+              <h3>Care Plan</h3>
+              <div class="form-group container-fluid">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1" class="text-muted">Plan Description</label>
+                  <textarea class="form-control" id="medication-plan" rows="3"></textarea>
+                </div>
+              </div>
+              <center><button id="add-medication" type="button" style="width:90%" class="btn btn-success">ADD</button>
+              <legend>                <br>
+              </legend>
+              <ul class="list-inline pull-right">
+                <li><button type="button" class="btn btn-default prev-step">Previous</button></li>
+                <li><button id="save3" type="button" class="btn btn-primary next-step">Save and continue</button></li>
+              </ul>
+            </div>
+            <div class="tab-pane" role="tabpanel" id="complete">
+
+              <div style="display:none" id="passportView">
+                <div class="container">
+                  <div class="row">
+                    <center>
+                      <a id="linkQR" href=""><img id="passportQR" src="" alt="Passport"></a>
+                    </center>
+                    <br>
+                  </div>
+                  <center>
+                    <div class="row">
+                      <a id="downloadQrCode" class="btn btn-success" href=""
+                        title="Print Passport for patient or legal guardian" data-placement="left"
+                        data-toggle="tooltip"><i class="far fa-save"></i> Download Passport</a>
+                      <a id="viewQR" class="btn btn-primary" href="" title="This link self-destructs itself in 60 sec. If deleted, click on the QR code"
+                        data-placement="right" data-toggle="tooltip"><i class="far fa-eye"></i> View Passport</a>
+                    </div>
+                  </center>
+                </div>
+              </div>
+
+              <div style="display:none" id="loader">
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <center>
+                        <h1 style="font-size:35px">1</h1>
+                        <h3 style="color:gray"> Uploading Passport to IPFS</h3>
+                        <img id="loader1" style="height:200px" src="img/loading.gif" alt="loading...">
+                        <img id="valid1" style="height:200px; display:none" src="img/check.gif" alt="loading...">
+                      </center>
+                    </div>
+                    <div class="col-md-4">
+                      <center>
+                        <h1 style="font-size:35px"> 2</h1>
+                        <h3 style="color:gray"> Linking IPFS to Ethereum </h3>
+                        <img id="loader2" style="height:200px" src="img/loading.gif" alt="loading...">
+                        <img id="valid2" style="height:200px; display:none" src="img/check.gif" alt="loading...">
+                      </center>
+                    </div>
+                    <div class="col-md-4">
+                      <center>
+                        <h1 style="font-size:35px">3</h1>
+                        <h3 style="color:gray"> Downloading Passport </h3>
+                        <img id="loader3" style="height:200px" src="img/loading.gif" alt="loading...">
+                        <img id="valid3" style="height:200px; display:none" src="img/check.gif" alt="loading...">
+                      </center>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="createPass">
+
+
+                <h3>CREATE PASSPORT</h3>
+                <div class="controls">
+                  <label class="checkbox">
+                    <input class="required" type="checkbox" name="reg1"
+                      value="I confirm that this data is legitimately approved by me." />I confirm that this data is
+                    legitimately approved by me.
+                  </label>
+                  <label class="checkbox">
+
+                    <input class="required" type="checkbox" name="reg2"
+                      value="I confirm that the patient or legal guardian has added a password to encryrpt this data." />
+                    I confirm that the patient or legal guardian has added a password to encryrpt this data.
+                  </label>
+
+                  <label class="checkbox">
+
+                    <input type="checkbox" name="reg3"
+                      value="I confirm that the patient or legal guardian has added a password to encryrpt this data." />
+                    I agree to add my email and phone number to the passport in case of emergency.
+                  </label>
+
+                </div>
+                <p>When you have finished entering data, allow the patient to type a password to encrypt his/her medical
+                  passport.
+                  Then press 'Create Passport'. You will have to sign with your keys the patient data using a <a
+                    href="https://blockchainhub.net/web3-decentralized-web/">Web3 provider.</a> </p>
+                <div class="row">
+                  <div class="input-group input-group-lg">
+                    <span class="input-group-addon" id="sizing-addon1"><i class="fas fa-lock"></i></span>
+                    <input type="password" id="encryptPassword" name="encryptPassword" class="form-control"
+                      placeholder="Let the patient type a password to encrypt the passport"
+                      aria-describedby="sizing-addon1">
+                  </div>
+                </div>
+                <br>
+                @if(!auth.user.name)
+                <button onclick="warning()" type="button" style="width:100%" class="btn btn-success">Create
+                  Passport</button>
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your full name in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.email)
+                <button onclick="warning()" type="button" style="width:100%" class="btn btn-success">Create
+                  Passport</button>
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your email in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.clinic)
+                <button onclick="warning()" type="button" style="width:100%" class="btn btn-success">Create
+                  Passport</button>
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your clinic name in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.phone)
+                <button onclick="warning()" type="button" style="width:100%" class="btn btn-success">Create
+                  Passport</button>
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your phone number in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.address)
+                <button onclick="warning()" type="button" style="width:100%" class="btn btn-success">Create
+                  Passport</button>
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your clinic full address in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @elseif(!auth.user.role)
+                <button onclick="warning()" type="button" style="width:100%" class="btn btn-success">Create
+                  Passport</button>
+
+                <script>
+                  function warning() {
+                    toast("warning",
+                      "Please, add your clinic role in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
+                    )
+                  }
+
+                </script>
+                @else
+                <button id="save4" type="button" style="width:100%" class="btn btn-success">Create Passport</button>
+                @endif
+                <br><br>
+
+                <p class="text-muted">The accuracy of this record is the responsibility of the person and institution
+                  entering the data.
+
+                  All data is is owned by the patient or legal guardian, who must keep the password to unencrypt his/her
+                  data. Once unencrypted, this passport can only be accessed via the QR code, or the associated link.
+                </p>
+
+              </div>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+      </div>
+      </form>
+  </div>
+  </section>
+</div>
+
+<input type="hidden" name="doctorName" value={{auth.user.name}}>
+<input type="hidden" name="doctorRole" value={{auth.user.role}}>
+<input type="hidden" name="doctorClinic" value={{auth.user.clinic}}>
+<input type="hidden" name="doctorPhone" value={{auth.user.phone}}>
+<input type="hidden" name="doctorClinicAddress" value={{auth.user.address}}>
+<input type="hidden" name="doctorEmail" value={{auth.user.email}}>
+
+</div>
+{{ script('js/bundle.js') }}
+@endsection
