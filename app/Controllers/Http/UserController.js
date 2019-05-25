@@ -83,49 +83,6 @@ class UserController {
         }
       }
 
-    /**
-     * Controller to create new users only if the admin
-     * is sending the request
-     * @param auth middleware provider for authentication
-     * @param request http request from the client
-     * @param response http response from the server
-     */
-  async createUser({auth,request,response}) {
-
-    try {
-    // get thee public key from the webln providre
-      const {wallet} = request.all()
-      let msg = ""
-      let type = ""
-    //   if the user is an admin, allow the creation of new users
-      if (auth.user.admin) {
-        const nonce = Math.floor(Math.random() * 10000)
-        const user = await User.create({
-          wallet: wallet.toLowerCase(),
-          nonce
-        })
-        // if the user is successfully created add a success response
-        if (user) {
-          msg = "New user added"
-          type = "success"
-        } else {
-        // if the user is not created add an unsuccesssful response
-          msg = "There was an error when adding a new user"
-          type = "error"
-        }
-      } else {
-        // if the user is not an admin, add an error message 
-        msg = "You do not have the permission to create"
-        type = "error"
-      }
-
-    //   send response
-      response.send({type,msg})
-    } catch (error) {
-      Logger.error(error)
-    }
-  }
-
 
   async demoAdmin({auth, request, response}) {
     
