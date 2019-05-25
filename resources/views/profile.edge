@@ -1,0 +1,203 @@
+@layout('layouts.master')
+@section('content')
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="css/users.css">
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+</script>
+<div class="container" style="margin-top:15%">
+  <div class="row">
+    <center>
+      <img src="https://avatars.dicebear.com/v2/jdenticon/{{user.wallet}}.svg" class="avatar" alt="Avatar"
+        style="height:100px">
+      @if(!auth.user.name)
+      <h4 id="nameLabel">Please, complete your profile</h4>
+      <input id="name" style="display:none; color:gray" type="text" placeholder="Type your full name">
+      @else
+      <h2 id="nameLabel">{{auth.user.name}}</h2>
+      @endif
+      <br>
+      <button data-toggle="modal" data-target="#deleteAccount" id="delete" class="btn btn-danger" style="background-color:tomato"><i class="far fa-trash-alt"></i>
+        <span>Delete</span></button>
+      <button id="save" style="background-color:teal; display:none; color:white" class="btn"><i class="fas fa-save"></i>
+        <span>Save</span></button>
+      <button id="edit" class="btn btn-primary"><i class="far fa-edit"></i> <span>Edit</span></button>
+    </center>
+    <br>
+  </div>
+
+</div>
+</div>
+<table class="table table-striped table-hover">
+  <tbody>
+    <tr>
+      <td><i style="font-size:200%" class="fas fa-hospital"></i></td>
+      @if(auth.user.clinic)
+      <td id="clinicLabel">{{auth.user.clinic}}</td>
+      @else
+      <td id="clinicLabel"></td>
+      @endif
+      <td><input id="clinic" style="display:none" type="text" placeholder="Type the clinic name"></td>
+    </tr>
+
+    <tr>
+      <td><i style="font-size:200%" class="fas fa-user-tag"></i></td>
+      @if(auth.user.role)
+      <td id="roleLabel">{{auth.user.role}}</td>
+      @else
+      <td id="roleLabel"></td>
+      @endif
+      <td><input id="role" style="display:none" type="text" placeholder="Type your role"></td>
+    </tr>
+
+    <tr>
+    <tr>
+    </tr>
+    <tr>
+      <td><i style="font-size:200%" class="fas fa-map-marker-alt"></i></td>
+      @if(auth.user.address)
+      <td id="addressLabel">{{auth.user.address}}</td>
+      @else
+      <td id="addressLabel"></td>
+      @endif
+      <td><input id="address" style="display:none" type="address" placeholder="Type your address"></td>
+    </tr>
+
+    <tr>
+      <td><i style="font-size:200%" class="fas fa-phone"></i></td>
+      @if(auth.user.phone)
+      <td id="phoneLabel">{{auth.user.phone}}</td>
+      @else 
+      <td id="phoneLabel"></td>
+      @endif
+      <td><input id="phone" style="display:none" type="phone" placeholder="Type your phone"></td>
+    </tr>
+    <tr>
+      <td><i style="font-size:200%" class="far fa-envelope"></i></td>
+      @if(auth.user.email)
+      <td id="emailLabel"><a href="">{{auth.user.email}}</a></td>
+      @else 
+      <td id="emailLabel"><a href=""></a></td>
+      @endif
+      <td><input id="email" style="display:none" type="email" placeholder="Type your email"></td>
+    </tr>
+
+    <tr>
+      <td><i style="font-size:200%" class="fas fa-wallet"></i></td>
+      <td>{{auth.user.wallet}}</td>
+    </tr>
+
+    </tr>
+  </tbody>
+</table>
+<!--div class="clearfix">
+            <ul class="pagination">
+                <li class="page-item disabled"><a href="#">Previous</a></li>
+                <li class="page-item"><a href="#" class="page-link">1</a></li>
+                <li class="page-item"><a href="#" class="page-link">2</a></li>
+                <li class="page-item active"><a href="#" class="page-link">3</a></li>
+                <li class="page-item"><a href="#" class="page-link">4</a></li>
+                <li class="page-item"><a href="#" class="page-link">5</a></li>
+                <li class="page-item"><a href="#" class="page-link">Next</a></li>
+            </ul-->
+</div>
+
+<div id="deleteAccount" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Delete a user</h4>
+        </div>
+        <div class="modal-body">
+          <p>Do you want to delete your profile?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="deleteSure" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+
+$("#deleteSure").on("click", function(){
+        var request = $.ajax({
+              url: "/delete",
+              type: 'post',
+              headers: {
+                'x-csrf-token': $('[name=_csrf]').val()
+              },
+              dataType: 'json'
+            })
+      
+            request.done(function (data) {
+              toast(data.type, data.msg);
+              setTimeout(() => {
+                window.location.replace('/')
+              }, 800);
+            });
+            request.fail(function (jqXHR, textStatus) {
+              toast('error', textStatus + jqXHR);
+            });
+      })
+  $("#edit").on("click", function () {
+    $("#nameLabel").toggle()
+    $("#addressLabel").toggle()
+    $("#roleLabel").toggle()
+    $("#phoneLabel").toggle()
+    $("#emailLabel").toggle()
+    $("#clinic").toggle()
+    $("#clinicLabel").toggle()
+    $("#name").toggle()
+    $("#address").toggle()
+    $("#role").toggle()
+    $("#phone").toggle()
+    $("#email").toggle()
+    $("#save").toggle()
+    $("#delete").toggle()
+  })
+
+  $("#save").on("click", function () {
+    var request = $.ajax({
+              url: "/edit",
+              type: 'post',
+              data:{
+                address: $("#address").val(),
+                role: $("#role").val(),
+                name: $("#name").val(),
+                phone: $("#phone").val(),
+                email:$("#email").val(),
+                clinic:$("#clinic").val()
+              },
+              headers: {
+                'x-csrf-token': $('[name=_csrf]').val()
+              },
+              dataType: 'json'
+            })
+      
+            request.done(function (data) {
+              toast(data.type, data.msg);
+              setTimeout(() => {
+                window.location.reload()
+              }, 800);
+            });
+            request.fail(function (jqXHR, textStatus) {
+              toast('error', textStatus + jqXHR);
+            });
+    
+    
+    
+    
+  })
+
+</script>
+@endsection
