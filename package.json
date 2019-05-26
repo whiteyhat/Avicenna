@@ -1,15 +1,47 @@
 {
-  "name": "root",
-  "private": true,
+  "name": "adonis-fullstack-app",
+  "version": "4.1.0",
+  "adonis-version": "4.1.0",
+  "description": "The fullstack application boilerplate for Adonisjs",
+  "main": "index.js",
   "scripts": {
-    "db": "cd packages/front && adonis migration:run && cd .. && cd ..",
-    "start": "lerna exec npm start --parallel",
-    "dep": "lerna exec npm install --parallel"
+    "start": "adonis serve --dev",
+    "dev": "nodemon --inspect server.js",
+    "test": "node ace test"
   },
-  "devDependencies": {
-    "lerna": "^3.14.1"
-  },
+  "keywords": [
+    "adonisjs",
+    "adonis-app"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
   "dependencies": {
-    "axios": "^0.18.0"
+    "@adonisjs/ace": "^5.0.8",
+    "@adonisjs/auth": "^3.0.7",
+    "@adonisjs/bodyparser": "^2.0.5",
+    "@adonisjs/cors": "^1.0.7",
+    "@adonisjs/fold": "^4.0.9",
+    "@adonisjs/framework": "^5.0.9",
+    "@adonisjs/ignitor": "^2.0.8",
+    "@adonisjs/lucid": "^6.1.3",
+    "@adonisjs/session": "^1.0.27",
+    "@adonisjs/shield": "^1.0.8",
+    "@adonisjs/websocket": "^1.0.11",
+    "Logger": "0.0.0",
+    "axios": "^0.18.0",
+    "eth-sig-util": "^2.1.2",
+    "ethereumjs-util": "^6.1.0",
+    "ipfs-http-client": "^31.1.0",
+    "ln-service": "^34.7.2",
+    "mysql": "^2.17.1",
+    "pdfkit": "^0.9.1",
+    "sudo-js": "^1.0.2",
+    "voilab-pdf-table": "^0.4.1",
+    "webln": "^0.2.1"
+  },
+  "devDependencies": {},
+  "autoload": {
+    "App": "./app"
   }
 }
