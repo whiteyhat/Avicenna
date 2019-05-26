@@ -153,7 +153,7 @@ class UserController {
         let path = PdfService.generatePDF(data, Date.now().toString());
 
         // craete the full relative path
-        const relativePath = "out/temp/" + path;
+        const relativePath = "public/temp/" + path;
 
         // automate the self-destruction operation
         PdfService.autoDeletePdf(path);
@@ -250,7 +250,7 @@ class UserController {
                     return response.send({
                       pr,
                       hash: finalResult.hash,
-                      path: "out/temp/" + path
+                      path: "public/temp/" + path
                     });
                   })
                   .catch(function(error) {
