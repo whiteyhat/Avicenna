@@ -16,7 +16,7 @@ class PdfService {
       sudo.setPassword(Env.get('SUDO_PASSWORD'))
 
     //   Create command
-      const command = ['rm', '-rf', "out/temp/"+path];
+      const command = ['rm', '-rf', "public/temp/"+path];
       sudo.exec(command, function(err, pid, result) {
 
         //   If any error log it
@@ -37,7 +37,7 @@ class PdfService {
 
   generatePDF(data, name) {
       // select full relative path
-    let filename = "out/temp/" + name + ".pdf"
+    let filename = "public/temp/" + name + ".pdf"
     try {
         // set up user encrypted password in case of not being encrypted
       let pass = ""
@@ -234,17 +234,17 @@ class PdfService {
         //************* CERTIFICATION DATA ************
         //*********************************************
         pdf
-        .image('out/img/logo.png', 250, 60, {
+        .image('public/img/logo.png', 250, 60, {
           align: 'center',
           scale: 0.25
         })
         .moveDown()
         // Add title
-        .font('out/fonts/bold.ttf', 25)
+        .font('public/fonts/bold.ttf', 25)
         .text('Avicenna Passport Certification',{
           align: 'center',
         }, 170, 50)
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .moveDown()
         // Add body
         .text("Avicenna certifies that the atached file identified with the IPFS hash: ", {
@@ -255,13 +255,13 @@ class PdfService {
           ellipsis: true
         })
         .fillColor('blue')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text(data.satellite.hash,{
           link: ipfsLink,
           underline: true
         })
         .fillColor('black')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text("saved in the Blockstream Satellite with the Tramsission ID: ", {
           width: 470,
           align: 'justify',
@@ -270,13 +270,13 @@ class PdfService {
           ellipsis: true
         })
         .fillColor('blue')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text(data.satellite.uuid,{
           link: "https://blockstream.com/satellite-queue/",
           underline: true
         })
         .fillColor('black')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text(" and the Authorization Token: ", {
           width: 470,
           align: 'justify',
@@ -285,13 +285,13 @@ class PdfService {
           ellipsis: true
         })
         .fillColor('blue')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text(data.satellite.authToken,{
           link: "https://blockstream.com/satellite-queue/",
           underline: true
         })
         .moveDown()
-        .font('out/fonts/bold.ttf', 19)
+        .font('public/fonts/bold.ttf', 19)
         .text( "Passport Emitter",{
           width: 470,
           align: 'center',
@@ -300,7 +300,7 @@ class PdfService {
           ellipsis: true
         })
         .moveDown()
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text( "This medical passport has been emitted by " + data.doctor.name + ", " + data.doctor.role + " at the " + data.doctor.clinic + ". This institution is located at " + data.doctor.clinicAddress + " and can be reachable via email ("+data.doctor.email+") or phone ("+data.doctor.phone+"). Avicenna certifies that the Declaration Terms represented in the next parargraph have been signed digitally using the following Bitcoin wallet: ",{
           width: 470,
           align: 'justify',
@@ -309,13 +309,13 @@ class PdfService {
           ellipsis: true
         })
         .fillColor('blue')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text(data.satellite.wallet,{
           link: "https://blockexplorer.com/messages/verify",
           underline: true
         })
         .fillColor('black')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text( " and with the signature hash: ",{
           width: 470,
           align: 'justify',
@@ -324,14 +324,14 @@ class PdfService {
           ellipsis: true
         })
         .fillColor('blue')
-        .font('out/fonts/roboto.ttf', 13)
+        .font('public/fonts/roboto.ttf', 13)
         .text(data.satellite.signature,{
           link: "https://etherscan.io/verifySig",
           underline: true
         })
         .moveDown()
         .fillColor('black')
-        .font('out/fonts/bold.ttf', 19)
+        .font('public/fonts/bold.ttf', 19)
         .text( "Passport Emitter Declaration",{
           width: 470,
           align: 'center',
@@ -340,7 +340,7 @@ class PdfService {
           ellipsis: true
         })
         .moveDown()
-        .font('out/fonts/italic.ttf', 11)
+        .font('public/fonts/italic.ttf', 11)
         .text( data.satellite.message,{
           width: 470,
           align: 'justify',
@@ -348,7 +348,7 @@ class PdfService {
           height: 300,
           ellipsis: true
         })
-        .font('out/fonts/italic.ttf', 13)
+        .font('public/fonts/italic.ttf', 13)
         .moveDown()
         .addPage()
   
