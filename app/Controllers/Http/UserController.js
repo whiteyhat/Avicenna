@@ -3,9 +3,12 @@ const Logger = use("Logger");
 const User = use("App/Models/User");
 const LightningService = use("App/Services/LightningService");
 const PdfService = use('App/Services/PdfService')
-const axios = require('axios')
-var FormData = require('form-data')
 const Database = use('Database')
+const lnService = require('ln-service')
+const createInvoice = require('ln-service/createInvoice')
+const Invoices = use('App/Models/Invoice')
+
+var FormData = require('form-data')
 
 class UserController {
   /**
@@ -95,8 +98,11 @@ class UserController {
           signature,
           message,
           wallet,
-          ipfshash
+          ipfshash,
+          socket
         } = request.all();
+
+        
 
          // Get the user instance to use for the final certification
         const user = await User.findBy("id", auth.user.id);
@@ -111,28 +117,43 @@ class UserController {
         const socialJson = JSON.parse(social);
         const medicationJson = JSON.parse(medication);
         const passwordJson = JSON.parse(password);
+        const socketId = JSON.parse(socket);
+        const signatureJson = JSON.parse(signature);
+        const messageJson = JSON.parse(message);
 
+        Logger.info(signatureJson)
+        Logger.info(message)
 
-    // Upload the hash to the Blockstream Satellite
-    // TODO: Upgrade this to upload the file instead of the string from the IPFS hash
-    await axios.post("https://api.blockstream.space/order?bid=10000&message=" +hash).then(async function(body) {
-        // Get the uuid, auth token and pr to deliver the data
-        const uuid = body.data.id;
-        const authToken = body.data.auth_token;
+        // Instantiate lnd instance. This is required for evey lightning call
+        const lnd = LightningService.getLndInstance()
 
-        // The pr must be sent to the client to pay the satellite operation
-        const pr = body.data.lightning_invoice["payreq"];
+        
+        // Time to be cancelled the invoice. After 60 seconds
+        var t = new Date();
+        t.setSeconds(t.getSeconds() + 60*3);
 
-        return response.send({pr})
-
-       
+        // Create invoice with respective time
+        const pr = await createInvoice({
+        lnd,
+        tokens: 100,
+        description: "Upload Avicenna's Passport to Blockstream Satellite",
+        expires_at: t,})
+        // create an invoice to the DB with the current resources
+        await Invoices.create({
+          invoiceId: pr.id,
+          ipfs_hash: hash,
+          satoshis: pr.tokens,
+          socketId,
+          signature: signatureJson,
+          message: messageJson,
         })
-      } catch (error) {
+        // Send invoice request and public key
+        return response.send({pr: pr.request})
+      } 
+    }catch (error) {
           Logger.error(error)
       }
-    }
   }
-
   async newPassport({ auth, request, response }) {
     try {
       if (auth.user.id) {
@@ -149,33 +170,6 @@ class UserController {
           wallet
         } = request.all();
 
-        //*********************************************
-        //**************** TESTING CODE ***************
-        //*********************************************
-        // const data = {patient: {
-        //   name: "carlos",
-        //   dob: "23/02/1992",
-        // },report:[{
-        //   condition: "Active",
-        //   year: "2018"
-        // }],allergy:[{
-        //   title: "Active",
-        //   year: "2018"
-        // }],immunisation:[{
-        //   title: "Active",
-        //   year: "2018"
-        // }],social:{
-        //   mobility:"independent",
-        //   eating:"independent"
-        // },password: "123456",medication:[{
-        //   title: "Insulin",
-        //   dose: "3gr",
-        //   plan:"Take 2 daily"
-        // }]
-        // }
-        //*********************************************
-        //*********************************************
-        //*********************************************
 
         // Get the user instance to use for the final certification
         const user = await User.findBy("id", auth.user.id);
@@ -214,9 +208,8 @@ class UserController {
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath).then(function(result) {
             Logger.info("IPFS HASH: " + result.hash);
-            return reponse.send({hash: result.hash})
-          })
-          .catch(function(error) {
+            return response.send({hash: result.hash})
+          }).catch(function(error) {
             console.log("Failed!", error);
           });
       } else {
@@ -447,6 +440,34 @@ class UserController {
 
 module.exports = UserController;
 
+//*********************************************
+        //**************** TESTING CODE ***************
+        //*********************************************
+        // const data = {patient: {
+        //   name: "carlos",
+        //   dob: "23/02/1992",
+        // },report:[{
+        //   condition: "Active",
+        //   year: "2018"
+        // }],allergy:[{
+        //   title: "Active",
+        //   year: "2018"
+        // }],immunisation:[{
+        //   title: "Active",
+        //   year: "2018"
+        // }],social:{
+        //   mobility:"independent",
+        //   eating:"independent"
+        // },password: "123456",medication:[{
+        //   title: "Insulin",
+        //   dose: "3gr",
+        //   plan:"Take 2 daily"
+        // }]
+        // }
+        //*********************************************
+        //*********************************************
+        //*********************************************
+
  //*********************************************
         //**************** TESTING CODE ***************
         //*********************************************
@@ -479,56 +500,3 @@ module.exports = UserController;
         //*********************************************
         //*********************************************
         //*********************************************
-
-        // create final data object to create the PDF Certificate
-    //     const finalData = {
-    //       image,
-    //       patient: jsonPatient,
-    //       report: reportJson,
-    //       allergy: allergyJson,
-    //       immunisation: immunisationJson,
-    //       social: socialJson,
-    //       password: passwordJson,
-    //       medication: medicationJson,
-    //       satellite: {
-    //         uuid,
-    //         authToken,
-    //         hash: result.hash,
-    //         signature,
-    //         message,
-    //         wallet
-    //       },
-    //       doctor: user
-    //     };
-
-    //     // Create the final PDF Certificate with the satellite data
-    //     let finalPath = PdfService.generatePDF(
-    //       finalData,
-    //       Date.now().toString()
-    //     );
-
-    //     // Upload the PDF Certificate to IPFS to ahve the immutable storage access endpoint
-    //     await LightningService.uploadToIPFS(relativePath)
-    //       .then(async function(finalResult) {
-    //         // automate the self-destruction operation of the certificate in the server
-    //         PdfService.autoDeletePdf(finalPath);
-
-    //         // Send the Payment Request to pay the satellite service
-    //         // Send the hash to retrieve the certificate via https://ipfs.io/ipfs/<IPFS_HASH>
-    //         // Send the path to access temporarily the certificate (because it takes 5-15 min to be available at IPFS)
-    //         return response.send({
-    //           pr,
-    //           hash: finalResult.hash,
-    //           path: "public/temp/" + path
-    //         });
-    //       })
-    //   .catch(function(error) {
-    //             console.log("Failed!", error);
-    //           });
-    //         // response.send(response.data.id)
-    //         // let pa = PdfService.generatePDF(fullData, Date.now().toString())
-    //       })
-    // .catch(function(error) {
-    //   // console.log(error.response.data.errors);
-    //   console.log(error);
-    // });
