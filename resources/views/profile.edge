@@ -168,7 +168,7 @@ $("#deleteSure").on("click", function(){
 
   $("#save").on("click", function () {
     var request = $.ajax({
-              url: "/edit",
+              url: "api/v0/profile/edit",
               type: 'post',
               data:{
                 address: $("#address").val(),
