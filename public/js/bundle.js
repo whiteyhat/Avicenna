@@ -416,28 +416,46 @@
 
                 toast('info', "Passport encrypted and uploaded to IPFS with the following hash: " + ipfsHash + ". <br><a href='https://ipfs.io/ipfs/" + ipfsHash + "' target='_blank''><button type='button'class='btn btn-default'>Open</button></a>");
         
-                setTimeout(function () {
+
+                formData.append('ipfshash', JSON.stringify(ipfsHash))
+                var request = $.ajax({
+                        url: "/api/v0/passport/pay",
+                        data: formData,
+                        type: 'post',
+                        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                        processData: false, // NEEDED, DON'T OMIT THIS
+                        headers: {
+                          'x-csrf-token': $('[name=_csrf]').val()
+                        },
+                      })
+        
+                request.done(function (data) {
                   toast('info', 'Uploading IPFS Passport to the Blockstream Satellite');
-                }, 2000);
-    
+
                 setTimeout(function () {
+                  $('#loader2').toggle()
+                  $('#valid2').toggle()
 
-                $('#loader2').toggle()
-                $('#valid2').toggle()
+                  AnimateProgressbar('#timetopay');
+                  
+                  showPR(result, '#pr', "#invoiceRoute",
+                      '#pr-string');
 
-                AnimateProgressbar('#timetopay');
-                
-                showPR(result, '#pr', "#invoiceRoute",
-                    '#pr-string');
+                  // Event handler to copy the invoice request when click the button copy
+                  copyInvoice('#pr-string','#copy-invoice');
+                  // when the wes channel reports the invoice as paid to the user who paid
+                  wes.getSubscription('invoice').on('invoicePaid', (invoice) => {
+                      toast('success', 'Lightning Invoice for Blockstream Satellite paid');
+                  });
+                }, 2000);
 
-                // Event handler to copy the invoice request when click the button copy
-                copyInvoice('#pr-string','#copy-invoice');
-                // when the wes channel reports the invoice as paid to the user who paid
-                wes.getSubscription('invoice').on('invoicePaid', (invoice) => {
-                    toast('success', 'Lightning Invoice for Blockstream Satellite paid');
+                })
+
+                request.fail(function (jqXHR, textStatus) {
+                  console.log(textStatus, jqXHR);
+                  $('#loader').fadeToggle()
+                  $('#createPass').fadeToggle()
                 });
-                }, 7000);
-
     
                 // setTimeout(function () {
                 //   toast('info', 'Downloading a Passport certification');
