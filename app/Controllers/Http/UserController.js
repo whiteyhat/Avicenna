@@ -80,6 +80,59 @@ class UserController {
     }
   }
 
+  async paySatellite({auth, request, response}) {
+    try {
+      
+     if (auth.user.id) {
+        const {
+          patient,
+          report,
+          allergy,
+          immunisation,
+          social,
+          medication,
+          password,
+          signature,
+          message,
+          wallet,
+          ipfshash
+        } = request.all();
+
+         // Get the user instance to use for the final certification
+        const user = await User.findBy("id", auth.user.id);
+
+        // Parse the form data objects
+        const image = request.file("image");
+        const jsonPatient = JSON.parse(patient);
+        const hash = JSON.parse(ipfshash);
+        const reportJson = JSON.parse(report);
+        const allergyJson = JSON.parse(allergy);
+        const immunisationJson = JSON.parse(immunisation);
+        const socialJson = JSON.parse(social);
+        const medicationJson = JSON.parse(medication);
+        const passwordJson = JSON.parse(password);
+
+
+    // Upload the hash to the Blockstream Satellite
+    // TODO: Upgrade this to upload the file instead of the string from the IPFS hash
+    await axios.post("https://api.blockstream.space/order?bid=10000&message=" +hash).then(async function(body) {
+        // Get the uuid, auth token and pr to deliver the data
+        const uuid = body.data.id;
+        const authToken = body.data.auth_token;
+
+        // The pr must be sent to the client to pay the satellite operation
+        const pr = body.data.lightning_invoice["payreq"];
+
+        return response.send({pr})
+
+       
+        })
+      } catch (error) {
+          Logger.error(error)
+      }
+    }
+  }
+
   async newPassport({ auth, request, response }) {
     try {
       if (auth.user.id) {
@@ -159,110 +212,9 @@ class UserController {
         PdfService.autoDeletePdf(path);
 
         // Upload the initial medical health record to IPFS
-        await LightningService.uploadToIPFS(relativePath)
-          .then(async function(result) {
+        await LightningService.uploadToIPFS(relativePath).then(function(result) {
             Logger.info("IPFS HASH: " + result.hash);
-
-            // Upload the hash to the Blockstream Satellite
-            // TODO: Upgrade this to upload the file instead of the string from the IPFS hash
-            await axios
-              .post(
-                "https://api.blockstream.space/order?bid=10000&message=" +
-                  result.hash
-              )
-              .then(async function(body) {
-                // Get the uuid, auth token and pr to deliver the data
-                const uuid = body.data.id;
-                const authToken = body.data.auth_token;
-
-                // The pr must be sent to the client to pay the satellite operation
-                const pr = body.data.lightning_invoice["payreq"];
-
-                //*********************************************
-                //**************** TESTING CODE ***************
-                //*********************************************
-                // const data = {
-                //   patient: {
-                //     name: "carlos",
-                //     dob: "23/02/1992",
-                //   },report:[{
-                //     condition: "Active",
-                //     year: "2018"
-                //   }],allergy:[{
-                //     title: "Active",
-                //     year: "2018"
-                //   }],immunisation:[{
-                //     title: "Active",
-                //     year: "2018"
-                //   }],social:{
-                //     mobility:"independent",
-                //     eating:"independent"
-                //   },password: "123456",medication:[{
-                //     title: "Insulin",
-                //     dose: "3gr",
-                //     plan:"Take 2 daily"
-                //   }],
-                //   satellite:{
-                //     uuid, authToken, hash:result.hash, signature, message, wallet
-                //   },
-                //   doctor: user
-                //   }
-                //*********************************************
-                //*********************************************
-                //*********************************************
-
-                // create final data object to create the PDF Certificate
-                const finalData = {
-                  image,
-                  patient: jsonPatient,
-                  report: reportJson,
-                  allergy: allergyJson,
-                  immunisation: immunisationJson,
-                  social: socialJson,
-                  password: passwordJson,
-                  medication: medicationJson,
-                  satellite: {
-                    uuid,
-                    authToken,
-                    hash: result.hash,
-                    signature,
-                    message,
-                    wallet
-                  },
-                  doctor: user
-                };
-
-                // Create the final PDF Certificate with the satellite data
-                let finalPath = PdfService.generatePDF(
-                  finalData,
-                  Date.now().toString()
-                );
-
-                // Upload the PDF Certificate to IPFS to ahve the immutable storage access endpoint
-                await LightningService.uploadToIPFS(relativePath)
-                  .then(async function(finalResult) {
-                    // automate the self-destruction operation of the certificate in the server
-                    PdfService.autoDeletePdf(finalPath);
-
-                    // Send the Payment Request to pay the satellite service
-                    // Send the hash to retrieve the certificate via https://ipfs.io/ipfs/<IPFS_HASH>
-                    // Send the path to access temporarily the certificate (because it takes 5-15 min to be available at IPFS)
-                    return response.send({
-                      pr,
-                      hash: finalResult.hash,
-                      path: "public/temp/" + path
-                    });
-                  })
-                  .catch(function(error) {
-                    console.log("Failed!", error);
-                  });
-                // response.send(response.data.id)
-                // let pa = PdfService.generatePDF(fullData, Date.now().toString())
-              })
-              .catch(function(error) {
-                // console.log(error.response.data.errors);
-                console.log(error);
-              });
+            return reponse.send({hash: result.hash})
           })
           .catch(function(error) {
             console.log("Failed!", error);
@@ -494,3 +446,89 @@ class UserController {
 }
 
 module.exports = UserController;
+
+ //*********************************************
+        //**************** TESTING CODE ***************
+        //*********************************************
+        // const data = {
+        //   patient: {
+        //     name: "carlos",
+        //     dob: "23/02/1992",
+        //   },report:[{
+        //     condition: "Active",
+        //     year: "2018"
+        //   }],allergy:[{
+        //     title: "Active",
+        //     year: "2018"
+        //   }],immunisation:[{
+        //     title: "Active",
+        //     year: "2018"
+        //   }],social:{
+        //     mobility:"independent",
+        //     eating:"independent"
+        //   },password: "123456",medication:[{
+        //     title: "Insulin",
+        //     dose: "3gr",
+        //     plan:"Take 2 daily"
+        //   }],
+        //   satellite:{
+        //     uuid, authToken, hash:result.hash, signature, message, wallet
+        //   },
+        //   doctor: user
+        //   }
+        //*********************************************
+        //*********************************************
+        //*********************************************
+
+        // create final data object to create the PDF Certificate
+    //     const finalData = {
+    //       image,
+    //       patient: jsonPatient,
+    //       report: reportJson,
+    //       allergy: allergyJson,
+    //       immunisation: immunisationJson,
+    //       social: socialJson,
+    //       password: passwordJson,
+    //       medication: medicationJson,
+    //       satellite: {
+    //         uuid,
+    //         authToken,
+    //         hash: result.hash,
+    //         signature,
+    //         message,
+    //         wallet
+    //       },
+    //       doctor: user
+    //     };
+
+    //     // Create the final PDF Certificate with the satellite data
+    //     let finalPath = PdfService.generatePDF(
+    //       finalData,
+    //       Date.now().toString()
+    //     );
+
+    //     // Upload the PDF Certificate to IPFS to ahve the immutable storage access endpoint
+    //     await LightningService.uploadToIPFS(relativePath)
+    //       .then(async function(finalResult) {
+    //         // automate the self-destruction operation of the certificate in the server
+    //         PdfService.autoDeletePdf(finalPath);
+
+    //         // Send the Payment Request to pay the satellite service
+    //         // Send the hash to retrieve the certificate via https://ipfs.io/ipfs/<IPFS_HASH>
+    //         // Send the path to access temporarily the certificate (because it takes 5-15 min to be available at IPFS)
+    //         return response.send({
+    //           pr,
+    //           hash: finalResult.hash,
+    //           path: "public/temp/" + path
+    //         });
+    //       })
+    //   .catch(function(error) {
+    //             console.log("Failed!", error);
+    //           });
+    //         // response.send(response.data.id)
+    //         // let pa = PdfService.generatePDF(fullData, Date.now().toString())
+    //       })
+    // .catch(function(error) {
+    //   // console.log(error.response.data.errors);
+    //   console.log(error);
+    // });
