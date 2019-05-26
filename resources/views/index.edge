@@ -682,6 +682,40 @@
   </section>
 </div>
 
+<div id="payreq" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Upload to Blockstream Satellite</h4>
+      </div>
+      <div class="modal-body">
+          <center>
+              <a id="invoiceRoute" href=""><img id="pr" src="" alt="Invoice Request"></a>
+      </center>
+        <progress style="display:none;" id="timetopay" class="nes-progress is-pattern" value="0" max="100" data-container="body"
+        data-placement="bottom" data-toggle="tooltip" title="Time left to pay the invoice"></progress>
+        
+        <center>
+        <br>
+        <div>
+          <h3><b>Amount: </b> 10000</h3>
+          <h4>Payment Resquest</h4>
+          <input type="text" id="pr-string">
+          <button id="copy-invoice" class="btn btn-primary">COPY</button>
+        </div>
+        </center>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <input type="hidden" name="doctorName" value={{auth.user.name}}>
 <input type="hidden" name="doctorRole" value={{auth.user.role}}>
 <input type="hidden" name="doctorClinic" value={{auth.user.clinic}}>
