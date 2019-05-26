@@ -67,7 +67,7 @@
 
         $("#login").on("click", function() {
           var request = $.ajax({
-            url: "/login",
+            url: "/api/v0/auth/login",
             data: {
               wallet: auth.node.pubkey
             },
