@@ -525,7 +525,7 @@
                     <div class="col-md-4">
                       <center>
                         <h1 style="font-size:35px">1</h1>
-                        <h3 style="color:gray"> Uploading Passport to IPFS</h3>
+                        <h3 style="color:gray"> Uploading Avicenna's Passport to IPFS</h3>
                         <img id="loader1" style="height:200px" src="img/loading.gif" alt="loading...">
                         <img id="valid1" style="height:200px; display:none" src="img/check.gif" alt="loading...">
                       </center>
@@ -533,7 +533,7 @@
                     <div class="col-md-4">
                       <center>
                         <h1 style="font-size:35px"> 2</h1>
-                        <h3 style="color:gray"> Linking IPFS to Ethereum </h3>
+                        <h3 style="color:gray"> Linking IPFS to Blockstream Satellite</h3>
                         <img id="loader2" style="height:200px" src="img/loading.gif" alt="loading...">
                         <img id="valid2" style="height:200px; display:none" src="img/check.gif" alt="loading...">
                       </center>
@@ -541,7 +541,7 @@
                     <div class="col-md-4">
                       <center>
                         <h1 style="font-size:35px">3</h1>
-                        <h3 style="color:gray"> Downloading Passport </h3>
+                        <h3 style="color:gray"> Generating a Secure Gateway to view the Passport </h3>
                         <img id="loader3" style="height:200px" src="img/loading.gif" alt="loading...">
                         <img id="valid3" style="height:200px; display:none" src="img/check.gif" alt="loading...">
                       </center>
@@ -695,16 +695,18 @@
           <center>
               <a id="invoiceRoute" href=""><img id="pr" src="" alt="Invoice Request"></a>
       </center>
-        <progress style="display:none;" id="timetopay" class="nes-progress is-pattern" value="0" max="100" data-container="body"
-        data-placement="bottom" data-toggle="tooltip" title="Time left to pay the invoice"></progress>
+      <div id="timetopay" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+      </div>
         
         <center>
         <br>
         <div>
-          <h3><b>Amount: </b> 10000</h3>
-          <h4>Payment Resquest</h4>
-          <input type="text" id="pr-string">
-          <button id="copy-invoice" class="btn btn-primary">COPY</button>
+          <h1>100 Satoshis</h1>
+          <div class="row" style="margin:5%">
+            <div class="col-md-8"><input class="form-control" style="width:100%" type="text" id="pr-string"></div>
+            <div class="col-md-4"><button style="width:100%" id="copy-invoice" class="btn btn-primary">COPY</button>
+            </div>
+          </div>
         </div>
         </center>
       </div>
