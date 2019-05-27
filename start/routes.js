@@ -31,6 +31,8 @@ Route.group(() => {
   Route.post('auth/login', 'UserController.login')
   Route.post('passport/new', 'UserController.newPassport')
   Route.post('profile/edit', 'UserController.edit')
+  Route.post('profile/link-node', 'UserController.noCustodial')
+  Route.post('profile/delete', 'UserController.deleteAccount')
   Route.post('passport/pay', 'UserController.paySatellite')
   Route.post('passport/complete', 'UserController.passportComplete')
 
