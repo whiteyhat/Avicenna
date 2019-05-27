@@ -166,6 +166,50 @@
             }
           }
         });
+
+        $("#start-admin").on("click", async function() {
+          $("#admin-loader").toggle()
+          let webln;
+          try {
+            webln = await requestProvider.requestProvider();
+          } catch (err) {
+            // Handle users without WebLN
+            toast(
+              "error",
+              "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
+            );
+          }
+          // Elsewhere in the code...
+          if (webln) {
+            // Call webln function
+            auth = await webln.getInfo();
+
+            if (auth.node.pubkey) {
+              $("#admin-loader").toggle()
+              var request = $.ajax({
+                url: "/api/v0/demo/admin",
+                type: "post",
+                data: {
+                  wallet: auth.node.pubkey
+                },
+                headers: {
+                  "x-csrf-token": $("[name=_csrf]").val()
+                },
+                dataType: "json"
+              });
+              request.done(function(data) {
+                $("#login").fadeIn();
+                toast(data.type, data.msg);
+              });
+              request.fail(function(data) {
+                toast("success", data.msg);
+                setTimeout(function() {
+                  // window.location.replace('/');
+                }, 600);
+              });
+            }
+          }
+        });
       },
       { "webln/lib/client": 1 }
     ]
