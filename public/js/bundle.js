@@ -430,7 +430,7 @@
               patient.name +
               " or his/her legal guardian. \n\n Me, " +
               $("[name=doctorName]").val() +
-              ", I agree with this terms and use my public keys from my Web3 provider to sign this legitimate document, today, " +
+              ", I agree with this terms and use my public keys from my bitcoin wallet to sign this legitimate document, today, " +
               formatDate(new Date()) +
               ".";
 
@@ -563,11 +563,9 @@
                                 }
                               });
 
-                              request.done(function(msg) {
-                                setTimeout(() => {
+                              request.done(function(obj) {
                                   $("#loader3").toggle();
                                   $("#valid3").toggle();
-                                }, 1400);
 
                                 setTimeout(() => {
                                   $("#loader").fadeToggle();
@@ -575,16 +573,16 @@
                                   $("#passportQR").attr(
                                     "src",
                                     "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
-                                      msg.finalHash
+                                      obj.hash
                                   );
-                                  $("#viewQR").attr("href", "temp/" + msg.path);
+                                  $("#viewQR").attr("href", "temp/" + obj.path);
 
                                   $("#downloadQrCode").on("click", function() {
                                     var a = $("<a>")
                                       .attr(
                                         "href",
                                         "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
-                                          msg.finalHash
+                                          obj.hash
                                       )
                                       .attr("download", "img.png")
                                       .appendTo("body");
@@ -595,9 +593,9 @@
 
                                   $("#linkQR").attr(
                                     "href",
-                                    "https://ipfs.io/ipfs/" + msg.finalHash
+                                    "https://ipfs.io/ipfs/" + obj.hash
                                   );
-                                }, 2300);
+                                }, 1000);
                               });
 
                               request.fail(function(jqXHR, textStatus) {
