@@ -131,7 +131,7 @@ class UserController {
         medication: medicationJson,
         satellite: {
           uuid: uuidJson,
-          authToken: uuidJson,
+          authToken: authTokenJson,
           hash: ipfs,
           signature: signatureJson,
           message: messageJson,
@@ -153,7 +153,7 @@ class UserController {
       await LightningService.uploadToIPFS(relativePath)
         .then(function(result) {
           Logger.info("IPFS HASH: " + result.hash);
-          return response.send({ finalhash: result.hash, path });
+          return response.send({ hash: result.hash, path });
         })
         .catch(function(error) {
           console.log("Failed!", error);
