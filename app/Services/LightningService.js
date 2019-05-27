@@ -88,7 +88,6 @@ class LightningService {
                 signature: data.signature
               },
               (err, pubkey) => {
-                console.log(pubkey);
                 if (pubkey) {
                   resolve({
                     pubkey
