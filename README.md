@@ -27,8 +27,9 @@ To reduce inequality, Avicenna provides an open healthcare infrastructure to be 
 
 ## Technology
 Avicenna uses and blockchain and decentralised infrastructure for security, accountability and connectivity. Th tech stack contains:
-* IPFS - for distributed p2p file sharing and ecnrypting
-* Ethereum - for smart contracts
+* IPFS - for distributed p2p file sharing and encrypting
+* Lightning Network - for tips and micro-payments
+* Blockstream Satellite - to certify data integrity
 * MySQL - for clinic management
 
 
