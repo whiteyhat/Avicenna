@@ -38,10 +38,7 @@ const initWS = async () => {
       // If invoice is paid
       if (data.is_confirmed) {
         // If invoice is equal to 1000 satoshis = If invoice for standard account creation
-        if (
-          data.description ===
-          "Upload Avicenna's Passport to Blockstream Satellite"
-        ) {
+        if (data.description ==="Upload Avicenna's Passport to Blockstream Satellite") {
           Logger.info("Invoice paid for passport generation");
 
           try {
@@ -64,63 +61,17 @@ const initWS = async () => {
               )
               .then(async function(body) {
                 // Get the uuid, auth token and pr to deliver the data
-                const uuid = body.data.id;
+                const uuid = body.data.uuid;
                 const authToken = body.data.auth_token;
 
                 // The pr must be sent to the client to pay the satellite operation
                 const pr = body.data.lightning_invoice["payreq"];
-                Logger.info(pr);
 
                 // await payInvoice({ lnd, request: pr });
-                Logger.info("invoice paid to blockstream");
-              });
+                  Ws.getChannel('invoice').topic('invoice').emitTo('invoicePaid', {
+                     uuid, authToken
+                     }, [socketId])
 
-            // create final data object to create the PDF Certificate
-            const finalData = {
-              image,
-              patient: jsonPatient,
-              report: reportJson,
-              allergy: allergyJson,
-              immunisation: immunisationJson,
-              social: socialJson,
-              password: passwordJson,
-              medication: medicationJson,
-              satellite: {
-                uuid,
-                authToken,
-                hash: invoice.ipfs_hash,
-                signature: invoice.signature,
-                message: invoice.message,
-                wallet: useer.wallet
-              },
-              doctor: user
-            };
-
-            // Create the final PDF Certificate with the satellite data
-            let finalPath = PdfService.generatePDF(
-              finalData,
-              Date.now().toString()
-            );
-
-            // Upload the PDF Certificate to IPFS to ahve the immutable storage access endpoint
-            await LightningService.uploadToIPFS(finalPath)
-              .then(async function(finalResult) {
-                // automate the self-destruction operation of the certificate in the server
-                PdfService.autoDeletePdf(finalPath);
-
-                Ws.getChannel("invoice")
-                  .topic("invoice")
-                  .emitTo(
-                    "invoicePaid",
-                    {
-                      hash: finalResult.hash,
-                      path: "public/temp/" + finalPath
-                    },
-                    [socketId]
-                  );
-              })
-              .catch(function(error) {
-                console.log("Failed!", error);
               });
           } catch (error) {
             Logger.error("error");
