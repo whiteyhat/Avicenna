@@ -83,6 +83,51 @@ class UserController {
     }
   }
 
+   async staff({auth, view, response}) {
+    try {
+      if (auth.user.wallet) {
+        const users = await Database.select('name', 'role', 'wallet').from('users')
+        edge.global('contract', Env.get('CONTRACT_ADDRESS'))
+        return view.render('staff', {users})
+      } else {
+        response.send({msg: "You do not have the permission to view the admin panel"})
+      }
+    } catch (error) {
+    }
+  }
+
+  async admin({auth, view, response}) {
+    try {
+      if (auth.user.admin) {
+        const users = await Database.select('name', 'id', 'role', 'address', 'email', 'phone', 'clinic', 'wallet', 'created_at').from('users')
+        return view.render('admin', {users})
+      } else {
+        response.send({msg: "You do not have the permission to view the admin panel"})
+      }
+    } catch (error) {
+    }
+  }
+
+  async noCustodial({auth, request, response}) {
+    const {grpc, tls, macaroon} = request.all()
+
+    if (!grpc || !tls || !macaroon) {
+      return response.send({error: "GRPC, TLS CERT or MACAROON must be provided"})
+    }
+    if (auth.user.id) {
+      Logger.info(grpc)
+      Logger.info(tls)
+      Logger.info(macaroon)
+      const user = await User.findBy("id", auth.user.id);
+
+      user.grpc = grpc
+      user.macaroon = macaroon
+      user.tls = tls
+      await user.save()
+      return response.send({type: "success", msg: "Lightning node successfully linked"})
+    }
+  }
+
   async passportComplete({ request, response, auth }) {
     try {
       const {
