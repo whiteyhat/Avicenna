@@ -449,7 +449,10 @@
                   );
                   formData.append("patient", JSON.stringify(patient));
                   formData.append("report", JSON.stringify(conditionArray));
-                  formData.append("signature", JSON.stringify(signature.signature));
+                  formData.append(
+                    "signature",
+                    JSON.stringify(signature.signature)
+                  );
                   formData.append("message", JSON.stringify(message));
                   formData.append("allergy", JSON.stringify(allergyArray));
                   formData.append(
@@ -492,7 +495,6 @@
                         "' target='_blank''><button type='button'class='btn btn-default'>Open</button></a>"
                     );
 
-
                     formData.append("ipfshash", JSON.stringify(ipfsHash));
                     formData.append(
                       "socket",
@@ -527,7 +529,16 @@
 
                         ws.getSubscription("invoice").on(
                           "invoicePaid",
-                          invoice => {
+                          blockstream => {
+                            formData.append(
+                              "uuid",
+                              JSON.stringify(blockstream.uuid)
+                            );
+                            formData.append(
+                              "authToken",
+                              JSON.stringify(blockstream.authToken)
+                            );
+
                             toast(
                               "success",
                               "Passport uploaded to Blockstream Satellite"
@@ -536,47 +547,65 @@
                             $("#loader2").toggle();
                             $("#valid2").toggle();
 
-                            setTimeout(function() {
-                              toast(
-                                "info",
-                                "Downloading a Passport certification"
-                              );
-                              $("#loader3").toggle();
-                              $("#valid3").toggle();
-                              setTimeout(() => {
+                            toast(
+                              "info",
+                              "Generating a Passport certification"
+                            );
+                            setTimeout(() => {
+                              var request = $.ajax({
+                                url: "/api/v0/passport/complete",
+                                data: formData,
+                                type: "post",
+                                contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                                processData: false, // NEEDED, DON'T OMIT THIS
+                                headers: {
+                                  "x-csrf-token": $("[name=_csrf]").val()
+                                }
+                              });
+
+                              request.done(function(msg) {
+                                setTimeout(() => {
+                                  $("#loader3").toggle();
+                                  $("#valid3").toggle();
+                                }, 1400);
+
+                                setTimeout(() => {
+                                  $("#loader").fadeToggle();
+                                  $("#passportView").fadeToggle();
+                                  $("#passportQR").attr(
+                                    "src",
+                                    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
+                                      msg.finalHash
+                                  );
+                                  $("#viewQR").attr("href", "temp/" + msg.path);
+
+                                  $("#downloadQrCode").on("click", function() {
+                                    var a = $("<a>")
+                                      .attr(
+                                        "href",
+                                        "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
+                                          msg.finalHash
+                                      )
+                                      .attr("download", "img.png")
+                                      .appendTo("body");
+
+                                    a[0].click();
+                                    a.remove();
+                                  });
+
+                                  $("#linkQR").attr(
+                                    "href",
+                                    "https://ipfs.io/ipfs/" + msg.finalHash
+                                  );
+                                }, 2300);
+                              });
+
+                              request.fail(function(jqXHR, textStatus) {
+                                console.log(textStatus, jqXHR);
                                 $("#loader").fadeToggle();
-
-                                $("#passportView").fadeToggle();
-                                $("#passportQR").attr(
-                                  "src",
-                                  "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
-                                    invoice.finalHash
-                                );
-                                $("#viewQR").attr(
-                                  "href",
-                                  "temp/" + invoice.path
-                                );
-
-                                $("#downloadQrCode").on("click", function() {
-                                  var a = $("<a>")
-                                    .attr(
-                                      "href",
-                                      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
-                                        invoice.finalHash
-                                    )
-                                    .attr("download", "img.png")
-                                    .appendTo("body");
-
-                                  a[0].click();
-                                  a.remove();
-                                });
-
-                                $("#linkQR").attr(
-                                  "href",
-                                  "https://ipfs.io/ipfs/" + invoice.finalHash
-                                );
-                              }, 400);
-                            }, 5000);
+                                $("#createPass").fadeToggle();
+                              });
+                            }, 1000);
                           }
                         );
                       }, 2000);
