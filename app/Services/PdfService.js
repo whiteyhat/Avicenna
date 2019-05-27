@@ -236,7 +236,7 @@ class PdfService {
         pdf
         .image('public/img/logo.png', 250, 60, {
           align: 'center',
-          scale: 0.25
+          scale: 0.2
         })
         .moveDown()
         // Add title
@@ -291,6 +291,7 @@ class PdfService {
           underline: true
         })
         .moveDown()
+        .fillColor('black')
         .font('public/fonts/bold.ttf', 19)
         .text( "Passport Emitter",{
           width: 470,
@@ -301,7 +302,7 @@ class PdfService {
         })
         .moveDown()
         .font('public/fonts/roboto.ttf', 13)
-        .text( "This medical passport has been emitted by " + data.doctor.name + ", " + data.doctor.role + " at the " + data.doctor.clinic + ". This institution is located at " + data.doctor.clinicAddress + " and can be reachable via email ("+data.doctor.email+") or phone ("+data.doctor.phone+"). Avicenna certifies that the Declaration Terms represented in the next parargraph have been signed digitally using the following Bitcoin wallet: ",{
+        .text( "This medical passport has been emitted by " + data.doctor.name + ", " + data.doctor.role + " at the " + data.doctor.clinic + ". This institution is located at " + data.doctor.clinicAddress + " and can be reachable via email ("+data.doctor.email+") or phone ("+data.doctor.phone+"). Avicenna certifies that the Declaration Terms represented in the next parargraph have been signed digitally using the following Bitcoin public key: ",{
           width: 470,
           align: 'justify',
           indent: 30,
