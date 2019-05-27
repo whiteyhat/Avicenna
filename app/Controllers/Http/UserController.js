@@ -1,6 +1,8 @@
 "use strict";
 const Logger = use("Logger");
+const edge = require('edge.js')
 const User = use("App/Models/User");
+const Env = use('Env')
 const LightningService = use("App/Services/LightningService");
 const PdfService = use("App/Services/PdfService");
 const Database = use("Database");
@@ -83,7 +85,7 @@ class UserController {
     }
   }
 
-   async staff({auth, view, response}) {
+  async staff({auth, view, response}) {
     try {
       if (auth.user.wallet) {
         const users = await Database.select('name', 'role', 'wallet').from('users')
@@ -93,6 +95,7 @@ class UserController {
         response.send({msg: "You do not have the permission to view the admin panel"})
       }
     } catch (error) {
+      Logger.error(error)
     }
   }
 
@@ -115,9 +118,6 @@ class UserController {
       return response.send({error: "GRPC, TLS CERT or MACAROON must be provided"})
     }
     if (auth.user.id) {
-      Logger.info(grpc)
-      Logger.info(tls)
-      Logger.info(macaroon)
       const user = await User.findBy("id", auth.user.id);
 
       user.grpc = grpc
