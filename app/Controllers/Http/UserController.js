@@ -2,13 +2,13 @@
 const Logger = use("Logger");
 const User = use("App/Models/User");
 const LightningService = use("App/Services/LightningService");
-const PdfService = use('App/Services/PdfService')
-const Database = use('Database')
-const lnService = require('ln-service')
-const createInvoice = require('ln-service/createInvoice')
-const Invoices = use('App/Models/Invoice')
+const PdfService = use("App/Services/PdfService");
+const Database = use("Database");
+const lnService = require("ln-service");
+const createInvoice = require("ln-service/createInvoice");
+const Invoices = use("App/Models/Invoice");
 
-var FormData = require('form-data')
+var FormData = require("form-data");
 
 class UserController {
   /**
@@ -83,10 +83,89 @@ class UserController {
     }
   }
 
-  async paySatellite({auth, request, response}) {
+  async passportComplete({ request, response, auth }) {
     try {
-      
-     if (auth.user.id) {
+      const {
+        patient,
+        report,
+        allergy,
+        immunisation,
+        social,
+        medication,
+        password,
+        signature,
+        message,
+        wallet,
+        uuid,
+        ipfshash,
+        authToken
+      } = request.all();
+
+      // Get the user instance to use for the final certification
+      const user = await User.findBy("id", auth.user.id);
+
+      // Parse the form data objects
+      const image = request.file("image");
+      const jsonPatient = JSON.parse(patient);
+      const reportJson = JSON.parse(report);
+      const allergyJson = JSON.parse(allergy);
+      const immunisationJson = JSON.parse(immunisation);
+      const socialJson = JSON.parse(social);
+      const medicationJson = JSON.parse(medication);
+      const passwordJson = JSON.parse(password);
+      const signatureJson = JSON.parse(signature);
+      const messageJson = JSON.parse(message);
+      const uuidJson = JSON.parse(uuid);
+      const authTokenJson = JSON.parse(authToken);
+      const ipfs = JSON.parse(ipfshash);
+
+      // create final data object to create the PDF Certificate
+      const data = {
+        image,
+        patient: jsonPatient,
+        report: reportJson,
+        allergy: allergyJson,
+        immunisation: immunisationJson,
+        social: socialJson,
+        password: passwordJson,
+        medication: medicationJson,
+        satellite: {
+          uuid: uuidJson,
+          authToken: uuidJson,
+          hash: ipfs,
+          signature: signatureJson,
+          message: messageJson,
+          wallet: user.wallet
+        },
+        doctor: user
+      };
+
+      // Create the final PDF Certificate with the satellite data
+      let path = PdfService.generatePDF(data, Date.now().toString());
+
+      // craete the full relative path
+      const relativePath = "public/temp/" + path;
+
+      // automate the self-destruction operation
+      PdfService.autoDeletePdf(path);
+
+      // Upload the initial medical health record to IPFS
+      await LightningService.uploadToIPFS(relativePath)
+        .then(function(result) {
+          Logger.info("IPFS HASH: " + result.hash);
+          return response.send({ finalhash: result.hash, path });
+        })
+        .catch(function(error) {
+          console.log("Failed!", error);
+        });
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async paySatellite({ auth, request, response }) {
+    try {
+      if (auth.user.id) {
         const {
           patient,
           report,
@@ -102,9 +181,7 @@ class UserController {
           socket
         } = request.all();
 
-        
-
-         // Get the user instance to use for the final certification
+        // Get the user instance to use for the final certification
         const user = await User.findBy("id", auth.user.id);
 
         // Parse the form data objects
@@ -121,23 +198,23 @@ class UserController {
         const signatureJson = JSON.parse(signature);
         const messageJson = JSON.parse(message);
 
-        Logger.info(signatureJson)
-        Logger.info(message)
+        Logger.info(signatureJson);
+        Logger.info(message);
 
         // Instantiate lnd instance. This is required for evey lightning call
-        const lnd = LightningService.getLndInstance()
+        const lnd = LightningService.getLndInstance();
 
-        
         // Time to be cancelled the invoice. After 60 seconds
         var t = new Date();
-        t.setSeconds(t.getSeconds() + 60*3);
+        t.setSeconds(t.getSeconds() + 60 * 3);
 
         // Create invoice with respective time
         const pr = await createInvoice({
-        lnd,
-        tokens: 100,
-        description: "Upload Avicenna's Passport to Blockstream Satellite",
-        expires_at: t,})
+          lnd,
+          tokens: 100,
+          description: "Upload Avicenna's Passport to Blockstream Satellite",
+          expires_at: t
+        });
         // create an invoice to the DB with the current resources
         await Invoices.create({
           invoiceId: pr.id,
@@ -145,14 +222,14 @@ class UserController {
           satoshis: pr.tokens,
           socketId,
           signature: signatureJson,
-          message: messageJson,
-        })
+          message: messageJson
+        });
         // Send invoice request and public key
-        return response.send({pr: pr.request})
-      } 
-    }catch (error) {
-          Logger.error(error)
+        return response.send({ pr: pr.request });
       }
+    } catch (error) {
+      Logger.error(error);
+    }
   }
   async newPassport({ auth, request, response }) {
     try {
@@ -169,7 +246,6 @@ class UserController {
           message,
           wallet
         } = request.all();
-
 
         // Get the user instance to use for the final certification
         const user = await User.findBy("id", auth.user.id);
@@ -206,10 +282,12 @@ class UserController {
         PdfService.autoDeletePdf(path);
 
         // Upload the initial medical health record to IPFS
-        await LightningService.uploadToIPFS(relativePath).then(function(result) {
+        await LightningService.uploadToIPFS(relativePath)
+          .then(function(result) {
             Logger.info("IPFS HASH: " + result.hash);
-            return response.send({hash: result.hash})
-          }).catch(function(error) {
+            return response.send({ hash: result.hash });
+          })
+          .catch(function(error) {
             console.log("Failed!", error);
           });
       } else {
@@ -280,10 +358,9 @@ class UserController {
       const user = await User.findBy("wallet", wallet);
 
       if (user) {
-        await Database
-          .table('tokens')
-          .where('user_id', user.id)
-          .delete()
+        await Database.table("tokens")
+          .where("user_id", user.id)
+          .delete();
         await user.delete();
         await User.create({ wallet: wallet.toLowerCase(), nonce });
       } else {
@@ -292,47 +369,50 @@ class UserController {
       response.send({
         type: "info",
         msg: "Demo started. Please click on log in on the top right button"
-      })
+      });
     } catch (error) {
-      Logger.error(error)
+      Logger.error(error);
     }
   }
 
-    async edit({auth, request, response}) {
-    const {role, name, email, phone, clinic, address} = request.all()
+  async edit({ auth, request, response }) {
+    const { role, name, email, phone, clinic, address } = request.all();
     try {
       if (auth.user.wallet) {
-        const user = await User.findBy('wallet', auth.user.wallet)
+        const user = await User.findBy("wallet", auth.user.wallet);
         if (role != undefined) {
-          user.role = role
+          user.role = role;
         }
-        user.role = role
+        user.role = role;
         if (name != undefined) {
-          user.name = name
+          user.name = name;
         }
         if (address != undefined) {
-          user.address = address
+          user.address = address;
         }
 
         if (email != undefined) {
-          user.email = email
+          user.email = email;
         }
 
         if (phone != undefined) {
-          user.phone = phone
+          user.phone = phone;
         }
 
         if (clinic != undefined) {
-          user.clinic = clinic
+          user.clinic = clinic;
         }
-     
-        await user.save()
-        response.send({msg: "Profile saved", type: "success"})
+
+        await user.save();
+        response.send({ msg: "Profile saved", type: "success" });
       } else {
-        response.send({msg: "You do not have the permissions", type: "error"})
+        response.send({
+          msg: "You do not have the permissions",
+          type: "error"
+        });
       }
     } catch (error) {
-      Logger.error(error)
+      Logger.error(error);
     }
   }
 
@@ -441,62 +521,62 @@ class UserController {
 module.exports = UserController;
 
 //*********************************************
-        //**************** TESTING CODE ***************
-        //*********************************************
-        // const data = {patient: {
-        //   name: "carlos",
-        //   dob: "23/02/1992",
-        // },report:[{
-        //   condition: "Active",
-        //   year: "2018"
-        // }],allergy:[{
-        //   title: "Active",
-        //   year: "2018"
-        // }],immunisation:[{
-        //   title: "Active",
-        //   year: "2018"
-        // }],social:{
-        //   mobility:"independent",
-        //   eating:"independent"
-        // },password: "123456",medication:[{
-        //   title: "Insulin",
-        //   dose: "3gr",
-        //   plan:"Take 2 daily"
-        // }]
-        // }
-        //*********************************************
-        //*********************************************
-        //*********************************************
+//**************** TESTING CODE ***************
+//*********************************************
+// const data = {patient: {
+//   name: "carlos",
+//   dob: "23/02/1992",
+// },report:[{
+//   condition: "Active",
+//   year: "2018"
+// }],allergy:[{
+//   title: "Active",
+//   year: "2018"
+// }],immunisation:[{
+//   title: "Active",
+//   year: "2018"
+// }],social:{
+//   mobility:"independent",
+//   eating:"independent"
+// },password: "123456",medication:[{
+//   title: "Insulin",
+//   dose: "3gr",
+//   plan:"Take 2 daily"
+// }]
+// }
+//*********************************************
+//*********************************************
+//*********************************************
 
- //*********************************************
-        //**************** TESTING CODE ***************
-        //*********************************************
-        // const data = {
-        //   patient: {
-        //     name: "carlos",
-        //     dob: "23/02/1992",
-        //   },report:[{
-        //     condition: "Active",
-        //     year: "2018"
-        //   }],allergy:[{
-        //     title: "Active",
-        //     year: "2018"
-        //   }],immunisation:[{
-        //     title: "Active",
-        //     year: "2018"
-        //   }],social:{
-        //     mobility:"independent",
-        //     eating:"independent"
-        //   },password: "123456",medication:[{
-        //     title: "Insulin",
-        //     dose: "3gr",
-        //     plan:"Take 2 daily"
-        //   }],
-        //   satellite:{
-        //     uuid, authToken, hash:result.hash, signature, message, wallet
-        //   },
-        //   doctor: user
-        //   }
-        //*********************************************
-        //*********************************************
-        //*********************************************
+//*********************************************
+//**************** TESTING CODE ***************
+//*********************************************
+// const data = {
+//   patient: {
+//     name: "carlos",
+//     dob: "23/02/1992",
+//   },report:[{
+//     condition: "Active",
+//     year: "2018"
+//   }],allergy:[{
+//     title: "Active",
+//     year: "2018"
+//   }],immunisation:[{
+//     title: "Active",
+//     year: "2018"
+//   }],social:{
+//     mobility:"independent",
+//     eating:"independent"
+//   },password: "123456",medication:[{
+//     title: "Insulin",
+//     dose: "3gr",
+//     plan:"Take 2 daily"
+//   }],
+//   satellite:{
+//     uuid, authToken, hash:result.hash, signature, message, wallet
+//   },
+//   doctor: user
+//   }
+//*********************************************
+//*********************************************
+//*********************************************
