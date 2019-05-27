@@ -3,7 +3,14 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="css/users.css">
-
+<style>
+    #rpc-btn:hover,
+    #macaroon-btn:hover,
+    #tls-btn:hover {
+      color: black;
+      cursor:pointer;
+    }
+</style>
 <script type="text/javascript">
   $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
@@ -16,17 +23,32 @@
       <img src="https://avatars.dicebear.com/v2/jdenticon/{{user.wallet}}.svg" class="avatar" alt="Avatar"
         style="height:100px">
       @if(!auth.user.name)
+      <br>
       <h4 id="nameLabel">Please, complete your profile</h4>
-      <input id="name" style="display:none; color:gray" type="text" placeholder="Type your full name">
+      <input id="name" style="display:none; color:gray; width:30%" class="form-control" type="text" placeholder="Type your full name">
+      <br>
       @else
       <h2 id="nameLabel">{{auth.user.name}}</h2>
       @endif
       <br>
-      <button data-toggle="modal" data-target="#deleteAccount" id="delete" class="btn btn-danger" style="background-color:tomato"><i class="far fa-trash-alt"></i>
-        <span>Delete</span></button>
-      <button id="save" style="background-color:teal; display:none; color:white" class="btn"><i class="fas fa-save"></i>
-        <span>Save</span></button>
-      <button id="edit" class="btn btn-primary"><i class="far fa-edit"></i> <span>Edit</span></button>
+      <div class="row">
+        <div class="col-md-4">
+            <button style="width:100%"  data-toggle="modal" data-target="#deleteAccount" id="delete" class="btn btn-danger"><i class="far fa-trash-alt"></i>
+              <span>Delete</span></button>
+        </div>
+        <div class="col-md-4">
+            <button id="save" style="background-color:teal; display:none; color:white; width:100%" class="btn"><i class="fas fa-save"></i>
+              <span>Save</span></button>
+              <button id="cust" style="width:100%; background-color:#D5920A; color:white;" data-toggle="modal" data-target="#non-custodial" class="btn"><i class="fas fa-bolt"></i> <span>Link Node</span></button>
+
+          </div>
+          <div class="col-md-4">
+              <button style="width:100%" id="edit" class="btn btn-primary"><i class="far fa-edit"></i> <span>Edit</span></button>
+            </div>
+      </div>
+      
+     
+      
     </center>
     <br>
   </div>
@@ -42,7 +64,7 @@
       @else
       <td id="clinicLabel"></td>
       @endif
-      <td><input id="clinic" style="display:none" type="text" placeholder="Type the clinic name"></td>
+      <td><input id="clinic" class="form-control" style="display:none; width:40%"  type="text" placeholder="Type the clinic name"></td>
     </tr>
 
     <tr>
@@ -52,7 +74,7 @@
       @else
       <td id="roleLabel"></td>
       @endif
-      <td><input id="role" style="display:none" type="text" placeholder="Type your role"></td>
+      <td><input id="role" class="form-control" style="display:none; width:40%"  type="text" placeholder="Type your role"></td>
     </tr>
 
     <tr>
@@ -65,7 +87,7 @@
       @else
       <td id="addressLabel"></td>
       @endif
-      <td><input id="address" style="display:none" type="address" placeholder="Type your address"></td>
+      <td><input id="address" class="form-control" style="display:none; width:40%"  type="address" placeholder="Type your address"></td>
     </tr>
 
     <tr>
@@ -75,7 +97,7 @@
       @else 
       <td id="phoneLabel"></td>
       @endif
-      <td><input id="phone" style="display:none" type="phone" placeholder="Type your phone"></td>
+      <td><input id="phone" class="form-control" style="display:none; width:40%"  type="phone" placeholder="Type your phone"></td>
     </tr>
     <tr>
       <td><i style="font-size:200%" class="far fa-envelope"></i></td>
@@ -84,7 +106,7 @@
       @else 
       <td id="emailLabel"><a href=""></a></td>
       @endif
-      <td><input id="email" style="display:none" type="email" placeholder="Type your email"></td>
+      <td><input id="email" class="form-control" style="display:none; width:40%" type="email" placeholder="Type your email"></td>
     </tr>
 
     <tr>
@@ -127,11 +149,119 @@
     </div>
   </div>
 
+  <div id="non-custodial" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Connect Node - No custodial</h4>
+        </div>
+        <div class="modal-body">
+          <center>
+          <img style="width:65%" src="img/loading.gif" alt="">
+          <br>
+          <div class="input-group input-group-lg">
+              <span class="input-group-addon">gRPC Endpoint</span>
+            <input id="grpc" type="text" class="form-control" placeholder='198.51.301.0:10009'
+              aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="rpc-btn"><i class="fas fa-question-circle"></i></a></span>
+          </div>
+          <br>
+          <div class="input-group input-group-lg">
+              <span class="input-group-addon">TLS Certificate</span>
+                <input id="cert" type="text" class="form-control" placeholder="Hex encoded"
+                  aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="tls-btn"><i class="fas fa-question-circle"></i></a></span>
+              </div>
+              <br>
+              <div class="input-group input-group-lg">
+                  <span class="input-group-addon">Invoice Macaroon</span>
+                <input id="macaroon" type="text" class="form-control" placeholder='Base64 encoded'
+                  aria-describedby="sizing-addon1">  <span class="input-group-addon"><a id="macaroon-btn"><i class="fas fa-question-circle"></i></a></span>
+              </div>
+          </center>
+          <br>
+
+          <div style="display:none" id="tls-help" class="alert alert-info" role="alert">
+            <h3>TLS Certificate</h3>
+            The TLS certificate ensures our server that we're talking to your node, and encrypts the communication.
+              
+            The certificate is usually located:
+              <ul>
+                <li><b>macOS:</b> ~/Library/Application Support/Lnd</li>
+                <li><b>Linux:</b> ~/.lnd</li>
+                <li><b>Windows:</b> %APPDATA%\Lnd</li>
+              </ul>
+              
+          </div>
+          <div style="display:none" id="macaroon-help" class="alert alert-info" role="alert">
+            <h3>Invoice Macaroon</h3>
+            The invoice macaroon is a file that gives us authorized access to generate invoices on your node.
+
+            The macaroons are usually located:
+              <ul>
+                <li><b>macOS:</b> ~/Library/Application Support/Lnd/data/chain/*</li>
+                <li><b>Linux:</b> ~/.lnd/data/chain/*</li>
+                <li><b>Windows:</b> %APPDATA%\Lnd\data\chain\*</li>
+              </ul>
+              
+          </div>
+          <div style="display:none" id="rpc-help" class="alert alert-info" role="alert">
+            <h3>gRPC Endpoint</h3>
+            The gRPC endpoint is the URL we'll use to communicate with your node. It is configured by rpclisten in lnd.conf.
+
+            Every time someone wants to tip you, we'll make a request to it to generate a new invoice. This means your server 
+            must be online and accessible at all times.
+              
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button id="connect-node" type="button" class="btn btn-success">Connect</button>
+        </div>
+      </div>
+    </div>
+</div>
+
 <script>
+
+$("#tls-btn").on("click", function(){
+  $("#tls-help").toggle()
+})
+$("#macaroon-btn").on("click", function(){
+  $("#macaroon-help").toggle()
+})
+$("#rpc-btn").on("click", function(){
+  $("#rpc-help").toggle()
+})
+
+$("#connect-node").on("click", function(){
+        var request = $.ajax({
+              url: "/api/v0/profile/link-node",
+              type: 'post',
+              data:{
+                tls:  $("#cert").val(),
+                macaroon:  $("#macaroon").val(),
+                grpc:  $("#grpc").val()
+              },
+              headers: {
+                'x-csrf-token': $('[name=_csrf]').val()
+              },
+              dataType: 'json'
+            })
+      
+            request.done(function (data) {
+              toast(data.type, data.msg)
+              $("#non-custodial").modal('hide')
+            });
+            request.fail(function (jqXHR, textStatus) {
+              console.log(textStatus, jqXHR);
+              
+            });
+      })
 
 $("#deleteSure").on("click", function(){
         var request = $.ajax({
-              url: "/delete",
+              url: "/api/v0/profile/delete",
               type: 'post',
               headers: {
                 'x-csrf-token': $('[name=_csrf]').val()
@@ -164,6 +294,7 @@ $("#deleteSure").on("click", function(){
     $("#email").toggle()
     $("#save").toggle()
     $("#delete").toggle()
+    $("#cust").toggle()
   })
 
   $("#save").on("click", function () {
