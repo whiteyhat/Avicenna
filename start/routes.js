@@ -32,5 +32,6 @@ Route.group(() => {
   Route.post('passport/new', 'UserController.newPassport')
   Route.post('profile/edit', 'UserController.edit')
   Route.post('passport/pay', 'UserController.paySatellite')
+  Route.post('passport/complete', 'UserController.passportComplete')
 
 }).prefix('api/v0')
