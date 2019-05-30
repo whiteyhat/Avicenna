@@ -256,7 +256,7 @@ class UserController {
         // Create invoice with respective time
         const pr = await createInvoice({
           lnd,
-          tokens: 100,
+          tokens: 15,
           description: "Upload Avicenna's Passport to Blockstream Satellite",
           expires_at: t
         });
