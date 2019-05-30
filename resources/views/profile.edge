@@ -334,12 +334,22 @@
                     </div>
                     <br>
                     <div>
+                        @if(clinic.image1)
+                        <input id="changePicture1" type="file" name="file1"><br>
+                        <img id="userPic1" style="width:100%" src="{{clinic.image1}}" height="" alt="Clinic Picture 1">   
+                        @else
                         <input id="changePicture1" type="file" name="file1"><br>
                           <img style="display:none" id="userPic1" src="" height="" alt="Clinic Picture 1">   
+                          @endif
                     </div><br>
                     <div>
+                        @if(clinic.image2)
                         <input id="changePicture2" type="file" name="file2"><br>
-                        <img style="display:none" id="userPic2" src="" height="" alt="Clinic Picture 2">   
+                        <img id="userPic2" style="width:100%" src="{{clinic.image2}}" height="" alt="Clinic Picture 2">  
+                        @else
+                        <input id="changePicture2" type="file" name="file2"><br>
+                        <img style="display:none" id="userPic2" src="" height="" alt="Clinic Picture 2"> 
+                        @endif  
                     </div>
                 </center>
 
