@@ -36,6 +36,9 @@ Route.group(() => {
   Route.post('profile/delete', 'UserController.deleteAccount')
   Route.post('passport/pay', 'UserController.paySatellite')
   Route.post('users/create-new', 'UserController.createUser')
+  Route.post('clinics/create-new', 'UserController.createClinic')
+  Route.post('users/join-clinic', 'UserController.addUserToClinic')
+  Route.post('users/remove-clinic', 'UserController.removeUserFromClinic')
   Route.post('passport/complete', 'UserController.passportComplete')
 
 }).prefix('api/v0')
