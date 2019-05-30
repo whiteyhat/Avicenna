@@ -53,7 +53,7 @@
                     <button id="save" style="background-color:teal; display:none; color:white; width:100%"
                         class="btn"><i class="fas fa-save"></i>
                         <span>Save</span></button>
-                    <a href="/donate/{{clinic}}">
+                    <a href="/donate/{{clinic.name}}">
                         <div title="Receive tips from patients or anyone" data-placement="bottom" data-toggle="tooltip">
                             <button id="cust" style="width:100%; background-color:#D5920A; color:white;" class="btn"><i
                                     class="fas fa-donate"></i> <span>View Donation Page</span></button></div>
@@ -79,7 +79,7 @@
         <tr>
             <td><i style="font-size:200%" class="fas fa-hospital"></i></td>
 
-            <td id="clinicLabel">{{clinic}}</td>
+            <td id="clinicLabel">{{clinic.name}}</td>
             <td>
                 <!-- Split button -->
                 <div id="clinic" style="display:none">
@@ -243,49 +243,103 @@
                     <h1>Link Lightning Node</h1>
                     <div class="input-group input-group-lg">
                         <span class="input-group-addon">gRPC Endpoint</span>
+                        @if(clinic.grpc)
+                        <input id="grpc" type="text" class="form-control" value="{{clinic.grpc}}"
+                            placeholder='198.51.301.0:10009' aria-describedby="sizing-addon1"> <span
+                            class="input-group-addon"><a id="rpc-btn"><i class="fas fa-question-circle"></i></a></span>
+                        @else
                         <input id="grpc" type="text" class="form-control" placeholder='198.51.301.0:10009'
                             aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="rpc-btn"><i
                                     class="fas fa-question-circle"></i></a></span>
+                        @endif
                     </div>
                     <br>
                     <div class="input-group input-group-lg">
                         <span class="input-group-addon">TLS Certificate</span>
+                        @if(clinic.tls)
+                        <input id="cert" type="text" class="form-control" value="{{clinic.tls}}"
+                            placeholder="Hex encoded" aria-describedby="sizing-addon1"> <span
+                            class="input-group-addon"><a id="tls-btn"><i class="fas fa-question-circle"></i></a></span>
+                        @else
                         <input id="cert" type="text" class="form-control" placeholder="Hex encoded"
                             aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="tls-btn"><i
                                     class="fas fa-question-circle"></i></a></span>
+                        @endif
                     </div>
                     <br>
                     <div class="input-group input-group-lg">
                         <span class="input-group-addon">Invoice Macaroon</span>
+                        @if(clinic.macaroon)
+                        <input id="macaroon" type="text" class="form-control" value="{{clinic.macaroon}}"
+                            placeholder='Base64 encoded' aria-describedby="sizing-addon1"> <span
+                            class="input-group-addon"><a id="macaroon-btn"><i
+                                    class="fas fa-question-circle"></i></a></span>
+                        @else
                         <input id="macaroon" type="text" class="form-control" placeholder='Base64 encoded'
                             aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="macaroon-btn"><i
                                     class="fas fa-question-circle"></i></a></span>
+                        @endif
                     </div>
                     <br>
                     <h1>Edit Clinic Details</h1>
                     <div class="input-group input-group-lg">
                         <span class="input-group-addon">Name</span>
-                        <input id="macaroon" type="text" class="form-control" placeholder='Clinic name'
+                        @if(clinic.name)
+                        <input id="clinic-name" type="text" class="form-control" value="{{clinic.name}}"
+                            placeholder='Clinic name' aria-describedby="sizing-addon1"> <span
+                            class="input-group-addon"></span>
+                        @else
+                        <input id="clinic-name" type="text" class="form-control" placeholder='Clinic name'
                             aria-describedby="sizing-addon1"> <span class="input-group-addon"></span>
+                        @endif
                     </div>
                     <br>
                     <div class="input-group input-group-lg">
                         <span class="input-group-addon">About</span>
-                        <input id="macaroon" type="text" class="form-control" placeholder='Clinic about text'
+                        @if(clinic.about)
+                        <input id="clinic-about" type="text" class="form-control" value="{{clinic.about}}"
+                            placeholder='Clinic about text' aria-describedby="sizing-addon1"> <span
+                            class="input-group-addon"><a id="about-btn"><i
+                                    class="fas fa-question-circle"></i></a></span>
+                        @else
+                        <input id="clinic-about" type="text" class="form-control" placeholder='Clinic about text'
                             aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="about-btn"><i
                                     class="fas fa-question-circle"></i></a></span>
+                        @endif
                     </div><br>
                     <div class="input-group input-group-lg">
                         <span class="input-group-addon">Target</span>
-                        <input id="macaroon" type="text" class="form-control" placeholder='Clinic target text'
+                        @if(clinic.target)
+                        <input id="clinic-target" type="text" class="form-control" value="{{clinic.target}}"
+                            placeholder='Clinic target text' aria-describedby="sizing-addon1"> <span
+                            class="input-group-addon"><a id="target-btn"><i
+                                    class="fas fa-question-circle"></i></a></span>
+                        @else
+                        <input id="clinic-target" type="text" class="form-control" placeholder='Clinic target text'
                             aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="target-btn"><i
                                     class="fas fa-question-circle"></i></a></span>
+                        @endif
                     </div><br>
                     <div class="input-group input-group-lg">
                         <span class="input-group-addon">Location</span>
-                        <input id="macaroon" type="text" class="form-control"
+                        @if(clinic.location)
+                        <input id="clinic-location" type="text" value="{{clinic.location}}" class="form-control"
                             placeholder='Clinic coordinates. Eg: 52.434775, -4.078529' aria-describedby="sizing-addon1">
                         <span class="input-group-addon"></span>
+                        @else
+                        <input id="clinic-location" type="text" class="form-control"
+                            placeholder='Clinic coordinates. Eg: 52.434775, -4.078529' aria-describedby="sizing-addon1">
+                        <span class="input-group-addon"></span>
+                        @endif
+                    </div>
+                    <br>
+                    <div>
+                        <input id="changePicture1" type="file" name="file1"><br>
+                          <img style="display:none" id="userPic1" src="" height="" alt="Clinic Picture 1">   
+                    </div><br>
+                    <div>
+                        <input id="changePicture2" type="file" name="file2"><br>
+                        <img style="display:none" id="userPic2" src="" height="" alt="Clinic Picture 2">   
                     </div>
                 </center>
 
@@ -295,9 +349,8 @@
                     <button id="connect-node" type="button" style="width:100%" class="btn btn-success"><i
                             class="fas fa-save"></i> Create / Save</button>
                     <br><br>
-                    <a href="/donate/{{clinic}}" target="_blank"><button id="connect-node" type="button"
+                    <a href="/donate/{{clinic.name}}" target="_blank"><button id="connect-node" type="button"
                             style="width:100%" class="btn btn-primary"><i class="fas fa-eye"></i> View</button></a>
-
                     <center>
             </div>
         </div>
@@ -323,19 +376,28 @@
     })
 
     $("#connect-node").on("click", function () {
+        const formData = new FormData();
+        formData.append("image1",document.querySelector("input[name=file1]").files[0]);
+        formData.append("image2",document.querySelector("input[name=file2]").files[0]);
+        formData.append("tls", JSON.stringify($("#cert").val()))
+        formData.append("macaroon", JSON.stringify($("#macaroon").val()))
+        formData.append("grpc", JSON.stringify($("#grpc").val()))
+        formData.append("location", JSON.stringify($("#clinic-location").val()))
+        formData.append("name", JSON.stringify($("#clinic-name").val()))
+        formData.append("about", JSON.stringify($("#clinic-about").val()))
+        formData.append("target", JSON.stringify($("#clinic-target").val()))
+        
         var request = $.ajax({
             url: "/api/v0/profile/link-node",
             type: 'post',
-            data: {
-                tls: $("#cert").val(),
-                macaroon: $("#macaroon").val(),
-                grpc: $("#grpc").val()
-            },
+            data: formData,
+            type: "post",
+            contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+            processData: false, // NEEDED, DON'T OMIT THIS
             headers: {
-                'x-csrf-token': $('[name=_csrf]').val()
-            },
-            dataType: 'json'
-        })
+                "x-csrf-token": $("[name=_csrf]").val()
+            }
+            });
 
         request.done(function (data) {
             toast(data.type, data.msg)
@@ -346,6 +408,40 @@
 
         });
     })
+
+    $("#changePicture1").on("change", async function() {
+          var file = document.querySelector("input[type=file]").files[0];
+          var reader = new FileReader();
+
+          reader.onloadend = function() {
+            $("#userPic1").attr("src", reader.result);
+            $("#userPic1").fadeToggle();
+            $("#userPic1").css("width", "100%");
+          };
+
+          if (file) {
+            reader.readAsDataURL(file);
+          } else {
+            console.log("Error on image buffer");
+          }
+        });
+
+        $("#changePicture2").on("change", async function() {
+          var file = document.querySelector("input[type=file]").files[0];
+          var reader = new FileReader();
+
+          reader.onloadend = function() {
+            $("#userPic2").attr("src", reader.result);
+            $("#userPic2").fadeToggle();
+            $("#userPic2").css("width", "100%");
+          };
+
+          if (file) {
+            reader.readAsDataURL(file);
+          } else {
+            console.log("Error on image buffer");
+          }
+        });
 
     $("#deleteSure").on("click", function () {
         var request = $.ajax({
