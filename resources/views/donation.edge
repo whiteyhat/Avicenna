@@ -23,21 +23,23 @@ body { padding-top: 20px; }
         <div class="item active">
           <img src="/img/slider-1.jpg">
            <div class="carousel-caption">
-            <h3>Headline</h3>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. <a href="http://sevenx.de/demo/bootstrap-carousel/" target="_blank" class="label label-danger">Bootstrap 3 - Carousel Collection</a></p>
+            @if(clinic.about)
+            <p>{{clinic.about}}</a></p>
+            @endif
           </div>
         </div><!-- End Item -->
  
          <div class="item">
           <img src="/img/slider-2.jpg">
            <div class="carousel-caption">
-            <h3>Headline</h3>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. <a href="http://sevenx.de/demo/bootstrap-carousel/" target="_blank" class="label label-danger">Bootstrap 3 - Carousel Collection</a></p>
+            @if(clinic.target)
+            <p>{{clinic.target}}</p>
+            @endif
           </div>
         </div><!-- End Item -->
         
         <div class="item">
-            <div class="mapouter"><div class="gmap_canvas"><iframe width="1980" height="500" id="gmap_canvas" src="https://maps.google.com/maps?q=university%20of%20san%20francisco&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe></div><style>.mapouter{position:relative;text-align:right;height:500px;width:1920px;}.gmap_canvas {overflow:hidden;background:none!important;height:500px;width:1920px;}</style></div>
+            <div class="mapouter"><div class="gmap_canvas"><iframe id="maps" width="1980" height="500" id="gmap_canvas" src="" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe></div><style>.mapouter{position:relative;text-align:right;height:500px;width:1920px;}.gmap_canvas {overflow:hidden;background:none!important;height:500px;width:1920px;}</style></div>
           </div>
         </div><!-- End Item -->
                 
@@ -55,7 +57,7 @@ body { padding-top: 20px; }
 <div class="container">
   <div class="row">
     <center>
-        <h1>Donate to {{clinic_name}}</h1>
+        <h1>Donate to {{clinic.name}}</h1>
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{pr}}">      
     </center>
     <br>
@@ -70,6 +72,8 @@ $(document).ready( function() {
     $('#myCarousel').carousel({
 		interval:   4000
 	});
+
+  $('#maps').attr('src', 'https://maps.google.com/maps?q={{x}}%2C%20{{y}}&t=&z=13&ie=UTF8&iwloc=&output=embed')
 	
 	var clickEvent = false;
 	$('#myCarousel').on('click', '.nav a', function() {
