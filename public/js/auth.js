@@ -157,11 +157,8 @@
                 $("#login").fadeIn();
                 toast(data.type, data.msg);
               });
-              request.fail(function(data) {
-                toast("success", data.msg);
-                setTimeout(function() {
-                  // window.location.replace('/');
-                }, 600);
+              request.fail(function(data1, data2) {
+                console.log(data1, data2)
               });
             }
           }
