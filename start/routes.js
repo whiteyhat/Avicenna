@@ -18,9 +18,10 @@ const Route = use('Route')
 
 Route.on('/').render('welcome')
 Route.get('/admin', 'UserController.admin').middleware(['isAdmin:auth'])
-Route.on('/profile').render('profile').middleware(['auth'])
+Route.get('/profile', 'UserController.profile').middleware(['auth'])
 Route.get('/staff', 'UserController.staff').middleware(['auth'])
 Route.on('/new-passport').render('index').middleware(['auth'])
+Route.get('/donate/:wallet', 'UserController.donate')
 
 
 Route.group(() => {
@@ -34,6 +35,7 @@ Route.group(() => {
   Route.post('profile/link-node', 'UserController.noCustodial')
   Route.post('profile/delete', 'UserController.deleteAccount')
   Route.post('passport/pay', 'UserController.paySatellite')
+  Route.post('users/create-new', 'UserController.createUser')
   Route.post('passport/complete', 'UserController.passportComplete')
 
 }).prefix('api/v0')
