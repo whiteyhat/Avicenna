@@ -31,7 +31,7 @@ class LightningService {
         //  Wait for 1 second to read the file as the PDF generation has latency
         setTimeout(function() {
           // Read the file from the path
-          var content = fs.readFileSync(path);
+        var content = fs.readFileSync(path);
 
           // If the 1 second delay to generate the pdf worked, it should be content
           // so this checks the PDF has been generated + read

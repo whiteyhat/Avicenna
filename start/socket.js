@@ -38,7 +38,10 @@ const initWS = async () => {
       // If invoice is paid
       if (data.is_confirmed) {
         // If invoice is equal to 1000 satoshis = If invoice for standard account creation
-        if (data.description ==="Upload Avicenna's Passport to Blockstream Satellite") {
+        if (
+          data.description ===
+          "Upload Avicenna's Passport to Blockstream Satellite"
+        ) {
           Logger.info("Invoice paid for passport generation");
 
           try {
@@ -67,11 +70,18 @@ const initWS = async () => {
                 // The pr must be sent to the client to pay the satellite operation
                 const pr = body.data.lightning_invoice["payreq"];
 
-                // await payInvoice({ lnd, request: pr });
-                  Ws.getChannel('invoice').topic('invoice').emitTo('invoicePaid', {
-                     uuid, authToken
-                     }, [socketId])
+                await payInvoice({ lnd, request: pr });
 
+                Ws.getChannel("invoice")
+                  .topic("invoice")
+                  .emitTo(
+                    "invoicePaid",
+                    {
+                      uuid,
+                      authToken
+                    },
+                    [socketId]
+                  );
               });
           } catch (error) {
             Logger.error("error");
