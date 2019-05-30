@@ -22,6 +22,9 @@ Route.on('/profile').render('profile').middleware(['auth'])
 Route.get('/staff', 'UserController.staff').middleware(['auth'])
 Route.on('/new-passport').render('index').middleware(['auth'])
 
+Route.on('/validate').render('validate')
+Route.post('/validate', 'ValidateController.validate')
+
 
 Route.group(() => {
   Route.post('auth/verify-signature', 'UserController.digitalSignature')

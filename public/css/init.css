@@ -58,3 +58,7 @@ p{
 .no-padding {
     padding: 0;
 }
+
+.tab-pane{
+    margin-bottom: 15px;
+}
