@@ -21,7 +21,12 @@ body { padding-top: 20px; }
       <div class="carousel-inner">
       
         <div class="item active">
+          @if(clinic.image1)
+          <img src="{{clinic.image1}}">
+          @else
           <img src="/img/slider-1.jpg">
+          @endif
+          
            <div class="carousel-caption">
             @if(clinic.about)
             <p>{{clinic.about}}</a></p>
@@ -30,8 +35,12 @@ body { padding-top: 20px; }
         </div><!-- End Item -->
  
          <div class="item">
-          <img src="/img/slider-2.jpg">
-           <div class="carousel-caption">
+            @if(clinic.image2)
+            <img src="{{clinic.image2}}">
+            @else
+            <img src="/img/slider-2.jpg">
+            @endif           
+            <div class="carousel-caption">
             @if(clinic.target)
             <p>{{clinic.target}}</p>
             @endif
