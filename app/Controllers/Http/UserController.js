@@ -2,6 +2,8 @@
 const Logger = use("Logger");
 const edge = require('edge.js')
 const User = use("App/Models/User");
+const Clinic = use("App/Models/Clinic");
+
 const Env = use('Env')
 const LightningService = use("App/Services/LightningService");
 const PdfService = use("App/Services/PdfService");
@@ -99,15 +101,63 @@ class UserController {
     }
   }
 
+  async donate({view, response, params}) {
+    try {
+      const clinicName = params.wallet
+      
+      // Get the user instance to use for the final certification
+      const clinic = await Clinic.findBy("name", clinicName);
+      if (clinic) {
+
+        // Instantiate lnd instance. This is required for evey lightning call
+        const lnd = LightningService.getLndInstance();
+
+        // Time to be cancelled the invoice. After 60 seconds
+        var t = new Date();
+        t.setSeconds(t.getSeconds() + 60 * 3);
+
+        // Create invoice with respective time
+        const pr = await createInvoice({
+          lnd,
+          description: "Donate to " + clinic.name,
+          expires_at: t
+        });
+       
+        edge.global('clinic_name', clinic.name)
+        return view.render('donation', {pr: pr.request})
+      } else {
+        response.send({msg: "No clinic registered with this publick key"})
+      }
+    } catch (error) {
+      Logger.error(error)
+    }
+  }
+
   async admin({auth, view, response}) {
     try {
       if (auth.user.admin) {
-        const users = await Database.select('name', 'id', 'role', 'address', 'email', 'phone', 'clinic', 'wallet', 'created_at').from('users')
+        const users = await Database.select('name', 'id', 'role', 'address', 'email', 'phone', 'wallet', 'created_at').from('users')
         return view.render('admin', {users})
       } else {
         response.send({msg: "You do not have the permission to view the admin panel"})
       }
     } catch (error) {
+      Logger.error(error)
+    }
+  }
+
+  async profile({view, auth, response}) {
+    try {
+        const user = await User.findBy("id", auth.user.id);
+      if (user) {
+        const clinic = await Clinic.findBy("user_id", user.id);
+        const clinics = await Database.select('name').from('clinics')
+        return view.render('profile', {clinic: clinic.name, clinics})
+      } else {
+        response.send({msg: "You do not have the permissions"})
+      }
+    } catch (error) {
+      Logger.error(error)
     }
   }
 
@@ -119,12 +169,15 @@ class UserController {
     }
     if (auth.user.id) {
       const user = await User.findBy("id", auth.user.id);
+      if (user.staff) {
+      const clinic = await Clinic.findBy("user_id", user.id);
 
-      user.grpc = grpc
-      user.macaroon = macaroon
-      user.tls = tls
-      await user.save()
-      return response.send({type: "success", msg: "Lightning node successfully linked"})
+      clinic.grpc = grpc
+      clinic.macaroon = macaroon
+      clinic.tls = tls
+      await clinic.save()
+      return response.send({type: "success", msg: "Lightning node successfully linked"}) 
+      }
     }
   }
 
@@ -362,6 +415,42 @@ class UserController {
     }
   }
 
+    async createUser({auth, request, response}) {
+    
+      try {
+        const {wallet, staff, admin} = request.all()
+
+      if (auth.user.admin) {
+        const nonce = Math.floor(Math.random() * 10000)
+        let msg = ""
+        let type = ""
+        const user = await User.create({wallet: wallet.toLowerCase(), nonce })
+        if (staff === "true") {
+          user.staff = 1
+          await user.save()
+        }
+        if (admin === "true") {
+          user.admin = 1
+          await user.save()
+        }
+        if (user) {
+          msg = "New user added"
+          type = "success"
+        }else{
+           msg = "There was an error when adding a new user"
+           type = "error"
+        }
+
+        response.send({type, msg})
+
+      } else {
+        response.send({type: "error", msg: "You do not have the permission to create"})
+      }
+    } catch (error) {
+      Logger.error(error)
+    }
+  }
+
   async demoAdmin({ auth, request, response }) {
     try {
       const { wallet } = request.all();
@@ -480,7 +569,7 @@ class UserController {
       const nonce =
         "I am signing a secret number (" +
         randomNonce +
-        ") to log in Satoshis.Games platform";
+        ") to log in Avicenna platform";
 
       //   If no public key was in the request body send an error responsee
       if (!wallet) {
