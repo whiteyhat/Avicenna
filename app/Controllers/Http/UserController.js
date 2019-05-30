@@ -201,7 +201,7 @@ class UserController {
 
       const name1 = Date.now().toString()+".jpg"
 
-      await image1.move(Helpers.publicPath('img/'), {
+      await image1.move(Helpers.publicPath('img/donation-pictures/'), {
           name: name1,
           overwrite: true
       })
