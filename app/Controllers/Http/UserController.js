@@ -3,7 +3,7 @@ const Logger = use("Logger");
 const edge = require('edge.js')
 const User = use("App/Models/User");
 const Clinic = use("App/Models/Clinic");
-
+const Helpers = use('Helpers')
 const Env = use('Env')
 const LightningService = use("App/Services/LightningService");
 const PdfService = use("App/Services/PdfService");
@@ -154,6 +154,7 @@ class UserController {
       if (user) {
         const clinic = await Clinic.findBy("user_id", user.id);
         const clinics = await Database.select('name').from('clinics')
+
         return view.render('profile', {clinic, clinics})
       } else {
         response.send({msg: "You do not have the permissions"})
@@ -178,7 +179,6 @@ class UserController {
 
       const image1 = request.file("image1");
       const image2 = request.file("image2");
-      console.log(image1);
 
     if (!grpc || !tls || !macaroon) {
       return response.send({error: "GRPC, TLS CERT or MACAROON must be provided"})
@@ -199,9 +199,32 @@ class UserController {
       clinic.target = targetJson
       clinic.about = aboutJson
 
+      const name1 = Date.now().toString()+".jpg"
 
-      // clinic.image1 = image1
-      // clinic.image2 = image2
+      await image1.move(Helpers.publicPath('img/'), {
+          name: name1,
+          overwrite: true
+      })
+
+      if (!image1.moved()) {
+        logger.error("error when moving image")
+      }
+
+      const name2 = Date.now().toString()+".jpg"
+
+      await image2.move(Helpers.publicPath('img/donation-pictures/'), {
+        name: name2,
+        overwrite: true
+      })
+
+      if (!image2.moved()) {
+        logger.error("error when moving image")
+      }
+
+      // Save path images
+      clinic.image1 = '/img/donation-pictures/'+name1
+      clinic.image2 = '/img/donation-pictures/'+name2
+
 
       // Save clinic
       await clinic.save()
