@@ -122,9 +122,11 @@ class UserController {
           description: "Donate to " + clinic.name,
           expires_at: t
         });
-       
-        edge.global('clinic_name', clinic.name)
-        return view.render('donation', {pr: pr.request})
+
+        const coordinates = clinic.location.split(',')
+        
+    
+        return view.render('donation', {pr: pr.request, clinic, x: coordinates[0], y: coordinates[1]})
       } else {
         response.send({msg: "No clinic registered with this publick key"})
       }
@@ -152,7 +154,7 @@ class UserController {
       if (user) {
         const clinic = await Clinic.findBy("user_id", user.id);
         const clinics = await Database.select('name').from('clinics')
-        return view.render('profile', {clinic: clinic.name, clinics})
+        return view.render('profile', {clinic, clinics})
       } else {
         response.send({msg: "You do not have the permissions"})
       }
@@ -162,7 +164,21 @@ class UserController {
   }
 
   async noCustodial({auth, request, response}) {
-    const {grpc, tls, macaroon} = request.all()
+    const {grpc, tls, macaroon, location, target, about, name} = request.all()
+
+      try {
+        
+      const grpcJson = JSON.parse(grpc)
+      const tlsJson = JSON.parse(tls)
+      const macaroonJson = JSON.parse(macaroon)
+      const locationJson = JSON.parse(location)
+      const targetJson = JSON.parse(target)
+      const aboutJson = JSON.parse(about)
+      const nameJson = JSON.parse(name)
+
+      const image1 = request.file("image1");
+      const image2 = request.file("image2");
+      console.log(image1);
 
     if (!grpc || !tls || !macaroon) {
       return response.send({error: "GRPC, TLS CERT or MACAROON must be provided"})
@@ -172,13 +188,29 @@ class UserController {
       if (user.staff) {
       const clinic = await Clinic.findBy("user_id", user.id);
 
-      clinic.grpc = grpc
-      clinic.macaroon = macaroon
-      clinic.tls = tls
+      // Add lightning details
+      clinic.grpc = grpcJson
+      clinic.macaroon = macaroonJson
+      clinic.tls = tlsJson
+
+      // Add clinic information details
+      clinic.name = nameJson
+      clinic.location = locationJson
+      clinic.target = targetJson
+      clinic.about = aboutJson
+
+
+      // clinic.image1 = image1
+      // clinic.image2 = image2
+
+      // Save clinic
       await clinic.save()
       return response.send({type: "success", msg: "Lightning node successfully linked"}) 
       }
     }
+    } catch (error) {
+        Logger.error(error)
+      }
   }
 
   async passportComplete({ request, response, auth }) {
