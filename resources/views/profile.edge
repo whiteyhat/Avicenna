@@ -336,19 +336,19 @@
                     <div>
                         @if(clinic.image1)
                         <input id="changePicture1" type="file" name="file1"><br>
-                        <img id="userPic1" style="width:100%" src="{{clinic.image1}}" height="" alt="Clinic Picture 1">   
+                        <img id="pic1" style="width:100%" src="{{clinic.image1}}" height="" alt="Clinic Picture 1">   
                         @else
                         <input id="changePicture1" type="file" name="file1"><br>
-                          <img style="display:none" id="userPic1" src="" height="" alt="Clinic Picture 1">   
-                          @endif
+                          <img style="display:none" style="width:100%" id="userPic1" src="" height="" alt="Clinic Picture 1">   
+                        @endif
                     </div><br>
                     <div>
                         @if(clinic.image2)
                         <input id="changePicture2" type="file" name="file2"><br>
-                        <img id="userPic2" style="width:100%" src="{{clinic.image2}}" height="" alt="Clinic Picture 2">  
+                        <img id="pic2" style="width:100%" src="{{clinic.image2}}" height="" alt="Clinic Picture 2">  
                         @else
                         <input id="changePicture2" type="file" name="file2"><br>
-                        <img style="display:none" id="userPic2" src="" height="" alt="Clinic Picture 2"> 
+                        <img  id="userPic2" style="display:none" style="width:100%" src="" height="" alt="Clinic Picture 2"> 
                         @endif  
                     </div>
                 </center>
@@ -387,8 +387,18 @@
 
     $("#connect-node").on("click", function () {
         const formData = new FormData();
-        formData.append("image1",document.querySelector("input[name=file1]").files[0]);
-        formData.append("image2",document.querySelector("input[name=file2]").files[0]);
+        let image1 = document.querySelector("input[name=file1]").files[0];
+        let image2 = document.querySelector("input[name=file2]").files[0];
+
+        if (!document.querySelector("input[name=file1]").files[0]) {
+            image1 = ("#pic1").attr('src')
+        } 
+        if (!document.querySelector("input[name=file2]").files[0]) {
+            image1 = ("#pic2").attr('src')
+        }
+
+        formData.append("image1", image1);
+        formData.append("image2", image2);
         formData.append("tls", JSON.stringify($("#cert").val()))
         formData.append("macaroon", JSON.stringify($("#macaroon").val()))
         formData.append("grpc", JSON.stringify($("#grpc").val()))
@@ -420,12 +430,15 @@
     })
 
     $("#changePicture1").on("change", async function() {
-          var file = document.querySelector("input[type=file]").files[0];
+          var file = document.querySelector("input[name=file1]").files[0];
           var reader = new FileReader();
 
           reader.onloadend = function() {
             $("#userPic1").attr("src", reader.result);
-            $("#userPic1").fadeToggle();
+            $("#userPic1").fadeIn();
+            $("#pic1").attr("src", reader.result);
+            $("#pic1").fadeIn();
+
             $("#userPic1").css("width", "100%");
           };
 
@@ -437,12 +450,14 @@
         });
 
         $("#changePicture2").on("change", async function() {
-          var file = document.querySelector("input[type=file]").files[0];
+          var file = document.querySelector("input[name=file2]").files[0];
           var reader = new FileReader();
 
           reader.onloadend = function() {
             $("#userPic2").attr("src", reader.result);
-            $("#userPic2").fadeToggle();
+            $("#userPic2").fadeIn();
+            $("#pic2").attr("src", reader.result);
+            $("#pic2").fadeIn();
             $("#userPic2").css("width", "100%");
           };
 
