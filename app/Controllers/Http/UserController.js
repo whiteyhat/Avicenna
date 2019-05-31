@@ -404,9 +404,7 @@ class UserController {
           invoiceId: pr.id,
           ipfs_hash: hash,
           satoshis: pr.tokens,
-          socketId,
-          signature: signatureJson,
-          message: messageJson
+          socketId
         });
         // Send invoice request and public key
         return response.send({ pr: pr.request });
