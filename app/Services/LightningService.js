@@ -75,7 +75,7 @@ class LightningService {
         const message =
           "I am signing a secret number (" +
           data.user.nonce +
-          ") to log in Satoshis.Games platform";
+          ") to log in Avicenna platform";
 
         // const wallet = await  lnService.verifyMessage(LndService.getLndInstance(), msg, data.signature)
 

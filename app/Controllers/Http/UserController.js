@@ -1,8 +1,10 @@
 "use strict";
 const Logger = use("Logger");
-const edge = require('edge.js')
+const edge = require("edge.js");
 const User = use("App/Models/User");
-const Env = use('Env')
+const Clinic = use("App/Models/Clinic");
+const Helpers = use("Helpers");
+const Env = use("Env");
 const LightningService = use("App/Services/LightningService");
 const PdfService = use("App/Services/PdfService");
 const Database = use("Database");
@@ -85,46 +87,183 @@ class UserController {
     }
   }
 
-  async staff({auth, view, response}) {
+  async staff({ auth, view, response }) {
     try {
       if (auth.user.wallet) {
-        const users = await Database.select('name', 'role', 'wallet').from('users')
-        edge.global('contract', Env.get('CONTRACT_ADDRESS'))
-        return view.render('staff', {users})
+        const users = await Database.select("name", "role", "wallet").from(
+          "users"
+        );
+        edge.global("contract", Env.get("CONTRACT_ADDRESS"));
+        return view.render("staff", { users });
       } else {
-        response.send({msg: "You do not have the permission to view the admin panel"})
+        response.send({
+          msg: "You do not have the permission to view the admin panel"
+        });
       }
     } catch (error) {
-      Logger.error(error)
+      Logger.error(error);
     }
   }
 
-  async admin({auth, view, response}) {
+  async donate({ view, response, params }) {
+    try {
+      const clinicName = params.wallet;
+
+      // Get the user instance to use for the final certification
+      const clinic = await Clinic.findBy("name", clinicName);
+      if (clinic) {
+        // Instantiate lnd instance. This is required for evey lightning call
+        const lnd = LightningService.getLndInstance();
+
+        // Time to be cancelled the invoice. After 60 seconds
+        var t = new Date();
+        t.setSeconds(t.getSeconds() + 60 * 3);
+
+        // Create invoice with respective time
+        const pr = await createInvoice({
+          lnd,
+          description: "Donate to " + clinic.name,
+          expires_at: t
+        });
+
+        const coordinates = clinic.location.split(",");
+
+        return view.render("donation", {
+          pr: pr.request,
+          clinic,
+          x: coordinates[0],
+          y: coordinates[1]
+        });
+      } else {
+        response.send({ msg: "No clinic registered with this publick key" });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async admin({ auth, view, response }) {
     try {
       if (auth.user.admin) {
-        const users = await Database.select('name', 'id', 'role', 'address', 'email', 'phone', 'clinic', 'wallet', 'created_at').from('users')
-        return view.render('admin', {users})
+        const users = await Database.select(
+          "name",
+          "id",
+          "role",
+          "address",
+          "email",
+          "phone",
+          "wallet",
+          "created_at"
+        ).from("users");
+        const clinics = await Database.select("*").from("clinics");
+
+        return view.render("admin", { users, clinics });
       } else {
-        response.send({msg: "You do not have the permission to view the admin panel"})
+        response.send({
+          msg: "You do not have the permission to view the admin panel"
+        });
       }
     } catch (error) {
+      Logger.error(error);
     }
   }
 
-  async noCustodial({auth, request, response}) {
-    const {grpc, tls, macaroon} = request.all()
-
-    if (!grpc || !tls || !macaroon) {
-      return response.send({error: "GRPC, TLS CERT or MACAROON must be provided"})
-    }
-    if (auth.user.id) {
+  async profile({ view, auth, response }) {
+    try {
       const user = await User.findBy("id", auth.user.id);
+      if (user) {
+        const clinic = await Clinic.findBy("user_id", user.id);
+        const clinics = await Database.select("name").from("clinics");
 
-      user.grpc = grpc
-      user.macaroon = macaroon
-      user.tls = tls
-      await user.save()
-      return response.send({type: "success", msg: "Lightning node successfully linked"})
+        return view.render("profile", { clinic, clinics });
+      } else {
+        response.send({ msg: "You do not have the permissions" });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async noCustodial({ auth, request, response }) {
+    const {
+      grpc,
+      tls,
+      macaroon,
+      location,
+      target,
+      about,
+      name
+    } = request.all();
+
+    try {
+      const grpcJson = JSON.parse(grpc);
+      const tlsJson = JSON.parse(tls);
+      const macaroonJson = JSON.parse(macaroon);
+      const locationJson = JSON.parse(location);
+      const targetJson = JSON.parse(target);
+      const aboutJson = JSON.parse(about);
+      const nameJson = JSON.parse(name);
+
+      const image1 = request.file("image1");
+      const image2 = request.file("image2");
+
+      if (!grpc || !tls || !macaroon) {
+        return response.send({
+          error: "GRPC, TLS CERT or MACAROON must be provided"
+        });
+      }
+      if (auth.user.id) {
+        const user = await User.findBy("id", auth.user.id);
+        if (user.staff) {
+          const clinic = await Clinic.findBy("user_id", user.id);
+
+          // Add lightning details
+          clinic.grpc = grpcJson;
+          clinic.macaroon = macaroonJson;
+          clinic.tls = tlsJson;
+
+          // Add clinic information details
+          clinic.name = nameJson;
+          clinic.location = locationJson;
+          clinic.target = targetJson;
+          clinic.about = aboutJson;
+
+          const name1 = Date.now().toString() + ".jpg";
+
+          await image1.move(Helpers.publicPath("img/donation-pictures/"), {
+            name: name1,
+            overwrite: true
+          });
+
+          if (!image1.moved()) {
+            logger.error("error when moving image");
+          }
+
+          const name2 = Date.now().toString() + ".jpg";
+
+          await image2.move(Helpers.publicPath("img/donation-pictures/"), {
+            name: name2,
+            overwrite: true
+          });
+
+          if (!image2.moved()) {
+            logger.error("error when moving image");
+          }
+
+          // Save path images
+          clinic.image1 = "/img/donation-pictures/" + name1;
+          clinic.image2 = "/img/donation-pictures/" + name2;
+
+          // Save clinic
+          await clinic.save();
+          return response.send({
+            type: "success",
+            msg: "Lightning node successfully linked"
+          });
+        }
+      }
+    } catch (error) {
+      Logger.error(error);
     }
   }
 
@@ -362,6 +501,139 @@ class UserController {
     }
   }
 
+  async createUser({ auth, request, response }) {
+    try {
+      const { wallet, staff, admin } = request.all();
+
+      if (auth.user.admin) {
+        const nonce = Math.floor(Math.random() * 10000);
+        let msg = "";
+        let type = "";
+        const user = await User.create({ wallet: wallet.toLowerCase(), nonce });
+        if (staff === "true") {
+          user.staff = 1;
+          await user.save();
+        }
+        if (admin === "true") {
+          user.admin = 1;
+          await user.save();
+        }
+        if (user) {
+          msg = "New user added";
+          type = "success";
+        } else {
+          msg = "There was an error when adding a new user";
+          type = "error";
+        }
+
+        response.send({ type, msg });
+      } else {
+        response.send({
+          type: "error",
+          msg: "You do not have the permission to create"
+        });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async addUserToClinic({ auth, request, response }) {
+    try {
+      const { name, wallet } = request.all();
+
+      if (auth.user.admin) {
+        let msg = "";
+        let type = "";
+        const user = await User.findBy({ wallet: wallet.toLowerCase() });
+        const clinic = await Clinic.findBy({ name });
+        if (user && clinic) {
+          msg = "New user added";
+          type = "success";
+
+          user.clinic_id = clinic.id;
+          clinic.user_id = user.id;
+
+          await clinic.save();
+          await user.save();
+        } else {
+          msg = "No clinic or user selected";
+          type = "error";
+        }
+
+        response.send({ type, msg });
+      } else {
+        response.send({
+          type: "error",
+          msg: "You do not have the permission to create"
+        });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async removeUserFromClinic({ auth, request, response }) {
+    try {
+      const { name, wallet } = request.all();
+
+      if (auth.user.admin) {
+        let msg = "";
+        let type = "";
+        const user = await User.findBy({ wallet: wallet.toLowerCase() });
+        const clinic = await Clinic.findBy({ name });
+        if (user && clinic) {
+          msg = "New user added";
+          type = "success";
+
+          user.clinic_id = 0;
+
+          await clinic.save();
+          await user.save();
+        } else {
+          msg = "No clinic or user selected";
+          type = "error";
+        }
+
+        response.send({ type, msg });
+      } else {
+        response.send({
+          type: "error",
+          msg: "You do not have the permission to create"
+        });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async createClinic({ auth, request, response }) {
+    try {
+      const { name } = request.all();
+
+      if (auth.user.admin) {
+        let msg = "";
+        let type = "";
+        const clinic = await Clinic.create({ name });
+        if (clinic) {
+          msg = "New clinic added";
+          type = "success";
+        } else {
+          msg = "There was an error when adding a new user";
+          type = "error";
+        }
+        response.send({ type, msg });
+      } else {
+        response.send({
+          type: "error",
+          msg: "You do not have the permission to create"
+        });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   async demoAdmin({ auth, request, response }) {
     try {
       const { wallet } = request.all();
@@ -480,7 +752,7 @@ class UserController {
       const nonce =
         "I am signing a secret number (" +
         randomNonce +
-        ") to log in Satoshis.Games platform";
+        ") to log in Avicenna platform";
 
       //   If no public key was in the request body send an error responsee
       if (!wallet) {
