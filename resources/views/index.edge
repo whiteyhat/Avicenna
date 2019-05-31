@@ -139,19 +139,6 @@
                   }
 
                 </script>
-                @elseif(!auth.user.clinic)
-                <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
-                    continue</button></li>
-
-
-                <script>
-                  function warning() {
-                    toast("warning",
-                      "Please, add your clinic name in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
-                    )
-                  }
-
-                </script>
                 @elseif(!auth.user.phone)
                 <li><button onclick="warning()" type="button" class="btn btn-primary next-step">Save and
                     continue</button></li>
@@ -605,18 +592,6 @@
                   function warning() {
                     toast("warning",
                       "Please, add your email in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
-                    )
-                  }
-
-                </script>
-                @elseif(!auth.user.clinic)
-                <button onclick="warning()" type="button" style="width:100%" class="btn btn-success">Create
-                  Passport</button>
-
-                <script>
-                  function warning() {
-                    toast("warning",
-                      "Please, add your clinic name in your profile <br><a href='/profile'><button type='button'class='btn btn-default'>Edit Profile</button></a>"
                     )
                   }
 
