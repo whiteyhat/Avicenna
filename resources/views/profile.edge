@@ -99,11 +99,14 @@
             <td><i style="font-size:200%" class="fas fa-user-tag"></i></td>
             @if(auth.user.role)
             <td id="roleLabel">{{auth.user.role}}</td>
+            <td><input id="role" class="form-control" style="display:none; width:40%" type="text"
+                placeholder="Type your role" value="{{auth.user.role}}"></td>
             @else
             <td id="roleLabel"></td>
-            @endif
             <td><input id="role" class="form-control" style="display:none; width:40%" type="text"
-                    placeholder="Type your role"></td>
+                placeholder="Type your role"></td>
+            @endif
+            
         </tr>
 
         <tr>
@@ -113,32 +116,38 @@
             <td><i style="font-size:200%" class="fas fa-map-marker-alt"></i></td>
             @if(auth.user.address)
             <td id="addressLabel">{{auth.user.address}}</td>
+            <td><input id="address" class="form-control" style="display:none; width:40%" type="address"
+                placeholder="Type your address" value="{{auth.user.address}}"></td>
             @else
             <td id="addressLabel"></td>
-            @endif
             <td><input id="address" class="form-control" style="display:none; width:40%" type="address"
-                    placeholder="Type your address"></td>
+                placeholder="Type your address"></td>
+            @endif
         </tr>
 
         <tr>
             <td><i style="font-size:200%" class="fas fa-phone"></i></td>
             @if(auth.user.phone)
             <td id="phoneLabel">{{auth.user.phone}}</td>
+            <td><input id="phone" class="form-control" style="display:none; width:40%" type="phone"
+                placeholder="Type your phone" value="{{auth.user.phone}}"></td>
             @else
             <td id="phoneLabel"></td>
-            @endif
             <td><input id="phone" class="form-control" style="display:none; width:40%" type="phone"
-                    placeholder="Type your phone"></td>
+                placeholder="Type your phone"></td>
+            @endif
         </tr>
         <tr>
             <td><i style="font-size:200%" class="far fa-envelope"></i></td>
             @if(auth.user.email)
             <td id="emailLabel"><a href="">{{auth.user.email}}</a></td>
+            <td><input id="email" class="form-control" style="display:none; width:40%" type="email"
+                placeholder="Type your email" value="{{auth.user.email}}"></td>
             @else
             <td id="emailLabel"><a href=""></a></td>
-            @endif
             <td><input id="email" class="form-control" style="display:none; width:40%" type="email"
-                    placeholder="Type your email"></td>
+                placeholder="Type your email"></td>
+            @endif
         </tr>
 
         <tr>
