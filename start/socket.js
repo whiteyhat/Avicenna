@@ -7,8 +7,11 @@ const Logger = use("Logger");
 const axios = require("axios");
 const Ws = use("Ws");
 const payInvoice = require("ln-service/pay");
+const PdfService = use("App/Services/PdfService");
 const Database = use("Database");
-const LightningService = use("App/Services/LightningService");
+const LightningService = use("App/Services/LightningService")
+const OpenTimestamps = require('javascript-opentimestamps')
+const fs = require("fs")
 
 let websocket = null;
 
@@ -38,11 +41,8 @@ const initWS = async () => {
       // If invoice is paid
       if (data.is_confirmed) {
         // If invoice is equal to 1000 satoshis = If invoice for standard account creation
-        if (
-          data.description ===
-          "Upload Avicenna's Passport to Blockstream Satellite"
-        ) {
-          Logger.info("Invoice paid for passport generation");
+        if (data.description ==="Upload Avicenna's Passport to Blockstream Satellite") {
+          Logger.info("Invoice paid for passport generation using Blockstream Satellite");
 
           try {
             // Find invoice by ID and save it into db as paid
@@ -83,6 +83,56 @@ const initWS = async () => {
                     [socketId]
                   );
               });
+          } catch (error) {
+            Logger.error("error");
+            Logger.error(error);
+          }
+        }
+
+        if (data.description.includes("Open Time Stamps")) {
+          Logger.info("Invoice paid for passport generation usin Open Time Stamps");
+
+          const filename = data.description.split("| ");
+          const path = 'public/temp/' + filename[1] + '.pdf'
+
+          try {
+            // Find invoice by ID and save it into db as paid
+            const invoice = await Invoice.findBy("invoiceId", data.id);
+            const socketId = `invoice#${invoice.socketId}`;
+            invoice.is_paid = true;
+            await invoice.save();
+
+            const user = await User.findBy("id", invoice.user_id);
+
+            const file = fs.readFileSync(path)
+            const detached = OpenTimestamps.DetachedTimestampFile.fromBytes(new OpenTimestamps.Ops.OpSHA256(), file);
+            OpenTimestamps.stamp(detached).then( ()=>{
+              const fileOts = detached.serializeToBytes();
+              // automate the self-destruction operation
+              PdfService.autoDeletePdf(path);
+              const frontPath = '/temp/'+ Date.now().toString()+'.ots'
+              const verificationPath = 'public'+ frontPath
+              fs.writeFile( verificationPath, fileOts, async function (err) {
+                  if (err) throw err;
+                  // Upload the hash of the verification hash to IPFS to have a gateway
+                  await LightningService.uploadToIPFS(verificationPath)
+                    .then(function(result) {
+                      // automate the self-destruction operation
+                      PdfService.autoDeletePdf(verificationPath);
+                      Logger.info("IPFS HASH: " + result.hash);
+                       Ws.getChannel("invoice").topic("invoice").emitTo("invoicePaid",{
+                          verification: frontPath,
+                          verificationIpfsPath: result.hash
+                        },
+                        [socketId]
+                      );
+                    })
+                    .catch(function(error) {
+                      console.log("Failed!", error);
+                    });
+                });
+            });
+
           } catch (error) {
             Logger.error("error");
             Logger.error(error);
