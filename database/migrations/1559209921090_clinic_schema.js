@@ -7,10 +7,9 @@ class ClinicSchema extends Schema {
   up () {
     this.create('clinics', (table) => {
       table.increments()
-      table.integer('user_id').unsigned().references('id').inTable('users')
       table.string('name')
       table.text('about')
-      table.string('target')
+      table.text('target')
       table.string('location')
       table.string('image1')
       table.string('image2')
