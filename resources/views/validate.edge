@@ -16,14 +16,15 @@
                 <ul class="nav nav-tabs" role="tablist">
                     <li role="presentation" class="active"><a href="#howto" aria-controls="howto" role="tab" data-toggle="tab">How
                             to</a></li>
-                    <li role="presentation"><a href="#validate" aria-controls="validate" role="tab"
+                    <li role="presentation"><a href="#validate_satellite" aria-controls="validate_satellite" role="tab"
                         data-toggle="tab">Satellite</a></li>
-                    <li role="presentation"><a href="https://opentimestamps.org/" target="_blank"> Open Time Stamps</a></li>
+                    <li role="presentation"><a href="#validate_ots" aria-controls="validate_ots" role="tab"
+                        data-toggle="tab"> Open Time Stamps</a></li>
                 </ul>
 
                 <!-- Tab panes -->
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane" id="validate">
+                    <div role="tabpanel" class="tab-pane" id="validate_satellite">
 
                         <div class="col-md-6">
                             <div class="form-horizontal">
@@ -82,6 +83,63 @@
                         </div>
 
                     </div>
+
+                    <div role="tabpanel" class="tab-pane" id="validate_ots">
+
+                            <div class="col-md-6">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="ost_file" class="col-md-6 control-label">.ost file</label>
+                                        <div class="col-md-6">
+                                                <input type="file" name="ots" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="data_file" class="col-md-6 control-label">Patient raw data</label>
+                                        <div class="col-md-6">
+                                                <input type="file" name="raw_data" />
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                            <div class="col-md-12 text-right">
+                                                <button class="btn btn-primary" id="btn-validate-stamp">Validate</button>
+                                                <a href="https://opentimestamps.org/" target="_blank"><button class="btn btn-secondary" id="btn-validate-stamp">Validate in OTS</button></a>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+    
+                            <div class="col-md-4">
+                                <table class="table table-bordered" id="validateresult" style="display:none">
+                                    <thead>
+                                        <tr>
+                                            <th>Step</th>
+                                            <th>Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">.ost file found</th>
+                                            <td id="ost_found"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Passport data file found</th>
+                                            <td id="raw_found"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Stamp verification match</th>
+                                            <td id="stamp"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" id="message"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+    
+                        </div>
 
 
 
