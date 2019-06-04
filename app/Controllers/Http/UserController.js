@@ -172,7 +172,7 @@ class UserController {
     try {
       const user = await User.findBy("id", auth.user.id);
       if (user) {
-        const clinic = await Clinic.findBy("user_id", user.id);
+        const clinic = await Clinic.findBy("id", user.clinic_id);
         const clinics = await Database.select("name").from("clinics");
 
         return view.render("profile", { clinic, clinics });
@@ -664,7 +664,7 @@ class UserController {
         const nonce = Math.floor(Math.random() * 10000);
         let msg = "";
         let type = "";
-        const user = await User.create({ wallet: wallet.toLowerCase(), nonce });
+        const user = await User.create({ wallet: wallet.toLowerCase(), nonce, clinic_id: (Math.floor(Math.random() * 10))});
         if (staff === "true") {
           user.staff = 1;
           await user.save();
@@ -834,9 +834,9 @@ class UserController {
           .where("user_id", user.id)
           .delete();
         await user.delete();
-        await User.create({ wallet: wallet.toLowerCase(), nonce });
+        await User.create({ wallet: wallet.toLowerCase(), nonce, clinic_id: (Math.floor(Math.random() * 10))});
       } else {
-        await User.create({ wallet: wallet.toLowerCase(), nonce });
+        await User.create({ wallet: wallet.toLowerCase(), nonce , clinic_id: (Math.floor(Math.random() * 10))});
       }
       response.send({
         type: "info",
