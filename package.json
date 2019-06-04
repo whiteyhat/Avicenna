@@ -8,6 +8,7 @@
     "start": "adonis serve --dev",
     "dev": "nodemon --inspect server.js",
     "test": "node ace test",
+    "db": "adonis migration:run --force",
     "seed": "adonis seed --files=ClinicSeeder.js"
   },
   "keywords": [
