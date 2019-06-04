@@ -303,29 +303,29 @@ class UserController {
       const ipfs = JSON.parse(ipfshash);
       const uuidJson = JSON.parse(uuid);
       const authTokenJson = JSON.parse(authToken);
-        
-        // create final data object to create the PDF Certificate
-        const data = {
-          image,
-          patient: jsonPatient,
-          report: reportJson,
-          allergy: allergyJson,
-          immunisation: immunisationJson,
-          social: socialJson,
-          password: passwordJson,
-          medication: medicationJson,
-          certification: {
-            satellite:{
+
+      // create final data object to create the PDF Certificate
+      const data = {
+        image,
+        patient: jsonPatient,
+        report: reportJson,
+        allergy: allergyJson,
+        immunisation: immunisationJson,
+        social: socialJson,
+        password: passwordJson,
+        medication: medicationJson,
+        certification: {
+          satellite: {
             uuid: uuidJson,
-            authToken: authTokenJson,
-            },
-            hash: ipfs,
-            signature: signatureJson,
-            message: messageJson,
-            wallet: user.wallet
+            authToken: authTokenJson
           },
-          doctor: user
-        };
+          hash: ipfs,
+          signature: signatureJson,
+          message: messageJson,
+          wallet: user.wallet
+        },
+        doctor: user
+      };
 
       // Create the final PDF Certificate with the satellite data
       let path = PdfService.generatePDF(data, Date.now().toString());
@@ -350,8 +350,7 @@ class UserController {
     }
   }
 
-
-async otsComplete({ request, response, auth }) {
+  async otsComplete({ request, response, auth }) {
     try {
       const {
         patient,
@@ -387,28 +386,27 @@ async otsComplete({ request, response, auth }) {
       const ipfs = JSON.parse(ipfshash);
       const verificationJson = JSON.parse(verification);
 
-
-        // create final data object to create the PDF Certificate
-        data = {
-          image,
-          patient: jsonPatient,
-          report: reportJson,
-          allergy: allergyJson,
-          immunisation: immunisationJson,
-          social: socialJson,
-          password: passwordJson,
-          medication: medicationJson,
-          certification: {
-            ots:{
+      // create final data object to create the PDF Certificate
+      data = {
+        image,
+        patient: jsonPatient,
+        report: reportJson,
+        allergy: allergyJson,
+        immunisation: immunisationJson,
+        social: socialJson,
+        password: passwordJson,
+        medication: medicationJson,
+        certification: {
+          ots: {
             verification: verificationJson
-            },
-            hash: ipfs,
-            signature: signatureJson,
-            message: messageJson,
-            wallet: user.wallet
           },
-          doctor: user
-        };
+          hash: ipfs,
+          signature: signatureJson,
+          message: messageJson,
+          wallet: user.wallet
+        },
+        doctor: user
+      };
 
       // Create the final PDF Certificate with the satellite data
       let path = PdfService.generatePDF(data, Date.now().toString());
@@ -622,6 +620,9 @@ async otsComplete({ request, response, auth }) {
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath)
           .then(function(result) {
+            // automate the self-destruction operation
+            PdfService.autoDeletePdf(relativePath);
+
             Logger.info("IPFS HASH: " + result.hash);
             return response.send({ hash: result.hash, filename: path });
           })
