@@ -414,6 +414,14 @@
           var pass = $("#encryptPassword").val();
 
           if (check1 && check2 && check3 && pass != undefined) {
+
+            if ($("input[name='satellite']").val() === "true") {
+                $("#loading_text").text("Linking IPFS to Blockstream Satellite");
+                $("#modal_title").text("Upload to Blockstream Satellite");
+            }else{
+                $("#loading_text").text("Certifying using Open Time Stamps");
+                $("#modal_title").text("Certify Passport using Open Time Stamps");
+            }
             $("#loader").fadeToggle();
             $("#createPass").fadeToggle();
 
@@ -485,6 +493,7 @@
                     $("#valid1").toggle();
 
                     const ipfsHash = data.hash;
+                    const filename = data.filename;
 
                     toast(
                       "info",
@@ -496,124 +505,232 @@
                     );
 
                     formData.append("ipfshash", JSON.stringify(ipfsHash));
+                    formData.append("filename", JSON.stringify(filename));
                     formData.append(
                       "socket",
                       JSON.stringify($("[name=_connId]").val())
                     );
 
-                    var request = $.ajax({
-                      url: "/api/v0/passport/pay",
-                      data: formData,
-                      type: "post",
-                      contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-                      processData: false, // NEEDED, DON'T OMIT THIS
-                      headers: {
-                        "x-csrf-token": $("[name=_csrf]").val()
-                      }
-                    });
 
-                    request.done(function(result) {
-                      setTimeout(function() {
-                        toast(
-                          "info",
-                          "Uploading IPFS Passport to the Blockstream Satellite"
-                        );
+                    if ($("input[name='satellite']").val() === "true") {
+                                            
+                      var request = $.ajax({
+                        url: "/api/v0/passport/satellite",
+                        data: formData,
+                        type: "post",
+                        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                        processData: false, // NEEDED, DON'T OMIT THIS
+                        headers: {
+                          "x-csrf-token": $("[name=_csrf]").val()
+                        }
+                      });
 
-                        AnimateProgressbar("#timetopay");
+                      request.done(function(result) {
+                        setTimeout(function() {
+                          toast(
+                            "info",
+                            "Uploading IPFS Passport to the Blockstream Satellite"
+                          );
 
-                        showPR(result, "#pr", "#invoiceRoute", "#pr-string");
+                          showPR(result, "#pr", "#invoiceRoute", "#pr-string");
 
-                        // Event handler to copy the invoice request when click the button copy
-                        copyInvoice("#pr-string", "#copy-invoice");
-                        $("#payreq").modal("show");
+                          // Event handler to copy the invoice request when click the button copy
+                          copyInvoice("#pr-string", "#copy-invoice");
+                          $("#sats").text("15 sats");
+                          $("#payreq").modal("show");
 
-                        ws.getSubscription("invoice").on(
-                          "invoicePaid",
-                          blockstream => {
-                            formData.append(
-                              "uuid",
-                              JSON.stringify(blockstream.uuid)
-                            );
-                            formData.append(
-                              "authToken",
-                              JSON.stringify(blockstream.authToken)
-                            );
+                          ws.getSubscription("invoice").on(
+                            "invoicePaid",
+                            blockstream => {
+                              formData.append(
+                                "uuid",
+                                JSON.stringify(blockstream.uuid)
+                              );
+                              formData.append(
+                                "authToken",
+                                JSON.stringify(blockstream.authToken)
+                              );
 
-                            toast(
-                              "success",
-                              "Passport uploaded to Blockstream Satellite"
-                            );
-                            $("#payreq").modal("hide");
-                            $("#loader2").toggle();
-                            $("#valid2").toggle();
+                              toast(
+                                "success",
+                                "Passport uploaded to Blockstream Satellite"
+                              );
+                              $("#payreq").modal("hide");
+                              $("#loader2").toggle();
+                              $("#valid2").toggle();
 
-                            toast(
-                              "info",
-                              "Generating a Passport certification"
-                            );
-                            setTimeout(() => {
-                              var request = $.ajax({
-                                url: "/api/v0/passport/complete",
-                                data: formData,
-                                type: "post",
-                                contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-                                processData: false, // NEEDED, DON'T OMIT THIS
-                                headers: {
-                                  "x-csrf-token": $("[name=_csrf]").val()
-                                }
-                              });
+                              toast(
+                                "info",
+                                "Generating a Passport certification"
+                              );
+                              setTimeout(() => {
+                                var request = $.ajax({
+                                  url: "/api/v0/passport/satellite/complete",
+                                  data: formData,
+                                  type: "post",
+                                  contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                                  processData: false, // NEEDED, DON'T OMIT THIS
+                                  headers: {
+                                    "x-csrf-token": $("[name=_csrf]").val()
+                                  }
+                                });
 
-                              request.done(function(obj) {
+                                request.done(function(obj) {
                                   $("#loader3").toggle();
                                   $("#valid3").toggle();
 
-                                setTimeout(() => {
+                                  setTimeout(() => {
+                                    $("#loader").fadeToggle();
+                                    $("#passportView").fadeToggle();
+                                    $("#passportQR").attr(
+                                      "src",
+                                      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
+                                        obj.hash
+                                    );
+                                    $("#viewQR").attr(
+                                      "href",
+                                      "temp/" + obj.path
+                                    );
+
+                                    $("#downloadQrCode").on("click", function() {document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
+                                    });
+
+                                    $("#linkQR").attr(
+                                      "href",
+                                      "https://ipfs.io/ipfs/" + obj.hash
+                                    );
+                                  }, 1000);
+                                });
+
+                                request.fail(function(jqXHR, textStatus) {
+                                  console.log(textStatus, jqXHR);
                                   $("#loader").fadeToggle();
-                                  $("#passportView").fadeToggle();
-                                  $("#passportQR").attr(
-                                    "src",
-                                    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
-                                      obj.hash
-                                  );
-                                  $("#viewQR").attr("href", "temp/" + obj.path);
+                                  $("#createPass").fadeToggle();
+                                });
+                              }, 1000);
+                            }
+                          );
+                        }, 2000);
+                      });
 
-                                  $("#downloadQrCode").on("click", function() {
-                                    var a = $("<a>")
-                                      .attr(
-                                        "href",
-                                        "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
-                                          obj.hash
-                                      )
-                                      .attr("download", "img.png")
-                                      .appendTo("body");
+                      request.fail(function(jqXHR, textStatus) {
+                        console.log(textStatus, jqXHR);
+                        $("#loader").fadeToggle();
+                        $("#createPass").fadeToggle();
+                      });
+                    } else {
+                      $("#loading_text").text("Linking IPFS to Blockstream Satellite");
+                      var request = $.ajax({
+                        url: "/api/v0/passport/opentimestamps",
+                        data: formData,
+                        type: "post",
+                        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                        processData: false, // NEEDED, DON'T OMIT THIS
+                        headers: {
+                          "x-csrf-token": $("[name=_csrf]").val()
+                        }
+                      });
 
-                                    a[0].click();
-                                    a.remove();
-                                  });
+                      request.done(function(result) {
+                        setTimeout(function() {
+                          setTimeout(() => {
+                            toast(
+                              "info",
+                              "Pay 5 satoshis to certify the passport using Open Time Stamps"
+                            );
+                          }, 1750);
 
-                                  $("#linkQR").attr(
-                                    "href",
-                                    "https://ipfs.io/ipfs/" + obj.hash
-                                  );
-                                }, 1000);
-                              });
+                          showPR(result, "#pr", "#invoiceRoute", "#pr-string");
 
-                              request.fail(function(jqXHR, textStatus) {
-                                console.log(textStatus, jqXHR);
-                                $("#loader").fadeToggle();
-                                $("#createPass").fadeToggle();
-                              });
-                            }, 1000);
-                          }
-                        );
-                      }, 2000);
-                    });
+                          // Event handler to copy the invoice request when click the button copy
+                          copyInvoice("#pr-string", "#copy-invoice");
+                          $("#sats").text("5 sats");
+                          $("#payreq").modal("show");
+                          
+                          }, 2000);
 
-                    request.fail(function(jqXHR, textStatus) {
-                      console.log(textStatus, jqXHR);
-                      $("#loader").fadeToggle();
-                      $("#createPass").fadeToggle();
-                    });
+                          ws.getSubscription("invoice").on(
+                            "invoicePaid",
+                            ots => {
+                              formData.append(
+                                "verification",
+                                JSON.stringify(ots.verificationIpfsPath)
+                              );
+
+                              toast(
+                                "success",
+                                "Passport certified using Open Time Stamps"
+                              );
+                              $("#payreq").modal("hide");
+                              $("#loader2").toggle();
+                              $("#valid2").toggle();
+
+                              toast(
+                                "info",
+                                "Passport certified using Open Time Stamps accessible using an IPFS gateway. " +
+                                  "<br><a href='https://ipfs.io/ipfs/" +
+                                  ots.verificationIpfsPath +
+                                  "' target='_blank''><button type='button'class='btn btn-default'>Open</button></a>"
+                              );
+
+                              document.getElementById("download_gateway").src =
+                                ots.verification;
+
+                              setTimeout(() => {
+                                var request = $.ajax({
+                                  url: "/api/v0/passport/ots/complete",
+                                  data: formData,
+                                  type: "post",
+                                  contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                                  processData: false, // NEEDED, DON'T OMIT THIS
+                                  headers: {
+                                    "x-csrf-token": $("[name=_csrf]").val()
+                                  }
+                                });
+
+                                request.done(function(obj) {
+                                  $("#loader3").toggle();
+                                  $("#valid3").toggle();
+
+                                  setTimeout(() => {
+                                    $("#loader").fadeToggle();
+                                    $("#passportView").fadeToggle();
+                                    $("#passportQR").attr(
+                                      "src",
+                                      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
+                                        obj.hash
+                                    );
+                                    $("#viewQR").attr(
+                                      "href",
+                                      "temp/" + obj.path
+                                    );
+
+                                    $("#downloadQrCode").on("click", function() {document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
+                                    });
+
+                                    $("#linkQR").attr(
+                                      "href",
+                                      "https://ipfs.io/ipfs/" + obj.hash
+                                    );
+                                  }, 1000);
+                                });
+
+                                request.fail(function(jqXHR, textStatus) {
+                                  console.log(textStatus, jqXHR);
+                                  $("#loader").fadeToggle();
+                                  $("#createPass").fadeToggle();
+                                });
+                              }, 1000);
+                            }
+                          );
+                      });
+
+                      request.fail(function(jqXHR, textStatus) {
+                        console.log(textStatus, jqXHR);
+                        $("#loader").fadeToggle();
+                        $("#createPass").fadeToggle();
+                      });
+                    }
                   });
                   request.fail(function(jqXHR, textStatus) {
                     console.log(textStatus, jqXHR);
