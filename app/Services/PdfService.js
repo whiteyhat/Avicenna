@@ -100,7 +100,6 @@ class PdfService {
           }
         ])
 
-        
 
         patientTable
         // add some plugins (here, a 'fit-to-width' for a column)
@@ -226,9 +225,8 @@ class PdfService {
 
         // If data about bitcoin confirmation has been provided include a section for
         // further validation 
-      if (data.satellite) {
-        const link = "https://avicenna.casa/get/" + data.satellite.uuid
-        const ipfsLink = "https://ipfs.io/ipfs/" + data.satellite.filehash
+      if (data.certification) {
+         const ipfsLink = "https://ipfs.io/ipfs/" + data.certification.hash
 
         //*********************************************
         //************* CERTIFICATION DATA ************
@@ -247,50 +245,120 @@ class PdfService {
         .font('public/fonts/roboto.ttf', 13)
         .moveDown()
         // Add body
-        .text("Avicenna certifies that the atached file identified with the IPFS hash: ", {
+        .text("Avicenna certifies that the atached file identified with the IPFS gateway hash ", {
           width: 470,
           align: 'justify',
           indent: 30,
           height: 300,
-          ellipsis: true
+          ellipsis: true,
+          continued: true
         })
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
-        .text(data.satellite.hash,{
+        .text(data.certification.hash + ' ',{
           link: ipfsLink,
-          underline: true
+          underline: true,
+          continued: true
         })
         .fillColor('black')
         .font('public/fonts/roboto.ttf', 13)
-        .text("saved in the Blockstream Satellite with the Tramsission ID: ", {
+        if (data.certification.satellite) {
+        pdf.text(" saved in the Blockstream Satellite with the Tramsission ID ", {
           width: 470,
           align: 'justify',
           indent: 30,
           height: 300,
-          ellipsis: true
+          underline: false,
+          ellipsis: true,
+          continued: true
         })
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
-        .text(data.satellite.uuid,{
-          link: "https://blockstream.com/satellite-queue/",
-          underline: true
+        .text(data.certification.satellite.uuid,{
+          link: "https://avecinna.casa/validate",
+          underline: true,
+          continued: true
         })
         .fillColor('black')
         .font('public/fonts/roboto.ttf', 13)
-        .text(" and the Authorization Token: ", {
+        .text(" and the Authorization Token ", {
           width: 470,
           align: 'justify',
           indent: 30,
           height: 300,
-          ellipsis: true
+          ellipsis: true,
+          underline: false,
+          continued: true
         })
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
-        .text(data.satellite.authToken,{
-          link: "https://blockstream.com/satellite-queue/",
-          underline: true
+        .text(data.certification.satellite.authToken,{
+          link: "https://avecinna.casa/validate",
+          underline: true,
+          continued: true
         })
-        .moveDown()
+        .fillColor('black')
+        .font('public/fonts/roboto.ttf', 13)
+        .text(".", {
+          width: 470,
+          align: 'justify',
+          indent: 30,
+          height: 300,
+          ellipsis: true,
+          underline: false
+        })
+
+        } else if(data.certification.ots) {
+
+        const otsIpfsLink = "https://ipfs.io/ipfs/" + data.certification.ots.verification
+        pdf.text(", certified using ", {
+          width: 470,
+          align: 'justify',
+          indent: 30,
+          height: 300,
+          ellipsis: true,
+          continued: true,
+          underline: false
+        })
+        .fillColor('blue')
+        .font('public/fonts/roboto.ttf', 13)
+        .text('OpenTimeStamps',{
+          link: "https://opentimestamps.org/",
+          underline: true,
+          continued: true
+        })
+        .fillColor('black')
+        .font('public/fonts/roboto.ttf', 13)
+        .text(" with the stamp ", {
+          width: 470,
+          align: 'justify',
+          indent: 30,
+          height: 300,
+          ellipsis: true,
+          underline: false,
+          continued: true
+        })
+        .fillColor('blue')
+        .font('public/fonts/roboto.ttf', 13)
+        .text(data.certification.ots.verification,{
+          link: otsIpfsLink,
+          underline: true,
+          continued: true
+        })
+        .fillColor('black')
+        .font('public/fonts/roboto.ttf', 13)
+        .text(".", {
+          width: 470,
+          align: 'justify',
+          indent: 30,
+          height: 300,
+          ellipsis: true,
+          underline: false
+        })
+
+        }
+
+        pdf.moveDown()
         .fillColor('black')
         .font('public/fonts/bold.ttf', 19)
         .text( "Passport Emitter",{
@@ -311,9 +379,10 @@ class PdfService {
         })
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
-        .text(data.satellite.wallet,{
-          link: "https://blockexplorer.com/messages/verify",
-          underline: true
+        .text(data.certification.wallet,{
+          link: "http://chainquery.com/bitcoin-api/verifymessage",
+          underline: true,
+          continued: true
         })
         .fillColor('black')
         .font('public/fonts/roboto.ttf', 13)
@@ -322,12 +391,13 @@ class PdfService {
           align: 'justify',
           indent: 30,
           height: 300,
-          ellipsis: true
+          ellipsis: true,
+          underline: false,
         })
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
-        .text(data.satellite.signature,{
-          link: "https://etherscan.io/verifySig",
+        .text(data.certification.signature,{
+          link: "http://chainquery.com/bitcoin-api/verifymessage",
           underline: true
         })
         .moveDown()
@@ -342,7 +412,7 @@ class PdfService {
         })
         .moveDown()
         .font('public/fonts/italic.ttf', 11)
-        .text( data.satellite.message,{
+        .text( data.certification.message,{
           width: 470,
           align: 'justify',
           indent: 30,
@@ -368,7 +438,7 @@ class PdfService {
         //*********************************************
 
         // Add patient image
-      if (data.image && !data.satellite) {
+      if (data.image && !data.certification) {
         pdf
         .image(data.image.tmpPath, {
           align: 'center',
