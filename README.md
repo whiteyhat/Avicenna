@@ -18,11 +18,6 @@ Avicenna solves frontline problems in healthcare using bitcoin distributed techn
 Achieving the target of reducing premature deaths due to incommunicable diseases by 1/3 by the year 2030 would also require more efficient technologies, Avicenna provides a digital health and social care ‘passport’ for each patient, accessible via a unique QR code printed on a card at no cost and evene offline service, for reduced inequalittties without access to digital resources.  
 
 Many more efforts are needed to fully eradicate a wide range of diseases and address many different persistent and emerging health issues. By focusing on providing more efficient health systems, improved sanitation and communication to helps doctors and volunteers serve patients with an open infrastructure, significant progress can be made in helping to save the lives of millions.
-
-###  [Goal 10: Reduce inequality within and among countries](https://www.un.org/sustainabledevelopment/inequality/)
-There is growing consensus that economic growth is not sufﬁcient to reduce poverty if it is not inclusive and if it does not involve the three dimensions of sustainable development – economic, social and environmental. Communities with a low eeconomical infrastructure are not able to provide 
-
-To reduce inequality, Avicenna provides an open healthcare infrastructure to be universal in principle, paying attention to the needs of disadvantaged and marginalized individuals. At the hands of volunteers and doctors, Hippocrartes digitilise clinics allowing notes to be recorded electronically - improving quality, and reducing reliance on paper notes. It provides to every patient their own digital health ‘passport’ that they can access securely and even with no internet access from anywhere.
  
 
 ## Technology
