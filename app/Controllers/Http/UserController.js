@@ -267,7 +267,7 @@ class UserController {
     }
   }
 
-  async passportComplete({ request, response, auth }) {
+  async satelliteComplete({ request, response, auth }) {
     try {
       const {
         patient,
@@ -282,7 +282,8 @@ class UserController {
         wallet,
         uuid,
         ipfshash,
-        authToken
+        authToken,
+        verification
       } = request.all();
 
       // Get the user instance to use for the final certification
@@ -299,30 +300,115 @@ class UserController {
       const passwordJson = JSON.parse(password);
       const signatureJson = JSON.parse(signature);
       const messageJson = JSON.parse(message);
+      const ipfs = JSON.parse(ipfshash);
       const uuidJson = JSON.parse(uuid);
       const authTokenJson = JSON.parse(authToken);
-      const ipfs = JSON.parse(ipfshash);
+        
+        // create final data object to create the PDF Certificate
+        const data = {
+          image,
+          patient: jsonPatient,
+          report: reportJson,
+          allergy: allergyJson,
+          immunisation: immunisationJson,
+          social: socialJson,
+          password: passwordJson,
+          medication: medicationJson,
+          certification: {
+            satellite:{
+            uuid: uuidJson,
+            authToken: authTokenJson,
+            },
+            hash: ipfs,
+            signature: signatureJson,
+            message: messageJson,
+            wallet: user.wallet
+          },
+          doctor: user
+        };
 
-      // create final data object to create the PDF Certificate
-      const data = {
-        image,
-        patient: jsonPatient,
-        report: reportJson,
-        allergy: allergyJson,
-        immunisation: immunisationJson,
-        social: socialJson,
-        password: passwordJson,
-        medication: medicationJson,
-        satellite: {
-          uuid: uuidJson,
-          authToken: authTokenJson,
-          hash: ipfs,
-          signature: signatureJson,
-          message: messageJson,
-          wallet: user.wallet
-        },
-        doctor: user
-      };
+      // Create the final PDF Certificate with the satellite data
+      let path = PdfService.generatePDF(data, Date.now().toString());
+
+      // craete the full relative path
+      const relativePath = "public/temp/" + path;
+
+      // automate the self-destruction operation
+      PdfService.autoDeletePdf(path);
+
+      // Upload the initial medical health record to IPFS
+      await LightningService.uploadToIPFS(relativePath)
+        .then(function(result) {
+          Logger.info("IPFS HASH: " + result.hash);
+          return response.send({ hash: result.hash, path });
+        })
+        .catch(function(error) {
+          console.log("Failed!", error);
+        });
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+
+async otsComplete({ request, response, auth }) {
+    try {
+      const {
+        patient,
+        report,
+        allergy,
+        immunisation,
+        social,
+        medication,
+        password,
+        signature,
+        message,
+        wallet,
+        ipfshash,
+        verification
+      } = request.all();
+
+      // Get the user instance to use for the final certification
+      const user = await User.findBy("id", auth.user.id);
+
+      let data = null;
+
+      // Parse the form data objects
+      const image = request.file("image");
+      const jsonPatient = JSON.parse(patient);
+      const reportJson = JSON.parse(report);
+      const allergyJson = JSON.parse(allergy);
+      const immunisationJson = JSON.parse(immunisation);
+      const socialJson = JSON.parse(social);
+      const medicationJson = JSON.parse(medication);
+      const passwordJson = JSON.parse(password);
+      const signatureJson = JSON.parse(signature);
+      const messageJson = JSON.parse(message);
+      const ipfs = JSON.parse(ipfshash);
+      const verificationJson = JSON.parse(verification);
+
+
+        // create final data object to create the PDF Certificate
+        data = {
+          image,
+          patient: jsonPatient,
+          report: reportJson,
+          allergy: allergyJson,
+          immunisation: immunisationJson,
+          social: socialJson,
+          password: passwordJson,
+          medication: medicationJson,
+          certification: {
+            ots:{
+            verification: verificationJson
+            },
+            hash: ipfs,
+            signature: signatureJson,
+            message: messageJson,
+            wallet: user.wallet
+          },
+          doctor: user
+        };
 
       // Create the final PDF Certificate with the satellite data
       let path = PdfService.generatePDF(data, Date.now().toString());
@@ -413,6 +499,79 @@ class UserController {
       Logger.error(error);
     }
   }
+
+  async payOpenTimeStamps({ auth, request, response }) {
+    try {
+      if (auth.user.id) {
+        const {
+          patient,
+          report,
+          allergy,
+          immunisation,
+          social,
+          medication,
+          password,
+          signature,
+          message,
+          wallet,
+          ipfshash,
+          socket,
+          filename
+        } = request.all();
+
+        // Get the user instance to use for the final certification
+        const user = await User.findBy("id", auth.user.id);
+
+        // Parse the form data objects
+        const image = request.file("image");
+        const jsonPatient = JSON.parse(patient);
+        const hash = JSON.parse(ipfshash);
+        const reportJson = JSON.parse(report);
+        const allergyJson = JSON.parse(allergy);
+        const immunisationJson = JSON.parse(immunisation);
+        const socialJson = JSON.parse(social);
+        const medicationJson = JSON.parse(medication);
+        const passwordJson = JSON.parse(password);
+        const socketId = JSON.parse(socket);
+        const signatureJson = JSON.parse(signature);
+        const messageJson = JSON.parse(message);
+        const filenameJson = JSON.parse(filename);
+
+        Logger.info(filenameJson);
+
+        const split = filenameJson.split(".");
+        const fileId = split[0];
+
+        // Instantiate lnd instance. This is required for evey lightning call
+        const lnd = LightningService.getLndInstance();
+
+        // Time to be cancelled the invoice. After 60 seconds
+        var t = new Date();
+        t.setSeconds(t.getSeconds() + 60 * 3);
+
+        // Create invoice with respective time
+        const pr = await createInvoice({
+          lnd,
+          tokens: 5,
+          description:
+            "Certify Avicenna's Passport using Open Time Stamps | " + fileId,
+          expires_at: t
+        });
+        // create an invoice to the DB with the current resources
+        await Invoices.create({
+          invoiceId: pr.id,
+          ipfs_hash: hash,
+          satoshis: pr.tokens,
+          socketId
+        });
+        // Send invoice request and public key
+        return response.send({ pr: pr.request });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   async newPassport({ auth, request, response }) {
     try {
       if (auth.user.id) {
@@ -460,14 +619,11 @@ class UserController {
         // craete the full relative path
         const relativePath = "public/temp/" + path;
 
-        // automate the self-destruction operation
-        PdfService.autoDeletePdf(path);
-
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath)
           .then(function(result) {
             Logger.info("IPFS HASH: " + result.hash);
-            return response.send({ hash: result.hash });
+            return response.send({ hash: result.hash, filename: path });
           })
           .catch(function(error) {
             console.log("Failed!", error);
