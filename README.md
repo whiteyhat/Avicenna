@@ -1,5 +1,5 @@
 # Avicenna
-###### An open, peer-to-peer and offline healthcare system backed by a distributed infrastructure 
+###### A healthcare system backed by a distributed infrastructure and Bitcoin technology
 
 ## Background - Insight of a specific case
 
@@ -24,9 +24,14 @@ Many more efforts are needed to fully eradicate a wide range of diseases and add
 Avicenna uses and bitcoin distributed infrastructure for security, accountability and connectivity. The tech stack contains:
 * IPFS - for distributed p2p file sharing and encrypting
 * Lightning Network - for tips and micro-payments
-* Blockstream Satellite - to certify data integrity
-* Open Time Stamps - to certify data integrity
-* MySQL - for clinic management
+* Blockstream Satellite - for data integrity certification
+* Open Time Stamps - for data integrity certification
+* MySQL - for relative data management
+* Pdfkit - for PDF document generation
+* Axios - for backend http requests
+* LN-service - for lightning management
+* Sudo-js - for system management (Self-destruct sensitive data from the system)
+* WebLN - for client bitcoin management (digital signatures)
 
 
 ## Gettings Started
@@ -37,4 +42,8 @@ Avicenna uses and bitcoin distributed infrastructure for security, accountabilit
 ```js
 adonis migration:run
 ```
-5. Start the web app: `npm start`
+5. Run the DB seeder to your local database 
+```js
+npm run db
+```
+6. Start the web app: `npm start`
