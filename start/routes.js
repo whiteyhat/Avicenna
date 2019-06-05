@@ -20,10 +20,10 @@ Route.on('/').render('welcome')
 Route.get('/admin', 'UserController.admin').middleware(['isAdmin:auth'])
 Route.get('/profile', 'UserController.profile').middleware(['auth'])
 Route.get('/staff', 'UserController.staff').middleware(['auth'])
-Route.on('/new-passport').render('index').middleware(['auth'])
 Route.get('/donate/:wallet', 'UserController.donate')
+Route.get('/passport/new', 'UserController.passportView').middleware(['auth'])
 
-Route.on('/validate').render('validate')
+Route.on('/passport/validate').render('validate').middleware(['auth'])
 Route.post('/validate', 'ValidateController.validate')
 
 
@@ -45,5 +45,4 @@ Route.group(() => {
   Route.post('users/remove-clinic', 'UserController.removeUserFromClinic')
   Route.post('passport/satellite/complete', 'UserController.satelliteComplete')
   Route.post('passport/ots/complete', 'UserController.otsComplete')
-
 }).prefix('api/v0')
