@@ -15,8 +15,8 @@
                             to</a></li>
                     <li role="presentation"><a href="#validate_satellite" aria-controls="validate_satellite" role="tab"
                         data-toggle="tab">Satellite</a></li>
-                    <li role="presentation"><a href="#validate_ots" aria-controls="validate_ots" role="tab"
-                        data-toggle="tab"> Open Time Stamps</a></li>
+                        <li role="presentation"><a href="https://opentimestamps.org" target="_blank"> Open Time Stamps</a></li>
+
                 </ul>
 
                 <!-- Tab panes -->
@@ -86,17 +86,17 @@
                             <div class="col-md-6">
                                 <div class="form-horizontal">
                                     <div class="form-group">
-                                        <label for="ost_file" class="col-md-6 control-label">.ost file</label>
-                                        <div class="col-md-6">
-                                                <input type="file" name="ots" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
                                         <label for="data_file" class="col-md-6 control-label">Patient raw data</label>
                                         <div class="col-md-6">
-                                                <input type="file" name="raw_data" />
+                                            <input type="file" name="raw_data" />
                                         </div>
                                     </div>
+                                                            <div class="form-group">
+                                                                <label for="ost_file" class="col-md-6 control-label">.ots file</label>
+                                                                <div class="col-md-6">
+                                                                        <input type="file" name="ots" />
+                                                                </div>
+                                                            </div>
 
 
                                     <div class="form-group">
@@ -107,42 +107,69 @@
                                         </div>
                                 </div>
                             </div>
-    
-                            <div class="col-md-4">
-                                <table class="table table-bordered" id="validateresult" style="display:none">
-                                    <thead>
-                                        <tr>
-                                            <th>Step</th>
-                                            <th>Result</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">.ost file found</th>
-                                            <td id="ost_found"></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">Passport data file found</th>
-                                            <td id="raw_found"></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">Stamp verification match</th>
-                                            <td id="stamp"></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2" id="message"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-    
+
                         </div>
 
 
 
                     <div role="tabpanel" class="tab-pane active" id="howto">
-                        <div class="col-md-12">
-                            TODO: How to
+                        <div class="container">
+                            <h2 id="validatesourceauthenticity">Validate source authenticity</h2>
+                            <legend></legend>
+
+                            <h3 id="opentimestamps">Open Time Stamps</h3>
+                            
+                            <p><img style="max-width: 100%" src="https://user-images.githubusercontent.com/31220861/58961519-99bc7b80-87a9-11e9-8535-1d631464fedb.png" alt="OTS verifcication" /></p>
+                            
+                            <h6 id="openpictureinfullscreenhttpsuserimagesgithubusercontentcom312208615896151999bc7b8087a911e985351d631464fedbpng"><a href="https://user-images.githubusercontent.com/31220861/58961519-99bc7b80-87a9-11e9-8535-1d631464fedb.png">Open Picture in full screen</a></h6>
+                            <br>
+                            <ol>
+                            <li><p>p>Download the <code>.ots</code> file and the original data (<code>.pdf</code> file) from the Avicenna's passport.</p></li>
+                            
+                            <li><p>p>Go to <a href="https://opentimestamps.org/">https://opentimestamps.org/</a> and paste first the <code>.ots</code> file and then the <code>.pdf</code> file.</p></li>
+                            
+                            <li><p>p>Click on verify.</p></li>
+                            </ol>
+                            <br>
+                            <h3 id="blockstreamsatellite">Blockstream Satellite</h3>
+                            
+                            <p><img style="max-width: 100%" src="https://user-images.githubusercontent.com/31220861/58958347-fff1d000-87a2-11e9-9745-107e05b0904f.png" alt="satellite verification" /></p>
+                            <h6 id="openpictureinfullscreenhttpsuserimagesgithubusercontentcom3122086158958347fff1d00087a211e99745107e05b0904fpng"><a href="https://user-images.githubusercontent.com/31220861/58958347-fff1d000-87a2-11e9-9745-107e05b0904f.png">Open Picture in full screen</a></h6>
+                            <br>
+                            <ol>
+                            <li><p>Go to Validate Passport from the Avicenna menu bar.</p></li>
+                            
+                            <li><p>Paste the <code>IPFS HASH</code>, <code>SATELLITE UUID</code> and <code>AUTH TOKEN</code>.</p></li>
+                            
+                            <li><p>Click on verify.</p></li>
+                            </ol>
+                            
+                                    <br>
+                                    <br><br>                    
+                            <h2 id="verifysignatureauthenticity">verify signature authenticity</h2>
+                            <legend></legend>
+                            
+                            <p><img style="max-width: 100%" src="https://user-images.githubusercontent.com/31220861/58959800-1ea59600-87a6-11e9-94f6-6c9e0f3e61e8.png" alt="SIGNATURE VERIF" /></p>
+                            <h6 id="openpictureinfullscreenhttpsuserimagesgithubusercontentcom31220861589598001ea5960087a611e994f66c9e0f3e61e8png"><a href="https://user-images.githubusercontent.com/31220861/58959800-1ea59600-87a6-11e9-94f6-6c9e0f3e61e8.png">Open Picture in full screen</a></h6>
+                            
+                            <ol>
+                            <li> <p> Go to <a href="https://tools.qz.sg/">https://tools.qz.sg/</a>.</p></li>
+                            
+                            <li><p>Paste the <code>ADDRESS</code>, <code>SIGNATURE</code> and <code>MESSAGE</code> from the Avicenna's passport.</p></li>
+                            </ol>
+                            <br><br><br>
+                            <h2 id="validatemedicalrecordauthenticity">Validate medical record authenticity</h2>
+                            <legend></legend>
+                            
+                            <p><img style="max-width: 100%" src="https://user-images.githubusercontent.com/31220861/58957740-89a09e00-87a1-11e9-857e-a756f7955ee9.png" alt="data integrity" /></p>
+                            
+                            <h6 id="openpictureinfullscreenhttpsuserimagesgithubusercontentcom312208615895774089a09e0087a111e9857ea756f7955ee9png"><a href="https://user-images.githubusercontent.com/31220861/58957740-89a09e00-87a1-11e9-857e-a756f7955ee9.png">Open Picture in full screen</a></h6>
+                            
+                            <ol>
+                            <li><p>Assert that the link from the passport points to <code>https://ipfs.io/ipfs/</code> + <code>&lt;content_hash&gt;</code>, as displayed above with a brown arrow.</p></li>
+                            
+                            <li><p>Verify that the medical record from the location <code>https://ipfs.io/ipfs/</code> + <code>&lt;content_hash&gt;</code> is identical to the medical record from the Avicenna passport, as represented above.</p></li>
+                            </ol>
                         </div>
                     </div>
                 </div>
