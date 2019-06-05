@@ -34,6 +34,7 @@
     "axios": "^0.18.0",
     "hash.js": "^1.1.7",
     "ipfs-http-client": "^31.1.0",
+    "javascript-opentimestamps": "^0.4.3",
     "ln-service": "^34.7.2",
     "mysql": "^2.17.1",
     "pdfkit": "^0.9.1",
