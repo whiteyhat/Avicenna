@@ -108,8 +108,6 @@ const initWS = async () => {
             const detached = OpenTimestamps.DetachedTimestampFile.fromBytes(new OpenTimestamps.Ops.OpSHA256(), file);
             OpenTimestamps.stamp(detached).then( ()=>{
               const fileOts = detached.serializeToBytes();
-              // automate the self-destruction operation
-              PdfService.autoDeletePdf(path);
               const frontPath = '/temp/'+ Date.now().toString()+'.ots'
               const verificationPath = 'public'+ frontPath
               fs.writeFile( verificationPath, fileOts, async function (err) {
@@ -119,6 +117,7 @@ const initWS = async () => {
                     .then(function(result) {
                       // automate the self-destruction operation
                       PdfService.autoDeletePdf(verificationPath);
+                      PdfService.autoDeletePdf(frontPath);
                       Logger.info("IPFS HASH: " + result.hash);
                        Ws.getChannel("invoice").topic("invoice").emitTo("invoicePaid",{
                           verification: frontPath,
