@@ -4,3 +4,4 @@ package-lock.json
 *.pdf
 public/img/donation-pictures/
 yarn.lock
+*.ots
