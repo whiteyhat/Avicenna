@@ -589,7 +589,7 @@
                                     );
                                     $("#viewQR").attr(
                                       "href",
-                                      "temp/" + obj.path
+                                      "/temp/" + obj.path
                                     );
 
                                     $("#downloadQrCode").on("click", function() {document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
@@ -702,7 +702,7 @@
                                     );
                                     $("#viewQR").attr(
                                       "href",
-                                      "temp/" + obj.path
+                                      "/temp/" + obj.path
                                     );
 
                                     $("#downloadQrCode").on("click", function() {document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
