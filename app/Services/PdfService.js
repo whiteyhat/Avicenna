@@ -263,49 +263,35 @@ class PdfService {
         .fillColor('black')
         .font('public/fonts/roboto.ttf', 13)
         if (data.certification.satellite) {
-        pdf.text(" saved in the Blockstream Satellite with the Tramsission ID ", {
+        pdf.text(" saved in the Blockstream Satellite with the Tramsission ID: ", {
           width: 470,
           align: 'justify',
           indent: 30,
           height: 300,
           underline: false,
-          ellipsis: true,
-          continued: true
-        })
+          ellipsis: true        
+          })
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
         .text(data.certification.satellite.uuid,{
           link: "/passport/validate",
-          underline: true,
-          continued: true
+          underline: true
         })
         .fillColor('black')
         .font('public/fonts/roboto.ttf', 13)
-        .text(" and the Authorization Token ", {
-          width: 470,
-          align: 'justify',
-          indent: 30,
-          height: 300,
-          ellipsis: true,
-          underline: false,
-          continued: true
-        })
-        .fillColor('blue')
-        .font('public/fonts/roboto.ttf', 13)
-        .text(data.certification.satellite.authToken,{
-          link: "/passport/validate",
-          underline: true,
-          continued: true
-        })
-        .fillColor('black')
-        .font('public/fonts/roboto.ttf', 13)
-        .text(".", {
+        .text(" and the Authorization Token: ", {
           width: 470,
           align: 'justify',
           indent: 30,
           height: 300,
           ellipsis: true,
           underline: false
+        })
+        .fillColor('blue')
+        .font('public/fonts/roboto.ttf', 13)
+        .text(data.certification.satellite.authToken,{
+          link: "/passport/validate",
+          underline: true,
         })
 
         } else if(data.certification.ots) {
@@ -380,7 +366,7 @@ class PdfService {
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
         .text(data.certification.wallet,{
-          link: "http://chainquery.com/bitcoin-api/verifymessage",
+          link: "https://tools.qz.sg/",
           underline: true,
           continued: true
         })
@@ -397,7 +383,7 @@ class PdfService {
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
         .text(data.certification.signature,{
-          link: "http://chainquery.com/bitcoin-api/verifymessage",
+          link: "https://tools.qz.sg/",
           underline: true
         })
         .moveDown()
