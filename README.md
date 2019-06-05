@@ -20,7 +20,7 @@ Achieving the target of reducing premature deaths due to incommunicable diseases
 Many more efforts are needed to fully eradicate a wide range of diseases and address many different persistent and emerging health issues. By focusing on providing more efficient health systems, improved sanitation and communication to helps doctors and volunteers serve patients with an open infrastructure, significant progress can be made in helping to save the lives of millions.
  
 
-## Technology
+## Tech Stack
 Avicenna uses and bitcoin distributed infrastructure for security, accountability and connectivity. The tech stack contains:
 * **IPFS** - for distributed p2p file sharing and encrypting
 * **Lightning Network** - for tips and micro-payments
