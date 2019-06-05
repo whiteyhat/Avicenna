@@ -297,9 +297,8 @@ class UserController {
         wallet,
         uuid,
         ipfshash,
-        authToken,
-        verification
-      } = request.all();
+        authToken      
+        } = request.all();
 
       // Get the user instance to use for the final certification
       const user = await User.findBy("id", auth.user.id);
@@ -349,7 +348,7 @@ class UserController {
       const relativePath = "public/temp/" + path;
 
       // automate the self-destruction operation
-      PdfService.autoDeletePdf(path);
+      PdfService.autoDeletePdf(relativePath);
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
@@ -430,7 +429,7 @@ class UserController {
       const relativePath = "public/temp/" + path;
 
       // automate the self-destruction operation
-      PdfService.autoDeletePdf(path);
+      PdfService.autoDeletePdf(relativePath);
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
@@ -550,8 +549,6 @@ class UserController {
         const messageJson = JSON.parse(message);
         const filenameJson = JSON.parse(filename);
 
-        Logger.info(filenameJson);
-
         const split = filenameJson.split(".");
         const fileId = split[0];
 
@@ -632,11 +629,12 @@ class UserController {
         // craete the full relative path
         const relativePath = "public/temp/" + path;
 
+            // automate the self-destruction operation
+            PdfService.autoDeletePdf(relativePath);
+
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath)
           .then(function(result) {
-            // automate the self-destruction operation
-            PdfService.autoDeletePdf(relativePath);
 
             Logger.info("IPFS HASH: " + result.hash);
             return response.send({ hash: result.hash, filename: path });
