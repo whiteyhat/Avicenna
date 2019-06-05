@@ -32,6 +32,21 @@ class UserController {
     }
   }
 
+  async passportView({ request, view, response, auth }){
+     try {
+      const user = await User.findBy("id", auth.user.id);
+      if (user) {
+        const clinic = await Clinic.findBy("id", user.clinic_id);
+
+        return view.render("index", { user, clinic });
+      } else {
+        response.send({ msg: "You do not have the permissions" });
+      }
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   /**
    * Controller to deletet a user only if the admin
    * is sending the request
