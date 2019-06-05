@@ -22,17 +22,16 @@ Many more efforts are needed to fully eradicate a wide range of diseases and add
 
 ## Technology
 Avicenna uses and bitcoin distributed infrastructure for security, accountability and connectivity. The tech stack contains:
-* IPFS - for distributed p2p file sharing and encrypting
-* Lightning Network - for tips and micro-payments
-* Blockstream Satellite - for data integrity certification
-* Open Time Stamps - for data integrity certification
-* MySQL - for relative data management
-* Pdfkit - for PDF document generation
-* Axios - for backend http requests
-* LN-service - for lightning management
-* Sudo-js - for system management (Self-destruct sensitive data from the system)
-* WebLN - for client bitcoin management (digital signatures)
-
+* **IPFS** - for distributed p2p file sharing and encrypting
+* **Lightning Network** - for tips and micro-payments
+* **Blockstream Satellite** - for data integrity certification
+* **Open Time Stamps** - for data integrity certification
+* **MySQL** - for relative data management
+* **Pdfkit** - for PDF document generation
+* **Axios** - for backend http requests
+* **LN-service** - for lightning management
+* **Sudo-js** - for system management (Self-destruct sensitive data from the system)
+* **WebLN** - for client bitcoin management (digital signatures)
 
 ## Gettings Started
 1. Clone the repository: `sudo git clone https://github.com/whiteyhat/Avicenna`
