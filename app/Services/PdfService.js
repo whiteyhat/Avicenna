@@ -275,7 +275,7 @@ class PdfService {
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
         .text(data.certification.satellite.uuid,{
-          link: "https://avecinna.casa/validate",
+          link: "/passport/validate",
           underline: true,
           continued: true
         })
@@ -293,7 +293,7 @@ class PdfService {
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
         .text(data.certification.satellite.authToken,{
-          link: "https://avecinna.casa/validate",
+          link: "/passport/validate",
           underline: true,
           continued: true
         })
