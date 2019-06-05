@@ -1,122 +1,7 @@
 @layout('layouts.master')
 @section('css')
 {{style('css/tab')}}
-<style>
-
-.togglecon {
-  height: auto;
-  margin: -10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 3s ease-in-out;
-}
-
-.uppertextleft {
-  color: black;
-  font-size: 2em;
-  padding-right: 1rem;
-  padding-top: 20px;
-  margin-left: -1rem;
-}
-
-.uppertextright {
-  color: black;
-  font-size: 2em;
-  padding-left: 1.5rem;
-  padding-top: 20px;
-  opacity: 0.1;
-}
-
-.toggle1 {
-  position: relative;
-  cursor: pointer;
-}
-.toggle1:before {
-  content: "";
-  position: relative;
-  width: 70px;
-  height: 28px;
-  top: 7px;
-  left: 5px;
-  background: #061283;
-  opacity: 0.9;
-  display: block;
-  border-radius: 15px;
-  transition: background 0.3s ease;
-}
-
-.toggle1 span {
-  position: absolute;
-  top: 2px;
-  left: 5px;
-  width: 35px;
-  height: 35px;
-  display: block;
-  background: #061283;
-  border: 1px solid #061283;
-  border-radius: 50%;
-  box-shadow: 0px 0px 8px rgba(6, 18, 131, 0.4);
-  transition: all 0.3s ease;
-}
-.toggle1 span:before {
-  content: "";
-  position: absolute;
-  display: block;
-  margin: -8px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: gray;
-  transform: scale(0);
-  opacity: 1;
-}
-.toggle1 span .fa-stamp {
-  color: white;
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-.toggle1 span .fa-satellite {
-  display: none;
-}
-
-#checkbox:checked + .toggle1:before {
-  background: rgba(255, 255, 255, 0.7);
-}
-#checkbox:checked + .toggle1 span {
-  transform: translateX(35px);
-  border: 1px solid #5d56d2;
-  box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.3);
-}
-#checkbox:checked + .toggle1 span:before {
-  transform: scale(2);
-  opacity: 0;
-  transition: all 0.8s ease;
-}
-#checkbox:checked + .toggle1 span .fa-stamp {
-  display: none;
-}
-#checkbox:checked + .toggle1 span .fa-satellite {
-  color: white;
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-/* UI Changes for when Light option is selected. Add any further changes here. */
-.lightUI {
-  margin: -10px;
-  transition: all 1.3s ease-in-out;
-}
-.lightUI .uppertextleft {
-  opacity: 0.1;
-}
-.lightUI .uppertextright {
-  opacity: 1;
-}
-
-</style>
+{{style('css/toggle')}}
 @endsection
 @section('content')
 
@@ -626,24 +511,24 @@
                       <center>
                         <h1 style="font-size:35px">1</h1>
                         <h3 style="color:gray"> Uploading Avicenna's Passport to IPFS</h3>
-                        <img id="loader1" style="height:200px" src="img/loading.gif" alt="loading...">
-                        <img id="valid1" style="height:200px; display:none" src="img/check.gif" alt="loading...">
+                        <img id="loader1" style="height:200px" src="/img/loading.gif" alt="loading...">
+                        <img id="valid1" style="height:200px; display:none" src="/img/check.gif" alt="loading...">
                       </center>
                     </div>
                     <div class="col-md-4">
                       <center>
                         <h1 style="font-size:35px"> 2</h1>
                         <h3 id="loading_text" style="color:gray"></h3>
-                        <img id="loader2" style="height:200px" src="img/loading.gif" alt="loading...">
-                        <img id="valid2" style="height:200px; display:none" src="img/check.gif" alt="loading...">
+                        <img id="loader2" style="height:200px" src="/img/loading.gif" alt="loading...">
+                        <img id="valid2" style="height:200px; display:none" src="/img/check.gif" alt="loading...">
                       </center>
                     </div>
                     <div class="col-md-4">
                       <center>
                         <h1 style="font-size:35px">3</h1>
                         <h3 style="color:gray"> Generating a Secure Gateway to view the Passport </h3>
-                        <img id="loader3" style="height:200px" src="img/loading.gif" alt="loading...">
-                        <img id="valid3" style="height:200px; display:none" src="img/check.gif" alt="loading...">
+                        <img id="loader3" style="height:200px" src="/img/loading.gif" alt="loading...">
+                        <img id="valid3" style="height:200px; display:none" src="/img/check.gif" alt="loading...">
                       </center>
                     </div>
                   </div>
@@ -821,11 +706,11 @@
   </div>
 </div>
 
-<input type="hidden" name="doctorName" value={{auth.user.name}}>
-<input type="hidden" name="doctorRole" value={{auth.user.role}}>
-<input type="hidden" name="doctorClinic" value={{auth.user.clinic}}>
-<input type="hidden" name="doctorPhone" value={{auth.user.phone}}>
-<input type="hidden" name="doctorClinicAddress" value={{auth.user.address}}>
+<input type="hidden" name="doctorName" value={{user.name}}>
+<input type="hidden" name="doctorRole" value={{user.role}}>
+<input type="hidden" name="doctorClinic" value={{clinic.name}}>
+<input type="hidden" name="doctorPhone" value={{user.phone}}>
+<input type="hidden" name="doctorClinicAddress" value={{user.address}}>
 <input type="hidden" name="doctorEmail" value={{auth.user.email}}>
 <input type="hidden" name="satellite" value="false">
 
@@ -841,5 +726,5 @@ $("input[name='method']").change(function(){
   }
 });
 </script>
-{{ script('js/bundle.js') }}
+{{ script('/js/bundle.js') }}
 @endsection
