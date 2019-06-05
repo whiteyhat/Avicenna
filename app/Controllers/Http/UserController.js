@@ -273,7 +273,7 @@ class UserController {
           await clinic.save();
           return response.send({
             type: "success",
-            msg: "Lightning node successfully linked"
+            msg: "Donation page updated"
           });
         }
       }
