@@ -432,13 +432,13 @@
               $("[name=doctorClinic]").val() +
               ", I can confirm that the accuracy of this medical record is my responsibility and/or " +
               $("[name=doctorClinic]").val() +
-              "'s responsabity. This medical record is confidential and belongs uniquely to " +
+              "'s responsibility. This medical record is confidential and belongs uniquely to " +
               patient.name +
               " or his/her or legal guardian. This data has been encrypted with a password provided by " +
               patient.name +
               " or his/her legal guardian. \n\n Me, " +
               $("[name=doctorName]").val() +
-              ", I agree with this terms and use my public keys from my bitcoin wallet to sign this legitimate document, today, " +
+              ", I agree with these terms and use my public keys from my bitcoin wallet to sign this legitimate document, today, " +
               formatDate(new Date()) +
               ".";
 
