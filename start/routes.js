@@ -1,31 +1,34 @@
 'use strict'
 
-/*
-|--------------------------------------------------------------------------
-| Routes
-|--------------------------------------------------------------------------
-|
-| Http routes are entry points to your web application. You can create
-| routes for different URL's and bind Controller actions to them.
-|
-| A complete guide on routing is available here.
-| http://adonisjs.com/docs/4.1/routing
-|
-*/
-
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
+
+/*
+|--------------------------------------------------------------------------
+|                                  VIEWS
+|--------------------------------------------------------------------------
+*/
 
 Route.on('/').render('welcome')
 Route.get('/admin', 'UserController.admin').middleware(['isAdmin:auth'])
 Route.get('/profile', 'UserController.profile').middleware(['auth'])
 Route.get('/staff', 'UserController.staff').middleware(['auth'])
 Route.get('/donate/:wallet', 'UserController.donate')
+
+/*
+|--------------------------------------------------------------------------
+|                                 PASSPORT
+|--------------------------------------------------------------------------
+*/
+
 Route.get('/passport/new', 'UserController.passportView').middleware(['auth'])
-
 Route.on('/passport/validate').render('validate').middleware(['auth'])
-Route.post('/validate', 'ValidateController.validate')
 
+/*
+|--------------------------------------------------------------------------
+|                                  API
+|--------------------------------------------------------------------------
+*/
 
 Route.group(() => {
   Route.post('auth/verify-signature', 'UserController.digitalSignature')
@@ -45,4 +48,6 @@ Route.group(() => {
   Route.post('users/remove-clinic', 'UserController.removeUserFromClinic')
   Route.post('passport/satellite/complete', 'UserController.satelliteComplete')
   Route.post('passport/ots/complete', 'UserController.otsComplete')
+  Route.post('passport/satellite/validate', 'ValidateController.validate')
+
 }).prefix('api/v0')
