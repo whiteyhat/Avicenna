@@ -70,7 +70,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     ],
     2: [
       function(require, module, exports) {
+        // instantaite webln provider
         var requestProvider = require("webln/lib/client");
+
+        // instantiate main variables to store data about the patient
         var patient,
           report,
           allergy,
@@ -81,11 +84,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         var allergyCounter = 0;
         var immunisationCounter = 0;
         var medication = 0;
+
+        // instantiate user data arrays
         var conditionArray = [];
         var allergyArray = [];
         var immunisationArray = [];
         var medicationArray = [];
         var image = "";
+
+        // instantiate ws object
         var ws;
 
         $(document).ready(function() {
@@ -104,7 +111,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           //Initialize tooltips
           $(".nav-tabs > li a[title]").tooltip();
 
-          //Wizard
+          // Wizard tabs
           $('a[data-toggle="tab"]').on("show.bs.tab", function(e) {
             var $target = $(e.target);
 
@@ -113,17 +120,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             }
           });
 
+          // next wizard tab
           $(".next-step").click(function(e) {
             var $active = $(".wizard .nav-tabs li.active");
             $active.next().removeClass("disabled");
             nextTab($active);
           });
+
+          // previous wizard tab
           $(".prev-step").click(function(e) {
             var $active = $(".wizard .nav-tabs li.active");
             prevTab($active);
           });
         });
 
+        // next wizard tab behaviour
         function nextTab(elem) {
           $(elem)
             .next()
@@ -131,23 +142,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             .click();
         }
 
+        // next wizard tab behaviour
         function prevTab(elem) {
           $(elem)
             .prev()
             .find('a[data-toggle="tab"]')
             .click();
         }
+
+        // Add medical condition
         $("#add-condition").on("click", async function() {
+
+          // Create report data object
           report = {
             condition: $("#condition").val(),
             year: $("#year").val(),
             notes: $("#condition-notes").val()
           };
 
+          // push the condition data object into the array
           conditionArray.push(report);
+
+          // add 1 more to the condition counter
           conditionCounter++;
+
+          // display medical conditions in the console log
           console.log(conditionArray);
 
+          // append the condition in the view
           $("#conditionblock").append(
             '<div class="input-group input-group-sm"><span class="input-group-addon"><b>Condition</b></span><input disabled value="' +
               report.condition +
@@ -158,28 +180,41 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               "</textarea></div><legend></legend>"
           );
 
+          // clear the textfields to allow another entry to be typed
           $("#condition").val("");
           $("#year").val("");
           $("#condition-notes").val("");
           toast("info", "New condition added");
         });
 
+        // Add allergy
         $("#add-allergy").on("click", function() {
+
+          // instantiate tas no risky
           let risk = "No";
+
+          // if the risk option is checked then make it risky
           if ($("#risk").is(":checked")) {
             risk = "Yes";
           }
 
+          // create the allergy data object
           allergy = {
             name: $("#allergy-name").val(),
             risk: risk,
             notes: $("#allergy-notes").val()
           };
 
+          // push the allergy data object into the array
           allergyArray.push(allergy);
+
+          // add 1 more to the allergy counter
           allergyCounter++;
+
+          // display allergies in the console log
           console.log(allergy);
 
+          // append the allergy in the view
           if (risk) {
             $("#allergyblock").append(
               '<div class="input-group input-group-sm"><span class="input-group-addon" id="sizing-addon1"><b>Allergy</b></span><input disabled value="' +
@@ -197,20 +232,35 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 "</textarea></div><legend></legend>"
             );
           }
+
+          // display notification to the user
           toast("info", "New allergy added");
+
+          // clear the textfields to allow another entry to be typed
           $("#allergy-name").val("");
           $("#allergy-notes").val("");
           $("#risk").prop("checked", false);
         });
 
+        // Add an immunisation
         $("#add-immunisation").on("click", function() {
+
+          // create the immunisation data object
           immunisation = {
             name: $("#immunisation-name").val(),
             year: $("#immunisation-date").val()
           };
+
+          // push the immunisation data object into the array
           immunisationArray.push(immunisation);
+
+           // add 1 more to the allergy counter
           immunisationCounter++;
+
+          // display immunisation in the console log
           console.log(immunisationArray);
+
+          // append the immunisation in the view
           $("#immunisationblock").append(
             '<div class="input-group input-group-sm"><span class="input-group-addon" id="sizing-addon1"><b>Allergy</b></span><input  disabled value="' +
               immunisation.name +
@@ -219,11 +269,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               '" disabled type="text" class="form-control"aria-describedby="sizing-addon1"></div><legend></legend>'
           );
 
+          // clear the textfields to allow another entry to be typed
           $("#immunisation-name").val("");
           $("#immunisation-date").val("");
+
+          // display notification to the user
           toast("info", "New immunisation added");
         });
+
+        // When clickin on the save button 1 
         $("#save1").on("click", async function() {
+          
+          // instantiate the WebLN instance
           let webln;
           try {
             webln = await requestProvider.requestProvider();
