@@ -21,10 +21,11 @@ const Database = use("Database");
 const lnService = require("ln-service");
 const createInvoice = require("ln-service/createInvoice");
 const Invoices = use("App/Models/Invoice");
+const axios = require("axios");
 
 /**
 Class to perform
- */ 
+ */
 class UserController {
   /**
    * Controller to log out from the auth middleware
@@ -161,13 +162,13 @@ class UserController {
 
         // If the health-care facility has activated the non-custodial feature
         if (clinic.tls && clinic.grgpc && clinic.macaroon) {
-          
+
           // Instantiate the non custodial ln instance using their invoice macaroon
           lnd = LightningService.nonCustodialLndInstance();
-        }else{
+        } else {
 
-        // Instantiate the custodial lnd instance. This is required for evey lightning call
-         lnd = LightningService.getLndInstance();
+          // Instantiate the custodial lnd instance. This is required for evey lightning call
+          lnd = LightningService.getLndInstance();
         }
 
         // Time to be cancelled the invoice. After 60 seconds
@@ -438,14 +439,14 @@ class UserController {
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
-        .then(function(result) {
+        .then(function (result) {
           // Display the IPFS HASH in the console log
           Logger.info("IPFS HASH: " + result.hash);
 
           // Return the IPFS hash gateway to the user
           return response.send({ hash: result.hash, path });
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log("Failed!", error);
         });
     } catch (error) {
@@ -527,14 +528,14 @@ class UserController {
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
-        .then(function(result) {
+        .then(function (result) {
           // Display the IPFS HASH in the console log
           Logger.info("IPFS HASH: " + result.hash);
 
           // Return the IPFS hash gateway to the user
           return response.send({ hash: result.hash, path });
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log("Failed!", error);
         });
     } catch (error) {
@@ -612,30 +613,51 @@ class UserController {
         const split = filenameJson.split(".");
         const fileId = split[0];
 
-        // Instantiate lnd instance. This is required for evey lightning call
-        const lnd = LightningService.getLndInstance();
+        let payRequest = null;
+        const description = "Certify Avicenna's Passport using Open Time Stamps | " + fileId;
 
-        // Time to be cancelled the invoice. After 60 seconds
-        var t = new Date();
-        t.setSeconds(t.getSeconds() + 60 * 3);
+        if (Env.get('OPEN_NODE_PROVIDER')) {
+          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: 5, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
+          const data = response.data.data;
+          payRequest = data.lightning_invoice.payreq;
+          // create an invoice to the DB with the current resources
+          await Invoices.create({
+            invoiceId: data.id,
+            ipfs_hash: hash,
+            satoshis: data.amount,
+            socketId
+          });
+        }
+        else {
+          // Instantiate lnd instance. This is required for evey lightning call
+          const lnd = LightningService.getLndInstance();
 
-        // Create invoice with respective time
-        const pr = await createInvoice({
-          lnd,
-          tokens: 5,
-          description:
-            "Certify Avicenna's Passport using Open Time Stamps | " + fileId,
-          expires_at: t
-        });
-        // create an invoice to the DB with the current resources
-        await Invoices.create({
-          invoiceId: pr.id,
-          ipfs_hash: hash,
-          satoshis: pr.tokens,
-          socketId
-        });
+          // Time to be cancelled the invoice. After 60 seconds
+          var t = new Date();
+          t.setSeconds(t.getSeconds() + 60 * 3);
+
+          // Create invoice with respective time
+          const pr = await createInvoice({
+            lnd,
+            tokens: 5,
+            description,
+            expires_at: t
+          });
+
+          // create an invoice to the DB with the current resources
+          await Invoices.create({
+            invoiceId: pr.id,
+            ipfs_hash: hash,
+            satoshis: pr.tokens,
+            socketId
+          });
+
+          payRequest = invoice.request;
+        }
+
+
         // Send invoice request and public key
-        return response.send({ pr: pr.request });
+        return response.send({ pr: payRequest });
       }
     } catch (error) {
       Logger.error(error);
@@ -700,14 +722,14 @@ class UserController {
 
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath)
-          .then(function(result) {
+          .then(function (result) {
             // Display the IPFS HASH in the console log
             Logger.info("IPFS HASH: " + result.hash);
 
             // Return the IPFS hash gateway to the user
             return response.send({ hash: result.hash, filename: path });
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log("Failed!", error);
           });
       } else {
@@ -1168,7 +1190,7 @@ class UserController {
 
       //   If the signature is verified
 
-      await LightningService.verifyDigitalSignature(data).then(async function(
+      await LightningService.verifyDigitalSignature(data).then(async function (
         result
       ) {
         if (result.pubkey.signed_by.toLowerCase() === user.wallet) {
