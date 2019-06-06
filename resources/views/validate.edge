@@ -193,14 +193,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <script type="text/javascript">
     $(document).ready(function () {
 
+        // When clicking on add a validate blockstream satellite
         $('#btn-validate').click(function () {
+
+            // hide component
             $('#validateresult').hide();
+
+            // load button aanimation
             lockButton();
+
+            // create data object containing the main essentail validator parameters
             var data = {
                 uuid: $('#uuid').val(),
                 authtoken: $('#authtoken').val(),
                 filehash: $('#filehash').val(),
             }
+
+            // do http request to validate the inputs from the passport
             var request = $.ajax({
                 url: "/validate",
                 type: 'post',
@@ -211,30 +220,38 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 dataType: 'json'
             })
 
+            // If successful display the validation details
             request.done(function (data) {
                 $('#txfound').html(getOkKo(data.satellite.txFound));
                 $('#txpaid').html(getOkKo(data.satellite.isPaid));
                 $('#ipfshash').html(getOkKo(data.ipfs.isSha256Ok));
                 $('#message').html(data.message);
                 $('#validateresult').show();
+
+                // Unload the button animation
                 unlockButton();
 
             });
+
+            // If error display the error message
             request.fail(function (jqXHR, textStatus) {
                 toast('error', textStatus + jqXHR);
                 unlockButton();
             });
         });
 
+        // Function to get the ok geen message
         function getOkKo(isValid) {
             return isValid ? '<span class="text-success">OK</span>' : '<span class="text-danger">KO</span>';
         }
 
+        // Function for the loading the button animation
         function lockButton(){
             $('#btn-validate').attr('disabled', true);
             $('#btn-validate').html('Validate <i class="fas fa-circle-notch fa-spin"></i>');
         }
 
+        // Function to unlock the loading animation
         function unlockButton(){
             $('#btn-validate').attr('disabled', false);
             $('#btn-validate').html('Validate');
