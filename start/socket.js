@@ -20,7 +20,8 @@ const PdfService = use("App/Services/PdfService");
 const Database = use("Database");
 const LightningService = use("App/Services/LightningService")
 const OpenTimestamps = require('javascript-opentimestamps')
-const fs = require("fs")
+const fs = require("fs");
+const Env = use("Env");
 
 let websocket = null;
 
@@ -206,7 +207,10 @@ const deleteInvoices = async () => {
 
 // Since BTCPay Server closes WS every 90 seconds it must be looped recursively
 try {
-  initWS();
+  const isOpenNodeProvider = Env.get('OPEN_NODE_PROVIDER');
+  if (!isOpenNodeProvider) {
+    initWS();
+  }
 } catch (error) {
   Logger.error(error);
 }
