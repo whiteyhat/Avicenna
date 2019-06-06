@@ -247,9 +247,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <script>
   $(document).ready(function () {
-        //Wizard
+
+        // When clicking on the learn more button
         $('#learnMore').click(function() {
 
+          // Scroll down to the next section
           $('html, body').animate({
             scrollTop: $("#content").offset().top
           }, 1500);
