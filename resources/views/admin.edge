@@ -297,6 +297,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <script>
 
+// When clicking on update clinic change the view to manage clinics
 $("#updateClinicName").on("click", function () {
   $("#updateName").toggle()
   $("#updateAddUser").toggle()
@@ -307,15 +308,23 @@ $("#updateClinicName").on("click", function () {
 
 })
 
+    // When clicking on add a user, create a new user
     $("#addUserBtn").on("click", function () {
+        // By default the user would be a standard user
         let staff = "false";
         let admin = "false";
+
+        // If the staff option is clicked, allocate such permissions
         if ($("#staff").is(":checked")) {
             staff = "true"
         }
+
+        // If the admin option is clicked, allocate such permissions
         if ($("#admin").is(":checked")) {
             admin = "true"
         }
+
+        // do http request to create a new user in the system
         var request = $.ajax({
             url: "/api/v0/users/create-new",
             data: {
@@ -330,18 +339,24 @@ $("#updateClinicName").on("click", function () {
             dataType: 'json'
         })
 
+        // If successful display a message from the backend and refresh the page
         request.done(function (data) {
             toast(data.type, data.msg);
             setTimeout(() => {
                 window.location.reload()
             }, 800);
         });
+
+        // If error display the error message
         request.fail(function (jqXHR, textStatus) {
             toast('error', textStatus + jqXHR);
         });
     })
 
+    // When clicking on update a user, edit an existing user
     $("#updateAddUser").on("click", function () {
+
+        // do http request to update an existing user in the system
         var request = $.ajax({
             url: "/api/v0/users/join-clinic",
             data: {
@@ -355,15 +370,21 @@ $("#updateClinicName").on("click", function () {
             dataType: 'json'
         })
 
+        // If successful display a message from the backend 
         request.done(function (data) {
             toast(data.type, data.msg);
         });
+
+        // If error display the error message
         request.fail(function (jqXHR, textStatus) {
-            toast('error', textStatus + jqXHR);
+            console.log(jqXHR, textStatus)
         });
     })
 
+    // When clicking on remove a user, delete an existing user
     $("#updateRemoveUser").on("click", function () {
+
+         // do http request to remove an existing user in the system
         var request = $.ajax({
             url: "/api/v0/users/remove-clinic",
             data: {
@@ -377,15 +398,21 @@ $("#updateClinicName").on("click", function () {
             dataType: 'json'
         })
 
+        // If successful display a message from the backend 
         request.done(function (data) {
             toast(data.type, data.msg);
         });
+
+        // If error display the error message
         request.fail(function (jqXHR, textStatus) {
           console.log(jqXHR, textStatus)
         });
     })
 
+    // When clicking on add a clinic, add a new clinic
     $("#addClinicBtn").on("click", function () {
+
+        // do http request to add a new clinic in the system
         var request = $.ajax({
             url: "/api/v0/clinics/create-new",
             data: {
@@ -398,14 +425,17 @@ $("#updateClinicName").on("click", function () {
             dataType: 'json'
         })
 
+        // If successful display a message from the backend and refresh the page
         request.done(function (data) {
             toast(data.type, data.msg);
             setTimeout(() => {
                 window.location.reload()
             }, 800);
         });
+
+        // If error display the error message
         request.fail(function (jqXHR, textStatus) {
-            toast('error', textStatus + jqXHR);
+            console.log(jqXHR, textStatus)
         });
     })
 
