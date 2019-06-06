@@ -76,7 +76,7 @@ body { padding-top: 20px; }
   <div class="row">
     <center>
         <h1>Donate to {{clinic.name}}</h1>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{pr}}">      
+        <a href="lightning:{{pr}}"><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{pr}}"></a>      
     </center>
     <br>
   </div>
@@ -87,13 +87,17 @@ body { padding-top: 20px; }
 
 <script>
 $(document).ready( function() {
+    // add carousel time interval to slideshow images
     $('#myCarousel').carousel({
 		interval:   4000
 	});
 
+  // Add map location
   $('#maps').attr('src', 'https://maps.google.com/maps?q={{x}}%2C%20{{y}}&t=&z=13&ie=UTF8&iwloc=&output=embed')
 	
 	var clickEvent = false;
+
+  // When clicking in the carousel add animation to control from the buttons
 	$('#myCarousel').on('click', '.nav a', function() {
 			clickEvent = true;
 			$('.nav li').removeClass('active');
