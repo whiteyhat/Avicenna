@@ -211,7 +211,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
             // do http request to validate the inputs from the passport
             var request = $.ajax({
-                url: "/validate",
+                url: "/api/v0/passport/satellite/validate",
                 type: 'post',
                 data: data,
                 headers: {
