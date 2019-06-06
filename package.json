@@ -9,7 +9,7 @@
     "dev": "nodemon --inspect server.js",
     "test": "node ace test",
     "db": "adonis migration:run --force",
-    "seed": "adonis seed --files=ClinicSeeder.js"
+    "seed": "adonis seed --files=ClinicSeeder.js && adonis seed --files=UserSeeder.js"
   },
   "keywords": [
     "adonisjs",
