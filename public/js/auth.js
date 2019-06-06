@@ -71,7 +71,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     2: [
       function(require, module, exports) {
 
-        // Get the request WebLN provider
+        // Request WebLN provider
         var requestProvider = require("webln/lib/client");
 
         // Instantiate the auth variable
