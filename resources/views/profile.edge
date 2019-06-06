@@ -386,25 +386,39 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </div>
 
 <script>
-
+    
+    // When clicking on tls show help alert
     $("#tls-btn").on("click", function () {
         $("#tls-help").toggle()
     })
+
+    // When clicking on macaroon show help alert
     $("#macaroon-btn").on("click", function () {
         $("#macaroon-help").toggle()
     })
+
+    // When clicking on rpc show help alert
     $("#rpc-btn").on("click", function () {
         $("#rpc-help").toggle()
     })
+
+    // When clicking on about show help alert
     $("#about-btn").on("click", function () {
         $("#about-help").toggle()
     })
+
+    // When clicking on target show help alert
     $("#target-btn").on("click", function () {
         $("#target-help").toggle()
     })
 
+    // send data to the backend using a FormData object
     $("#connect-node").on("click", function () {
+
+        // Create the FormData object
         const formData = new FormData();
+
+        // Insert the images in the FormData object
         let image1 = document.querySelector("input[name=file1]").files[0];
         let image2 = document.querySelector("input[name=file2]").files[0];
 
@@ -417,6 +431,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         formData.append("image1", image1);
         formData.append("image2", image2);
+
+        // Insert the other textfield values within the FormData object
         formData.append("tls", JSON.stringify($("#cert").val()))
         formData.append("macaroon", JSON.stringify($("#macaroon").val()))
         formData.append("grpc", JSON.stringify($("#grpc").val()))
@@ -424,7 +440,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         formData.append("name", JSON.stringify($("#clinic-name").val()))
         formData.append("about", JSON.stringify($("#clinic-about").val()))
         formData.append("target", JSON.stringify($("#clinic-target").val()))
-        
+
+        // Do the http request to update the DB
         var request = $.ajax({
             url: "/api/v0/profile/link-node",
             type: 'post',
@@ -437,16 +454,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             }
             });
 
+        // If successful display a message from the backend
         request.done(function (data) {
             toast(data.type, data.msg)
+
+            // hide the modal
             $("#non-custodial").modal('hide')
         });
+
+        // If error display the error message
         request.fail(function (jqXHR, textStatus) {
             console.log(textStatus, jqXHR);
-
         });
     })
 
+    // Function to get the first picture when uploaded and show it in the view
     $("#changePicture1").on("change", async function() {
           var file = document.querySelector("input[name=file1]").files[0];
           var reader = new FileReader();
@@ -467,6 +489,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           }
         });
 
+        // Function to get the second picture when uploaded and show it in the view
         $("#changePicture2").on("change", async function() {
           var file = document.querySelector("input[name=file2]").files[0];
           var reader = new FileReader();
@@ -486,7 +509,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           }
         });
 
+    // Delete user profile
     $("#deleteSure").on("click", function () {
+
+        // do http request to delete user profile
         var request = $.ajax({
             url: "/api/v0/profile/delete",
             type: 'post',
@@ -495,17 +521,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             },
             dataType: 'json'
         })
-
+        // If successful exit the profile, delete and refresh
         request.done(function (data) {
             toast(data.type, data.msg);
             setTimeout(() => {
                 window.location.replace('/')
             }, 800);
         });
+
+        // If error display the error message
         request.fail(function (jqXHR, textStatus) {
             toast('error', textStatus + jqXHR);
         });
     })
+
+    // When clicking on edit change the view to edit the profile
     $("#edit").on("click", function () {
         $("#nameLabel").toggle()
         $("#addressLabel").toggle()
@@ -525,6 +555,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     })
 
     $("#save").on("click", function () {
+
+        // do the http request tto update the user profile
         var request = $.ajax({
             url: "api/v0/profile/edit",
             type: 'post',
@@ -542,19 +574,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             dataType: 'json'
         })
 
+        // If successful display a message from the backend and refresh the page
         request.done(function (data) {
             toast(data.type, data.msg);
             setTimeout(() => {
                 window.location.reload()
             }, 800);
         });
+
+        // If error display the error message
         request.fail(function (jqXHR, textStatus) {
-            toast('error', textStatus + jqXHR);
+            console.log(textStatus, jqXHR);
         });
-
-
-
-
     })
 
 </script>
