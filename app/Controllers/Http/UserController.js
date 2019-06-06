@@ -155,8 +155,20 @@ class UserController {
       // find the clinic by its name
       const clinic = await Clinic.findBy("name", clinicName);
       if (clinic) {
-        // Instantiate lnd instance. This is required for evey lightning call
-        const lnd = LightningService.getLndInstance();
+
+        // Instantiate the lnd instance
+        let lnd = null
+
+        // If the health-care facility has activated the non-custodial feature
+        if (clinic.tls && clinic.grgpc && clinic.macaroon) {
+          
+          // Instantiate the non custodial ln instance using their invoice macaroon
+          lnd = LightningService.nonCustodialLndInstance();
+        }else{
+
+        // Instantiate the custodial lnd instance. This is required for evey lightning call
+         lnd = LightningService.getLndInstance();
+        }
 
         // Time to be cancelled the invoice. After 60 seconds
         var t = new Date();
