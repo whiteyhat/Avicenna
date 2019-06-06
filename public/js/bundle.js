@@ -283,6 +283,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           // instantiate the WebLN instance
           let webln;
           try {
+
+            // Request WebLN provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
             // Handle users without WebLN
@@ -291,14 +293,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
             );
           }
-
+          
+          // instantiatte teh gender object
           let gender = null;
           if ($("#male").is(":checked")) {
+            // if male is checked then male
             gender = "male";
           } else {
+
+            // if female checked the female
             gender = "female";
           }
 
+          // create the patient data object
           patient = {
             dna: $("#DNA").val(),
             blood: $("#blood").val(),
@@ -306,10 +313,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             dob: $("#dob").val(),
             gender: gender
           };
+
+          // display immunisation in the console log
           console.log(patient);
+
+          // display notification to the user
           toast("success", "Patient personal details saved");
         });
 
+        // When clicking on change picture
         $("#changePicture").on("change", async function() {
           var file = document.querySelector("input[type=file]").files[0];
           var reader = new FileReader();
@@ -326,8 +338,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           }
         });
 
+        // When clicking on save 2
         $("#save2").on("click", function() {
+
+          // instantiate mobility data object
           let mobility = null;
+
+          // get mobility type
           if ($("#mobility-independent").is(":checked")) {
             mobility = "independent";
           } else if ($("#mobility-help").is(":checked")) {
@@ -336,7 +353,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             mobility = "dependent";
           }
 
+           // instantiate eating data object
           let eating = null;
+
+          // get eating type
           if ($("#eating-independent").is(":checked")) {
             eating = "independent";
           } else if ($("#eating-help").is(":checked")) {
@@ -345,7 +365,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             eating = "dependent";
           }
 
+           // instantiate dressing data object
           let dressing = null;
+
+          // get dressing type
           if ($("#dressing-independent").is(":checked")) {
             dressing = "independent";
           } else if ($("#dressing-help").is(":checked")) {
@@ -354,7 +377,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             dressing = "dependent";
           }
 
+          // instantiate toileting data object
           let toileting = null;
+
+          // get toileting type
           if ($("#toileting-independent").is(":checked")) {
             toileting = "independent";
           } else if ($("#toileting-help").is(":checked")) {
@@ -363,7 +389,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             toileting = "dependent";
           }
 
+          // instantiate washing data object
           let washing = null;
+
+          // get washing type
           if ($("#washing-independent").is(":checked")) {
             washing = "independent";
           } else if ($("#washing-help").is(":checked")) {
@@ -372,6 +401,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             washing = "dependent";
           }
 
+          // create the social data object
           social = {
             mobility,
             eating,
@@ -382,11 +412,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             behaviour: $("#social-behaviour").val()
           };
 
+          // display social in the console log
           console.log(social);
+
+          // display notification to the suer
           toast("success", "Patient medical report saved");
         });
 
+        // When clicking on add medication
         $("#add-medication").on("click", async function() {
+          // Instantiate the days
           let monday = "No";
           let tuesday = "No";
           let wednesday = "No";
@@ -395,37 +430,52 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           let saturday = "No";
           let sunday = "No";
 
+          // Instantiate the dates array
           let dates = [];
 
+          // if monday checked, add it to the array
           if ($("#monday").is(":checked")) {
             dates.push(" Monday");
             monday = "Yes";
           }
+
+          // if tuesday checked, add it to the array
           if ($("#tuesday").is(":checked")) {
             dates.push(" Tuesday");
             tuesday = "Yes";
           }
+
+          // if wednesday checked, add it to the array
           if ($("#wednesday").is(":checked")) {
             dates.push(" Wednesday");
             wednesday = "Yes";
           }
+
+          // if thursday checked, add it to the array
           if ($("#thursday").is(":checked")) {
             dates.push(" Thursday");
             thursday = "Yes";
           }
+
+          // if friday checked, add it to the array
           if ($("#friday").is(":checked")) {
             dates.push(" Friday");
             friday = "Yes";
           }
+
+          // if saturday checked, add it to the array
           if ($("#saturday").is(":checked")) {
             dates.push(" Saturday");
             saturday = "Yes";
           }
+
+          // if sunday checked, add it to the array
           if ($("#sunday").is(":checked")) {
             dates.push(" Sunday");
             sunday = "Yes";
           }
 
+          // create the patient data object
           medication = {
             name: $("#medication-name").val(),
             dose: $("#medication-dose").val(),
@@ -439,9 +489,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             plan: $("#medication-plan").val()
           };
 
+          // push the medication data object into the array
           medicationArray.push(medication);
+
+          // display medication in the console log
           console.log(medication);
 
+          // Append medication to the view
           $("#medicationblock").append(
             '<div class="input-group input-group-sm"><span class="input-group-addon"><b>Medication</b></span><input disabled value="' +
               medication.name +
@@ -454,6 +508,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               "</textarea></div><legend></legend>"
           );
 
+          // clear the textfields to allow another entry to be typed
           $("#medication-name").val("");
           $("#medication-dose").val("");
           $("#monday").prop("checked", false);
@@ -465,21 +520,33 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           $("#sunday").prop("checked", false);
           $("#medication-plan").val("");
 
+          // display notification to the user
           toast("info", "New medication prescribed");
         });
 
+
+        // Clicking on the button save 3
         $("#save3").on("click", function() {
+
+          //  Display notification to the user
           toast("success", "Patient medication saved");
         });
 
+        // Clicking on the button save 4 => main button to generate the passport
         $("#save4").on("click", function() {
+
+          // create the validation checks
           var check1 = $('input[name="reg1"]:checked').length > 0;
           var check2 = $('input[name="reg2"]:checked').length > 0;
           var check3 = $('input[name="reg3"]:checked').length > 0;
+
+          // get the user password
           var pass = $("#encryptPassword").val();
 
+          // validation checks to ensure the user has understand the requirements
           if (check1 && check2 && check3 && pass != undefined) {
 
+            // if the satellite has been chosen display a different title for the second step
             if ($("input[name='satellite']").val() === "true") {
                 $("#loading_text").text("Linking IPFS to Blockstream Satellite");
                 $("#modal_title").text("Upload to Blockstream Satellite");
@@ -487,9 +554,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 $("#loading_text").text("Certifying using Open Time Stamps");
                 $("#modal_title").text("Certify Passport using Open Time Stamps");
             }
+
+            // switch to the loading view
             $("#loader").fadeToggle();
+
+            // hide the password view
             $("#createPass").fadeToggle();
 
+            // create the message data object to be signed by the user using his/her private keys
             const message =
               "As a " +
               $("[name=doctorRole]").val() +
@@ -507,41 +579,39 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               formatDate(new Date()) +
               ".";
 
+              // prompt a sign message using the WebLN provider
             webln
               .signMessage(message, async success => {})
               .then(function(signature) {
+
+                // if the digital signature has been successful
                 if (signature) {
+
+                  // display a notification to the user about the next step after tthe signature
                   toast(
                     "info",
                     "Encrypting and uploading patient passport to IPFS"
                   );
+
+                  // create a FormData to store data about the patient details to be sent to the backend
                   const formData = new FormData();
+
+                  // append data to the FormData object
                   formData.append(
                     "image",
                     document.querySelector("input[type=file]").files[0]
                   );
                   formData.append("patient", JSON.stringify(patient));
                   formData.append("report", JSON.stringify(conditionArray));
-                  formData.append(
-                    "signature",
-                    JSON.stringify(signature.signature)
-                  );
+                  formData.append("signature",JSON.stringify(signature.signature));
                   formData.append("message", JSON.stringify(message));
                   formData.append("allergy", JSON.stringify(allergyArray));
-                  formData.append(
-                    "immunisation",
-                    JSON.stringify(immunisationArray)
-                  );
-                  formData.append(
-                    "medication",
-                    JSON.stringify(medicationArray)
-                  );
+                  formData.append("immunisation",JSON.stringify(immunisationArray));
+                  formData.append("medication",JSON.stringify(medicationArray));
                   formData.append("social", JSON.stringify(social));
-                  formData.append(
-                    "password",
-                    JSON.stringify($("[name=encryptPassword]").val())
-                  );
+                  formData.append("password",JSON.stringify($("[name=encryptPassword]").val()));
 
+                  // do http request to the backend to send the patient data
                   var request = $.ajax({
                     url: "/api/v0/passport/new",
                     data: formData,
@@ -553,13 +623,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                     }
                   });
 
+                  // Id the http request has been successful
                   request.done(function(data) {
+
+                    // display the a valid animation for the step 1
                     $("#loader1").toggle();
                     $("#valid1").toggle();
 
+                    // get the params from the response body
                     const ipfsHash = data.hash;
                     const filename = data.filename;
 
+                    // display a notification to the user about the outputs of the step 1 
                     toast(
                       "info",
                       "Passport encrypted and uploaded to IPFS with the following hash: " +
@@ -569,16 +644,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                         "' target='_blank''><button type='button'class='btn btn-default'>Open</button></a>"
                     );
 
+                    // append IPFS HASH, socket id, and temp file path of the user data to the FormData object
                     formData.append("ipfshash", JSON.stringify(ipfsHash));
                     formData.append("filename", JSON.stringify(filename));
-                    formData.append(
-                      "socket",
-                      JSON.stringify($("[name=_connId]").val())
-                    );
+                    formData.append("socket",JSON.stringify($("[name=_connId]").val()));
 
-
+                    // if the validation methhohd was the satellite
                     if ($("input[name='satellite']").val() === "true") {
-                                            
+
+                      // do a http request to upload the user data into the Blockstream Satellite
                       var request = $.ajax({
                         url: "/api/v0/passport/satellite",
                         data: formData,
@@ -590,45 +664,64 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                         }
                       });
 
+                      // If successful returns a payment request to pay the invoice to proceed with
+                      // the certification process
                       request.done(function(result) {
                         setTimeout(function() {
+
+                          // display notification to the user
                           toast(
                             "info",
                             "Uploading IPFS Passport to the Blockstream Satellite"
                           );
 
+                          // display payment request as a QR code with a clickable lightning prefix
                           showPR(result, "#pr", "#invoiceRoute", "#pr-string");
 
                           // Event handler to copy the invoice request when click the button copy
                           copyInvoice("#pr-string", "#copy-invoice");
+
+                          // display the costs
                           $("#sats").text("15 sats");
+
+                          // display the modal
                           $("#payreq").modal("show");
 
+                          // when the invoice has been paid retrieve data about the Blockstream 
+                          // Satellite order UUID + AUTH TOKEN
                           ws.getSubscription("invoice").on(
                             "invoicePaid",
                             blockstream => {
-                              formData.append(
-                                "uuid",
-                                JSON.stringify(blockstream.uuid)
-                              );
-                              formData.append(
-                                "authToken",
-                                JSON.stringify(blockstream.authToken)
-                              );
 
+                              // append the UUID + AUTH TOKEN to the FormData object
+                              formData.append("uuid",JSON.stringify(blockstream.uuid));
+                              formData.append("authToken",JSON.stringify(blockstream.authToken));
+
+                              // display a notification to the user
                               toast(
                                 "success",
                                 "Passport uploaded to Blockstream Satellite"
                               );
+
+                              // hide the modal
                               $("#payreq").modal("hide");
+
+                              // display the a valid animation for the step 2
                               $("#loader2").toggle();
                               $("#valid2").toggle();
 
+                              // display an informative notification to the user
                               toast(
                                 "info",
                                 "Generating a Passport certification"
                               );
+
+                              // after 1 second
                               setTimeout(() => {
+                                
+                                // do a http request to complete the certification process to generate a new
+                                // pdf containing data ab out the patient + doctor signature + Blockstream 
+                                // Satellite outputs
                                 var request = $.ajax({
                                   url: "/api/v0/passport/satellite/complete",
                                   data: formData,
@@ -640,26 +733,40 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                   }
                                 });
 
+                                // If successful returns a temp path to serve quickly the passport which
+                                // it will be self-destructed in 60 approx and serve an immutable path to 
+                                // retrieve the public access for the patient passporrt using an IPFS gateway
                                 request.done(function(obj) {
+                                  // display the a valid animation for the step 3
                                   $("#loader3").toggle();
                                   $("#valid3").toggle();
 
+                                  // after 1 second
                                   setTimeout(() => {
+
+                                    // switch the view for the passport access screen
                                     $("#loader").fadeToggle();
                                     $("#passportView").fadeToggle();
+
+                                    // display the public key of the patient passport
                                     $("#passportQR").attr(
                                       "src",
                                       "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
                                         obj.hash
                                     );
+
+                                    // set the path for a temporary quick access fo the patient's passport
                                     $("#viewQR").attr(
                                       "href",
                                       "/temp/" + obj.path
                                     );
 
-                                    $("#downloadQrCode").on("click", function() {document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
+                                    // create a link to download the patient's passport public key as a QR image
+                                    $("#downloadQrCode").on("click", function() {
+                                      document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
                                     });
 
+                                    // set the immutable path to serve the patient's passport using an IPFS gateway
                                     $("#linkQR").attr(
                                       "href",
                                       "https://ipfs.io/ipfs/" + obj.hash
@@ -667,8 +774,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                   }, 1000);
                                 });
 
+                                // If error display the error message and switch the view
                                 request.fail(function(jqXHR, textStatus) {
                                   console.log(textStatus, jqXHR);
+
+                                  // switch the view
                                   $("#loader").fadeToggle();
                                   $("#createPass").fadeToggle();
                                 });
@@ -678,13 +788,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                         }, 2000);
                       });
 
+                      // If error display the error message and switch the view
                       request.fail(function(jqXHR, textStatus) {
                         console.log(textStatus, jqXHR);
+
+                        // switch the view
                         $("#loader").fadeToggle();
                         $("#createPass").fadeToggle();
                       });
+
+                      // If the cerrtification method chosen is Open Time Stamps
                     } else {
                       $("#loading_text").text("Linking IPFS to Blockstream Satellite");
+
+                      // do a http request to retrieve a payment request to proceed with the 
+                      // Open Time Stamps certification
                       var request = $.ajax({
                         url: "/api/v0/passport/opentimestamps",
                         data: formData,
@@ -696,40 +814,58 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                         }
                       });
 
+                      // if the http request is successful returns the payment request of 5 satoshis
                       request.done(function(result) {
+                        
+                        // after 2 seconds
                         setTimeout(function() {
+
+                          // after 1.75 seconds
                           setTimeout(() => {
+
+                            // display an informative message about the amount to pay using lightning
                             toast(
                               "info",
                               "Pay 5 satoshis to certify the passport using Open Time Stamps"
                             );
                           }, 1750);
 
+                          // display payment request as a QR code with a clickable lightning prefix
                           showPR(result, "#pr", "#invoiceRoute", "#pr-string");
 
                           // Event handler to copy the invoice request when click the button copy
                           copyInvoice("#pr-string", "#copy-invoice");
+
+                          // display the costs
                           $("#sats").text("5 sats");
+
+                          // hide modal
                           $("#payreq").modal("show");
                           
                           }, 2000);
 
+                          // when the invoice has been paid retrieve data about the .ost stamp file
                           ws.getSubscription("invoice").on(
                             "invoicePaid",
                             ots => {
-                              formData.append(
-                                "verification",
-                                JSON.stringify(ots.verificationIpfsPath)
-                              );
 
+                              // Add the temporary path for the .ost stamp file to the FormData object
+                              formData.append( "verification", JSON.stringify(ots.verificationIpfsPath) );
+
+                              // display a notifcation message
                               toast(
                                 "success",
                                 "Passport certified using Open Time Stamps"
                               );
+
+                              // hide modal
                               $("#payreq").modal("hide");
+
+                               // display the a valid animation for the step 2
                               $("#loader2").toggle();
                               $("#valid2").toggle();
 
+                              // display an informative message about the IPFS gateway to serve the .ots file 
                               toast(
                                 "info",
                                 "Passport certified using Open Time Stamps accessible using an IPFS gateway. " +
@@ -738,10 +874,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                   "' target='_blank''><button type='button'class='btn btn-default'>Open</button></a>"
                               );
 
+                              // down.oad the .ots file to the local device
                               document.getElementById("download_gateway").src =
                                 ots.verification;
 
+                                // after 1 second
                               setTimeout(() => {
+
+                                // If successful returns a temp path to serve quickly the passport which
+                                // it will be self-destructed in 60 approx and serve an immutable path to 
+                                // retrieve the public access for the patient passporrt using an IPFS gateway
                                 var request = $.ajax({
                                   url: "/api/v0/passport/ots/complete",
                                   data: formData,
@@ -753,26 +895,40 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                   }
                                 });
 
+                                // If successful returns a temp path to serve quickly the passport which
+                                // it will be self-destructed in 60 approx and serve an immutable path to 
+                                // retrieve the public access for the patient passporrt using an IPFS gateway
                                 request.done(function(obj) {
+
+                                  // display the a valid animation for the step 3
                                   $("#loader3").toggle();
                                   $("#valid3").toggle();
 
+                                  // after 1 second
                                   setTimeout(() => {
+
+                                    // switch the view for the passport access screen
                                     $("#loader").fadeToggle();
                                     $("#passportView").fadeToggle();
+
+                                    // display the public key of the patient passport
                                     $("#passportQR").attr(
                                       "src",
                                       "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
                                         obj.hash
                                     );
+
+                                    // set the path for a temporary quick access fo the patient's passport
                                     $("#viewQR").attr(
                                       "href",
                                       "/temp/" + obj.path
                                     );
 
+                                    // create a link to download the patient's passport public key as a QR image
                                     $("#downloadQrCode").on("click", function() {document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
                                     });
 
+                                    // set the immutable path to serve the patient's passport using an IPFS gateway
                                     $("#linkQR").attr(
                                       "href",
                                       "https://ipfs.io/ipfs/" + obj.hash
@@ -780,8 +936,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                   }, 1000);
                                 });
 
+                                // If error display the error message and switch the view
                                 request.fail(function(jqXHR, textStatus) {
                                   console.log(textStatus, jqXHR);
+
+                                  // switch the view
                                   $("#loader").fadeToggle();
                                   $("#createPass").fadeToggle();
                                 });
@@ -790,15 +949,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                           );
                       });
 
+                      // If error display the error message and switch the view
                       request.fail(function(jqXHR, textStatus) {
                         console.log(textStatus, jqXHR);
+
+                        // switch the view
                         $("#loader").fadeToggle();
                         $("#createPass").fadeToggle();
                       });
                     }
                   });
+
+                  // If error display the error message and switch the view
                   request.fail(function(jqXHR, textStatus) {
                     console.log(textStatus, jqXHR);
+
+                    // switch the view
                     $("#loader").fadeToggle();
                     $("#createPass").fadeToggle();
                   });
@@ -808,58 +974,25 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                     $("#loader").fadeToggle();
                     $("#createPass").fadeToggle();
                   });
+
+                  // if the message was not successfully signed
                 } else {
+
+                  // return an error notification
                   toast("error", "Sorry, We could not get your signature");
-                  $("#loader").fadeToggle();
-                  $("#createPass").fadeToggle();
                 }
               });
+
+            // if the user did not check the requrired input checkboxes
           } else {
+
+            // return an error notification
             toast(
               "error",
               "Confirm the required checkbox are marked and make sure the patient has typed a password"
             );
           }
         });
-
-        function formatDate(date) {
-          var monthNames = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December"
-          ];
-
-          var hours = date.getHours();
-          var minutes = date.getMinutes();
-          var seconds = date.getSeconds();
-
-          var day = date.getDate();
-          var monthIndex = date.getMonth();
-          var year = date.getFullYear();
-
-          return (
-            day +
-            " of " +
-            monthNames[monthIndex] +
-            " of " +
-            year +
-            " at " +
-            hours +
-            ":" +
-            minutes +
-            ":" +
-            seconds
-          );
-        }
       },
       { "webln/lib/client": 1 }
     ]
@@ -868,7 +1001,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   [2]
 );
 
+/*
+|--------------------------------------------------------------------------
+|                              HELPER    FUNCTIONS
+|--------------------------------------------------------------------------
+*/
+
+// function to serve the lightning payment gateway
 function showPR(result, pr, invoiceRoute, prString) {
+
+  // serve the qr code image
   $(pr).attr(
     "src",
     "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + result.pr
@@ -877,10 +1019,15 @@ function showPR(result, pr, invoiceRoute, prString) {
   $(invoiceRoute).prop("href", "lightning:" + result.pr);
   // Show invoice request as string
   $(prString).val(result.pr);
+
+  // set the request to be only readable
   $(prString).prop("readonly", true);
 }
 
+// function to copy the lightning payment request
 function copyInvoice(prString, copyBtn) {
+  
+  // when clicking on the copy buttton
   $(copyBtn).on("click", function() {
     /* Get the selected text field */
     $(prString).select();
@@ -891,28 +1038,42 @@ function copyInvoice(prString, copyBtn) {
   });
 }
 
-function AnimateProgressbar(timetopay) {
-  var start = new Date();
-  var maxTime = 3000 * 60;
-  var timeoutVal = Math.floor(maxTime / 100);
-  animateUpdate();
+// function to get the date object in a convinient string format
+function formatDate(date) {
+  var monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
 
-  function updateProgress(percentage) {
-    $(timetopay).val(percentage);
-  }
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var seconds = date.getSeconds();
 
-  function animateUpdate() {
-    var now = new Date();
-    var timeDiff = now.getTime() - start.getTime();
-    var perc = Math.round((timeDiff / maxTime) * 100);
-    if (perc <= 100) {
-      updateProgress(perc);
-      setTimeout(animateUpdate, timeoutVal);
-    }
-    if (perc == 75) {
-      toast("warning", "Invoice expiring soon");
-    } else if (perc == 100) {
-      toast("error", "Invoice Expired");
-    }
-  }
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+
+  return (
+    day +
+    " of " +
+    monthNames[monthIndex] +
+    " of " +
+    year +
+    " at " +
+    hours +
+    ":" +
+    minutes +
+    ":" +
+    seconds
+  );
 }

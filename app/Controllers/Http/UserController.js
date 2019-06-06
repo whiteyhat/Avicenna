@@ -975,7 +975,7 @@ class UserController {
         await user.delete();
 
         // Create a new user
-        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true });
+        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true, name: "Admin" });
 
         // Return response body
         return response.send({
@@ -986,7 +986,7 @@ class UserController {
         // If the user does not exist in the DB
       } else {
         // Create a new user
-        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true });
+        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true, name:"Admin" });
 
         // Return response body to the user
         return response.send({
