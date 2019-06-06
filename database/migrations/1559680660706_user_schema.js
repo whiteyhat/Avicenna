@@ -17,7 +17,6 @@ class UserSchema extends Schema {
       table.string('address')
       table.string('phone')
       table.string('email')
-      table.binary('image')
       table.timestamps()
     })
   }
