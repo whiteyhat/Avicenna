@@ -740,7 +740,7 @@ class UserController {
         const user = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: Math.floor(Math.random() * 10)
+          clinic_id: (Math.random() * (10 - 1) + 1)
         });
 
         // If the user created needs to have staff permisssions
@@ -1005,7 +1005,7 @@ class UserController {
         await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: Math.floor(Math.random() * 10)
+          clinic_id: (Math.random() * (10 - 1) + 1)
         });
 
         // If the user does not exist in the DB
@@ -1014,7 +1014,7 @@ class UserController {
         await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: Math.floor(Math.random() * 10)
+          clinic_id: (Math.random() * (10 - 1) + 1)
         });
       }
 
