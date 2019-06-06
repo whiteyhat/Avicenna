@@ -70,10 +70,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     ],
     2: [
       function(require, module, exports) {
-        var requestProvider = require("webln/lib/client");
-        let auth;
 
+        // Get the request WebLN provider
+        var requestProvider = require("webln/lib/client");
+
+        // Instantiate the auth variable
+        var auth;
+
+        // When clickin on login
         $("#login").on("click", function() {
+
+          // do http request to log in the user
+          // send the user pubkey
           var request = $.ajax({
             url: "/api/v0/auth/login",
             data: {
@@ -86,13 +94,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             dataType: "json"
           });
 
+          // If successful returns a nonce and prompts a digital signature using WebLN
           request.done(function(data) {
+
+            // If there is a nonce from the response body
             if (data.nonce) {
+
+              // Display a notification to the user
               toast(data.type, data.msg);
+
+              // Prompt the WebLN provider to sign a digital signature 
               webln
                 .signMessage(data.nonce, async success => {})
                 .then(function(data) {
+
+                  // When the user has signed a message
                   if (data) {
+
+                    // do a http request to get the verification
+                    // to authenticate the source of the pubkey
+                    // has an identical match with the initial
+                    // pubkey sent by the user
                     var request = $.ajax({
                       url: "/api/v0/auth/verify-signature",
                       type: "post",
@@ -105,6 +127,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                       },
                       dataType: "json"
                     });
+
+                    // If successful display a message from the backend and refresh the page
                     request.done(function(data) {
                       if (data.msg) {
                         toast(data.type, data.msg);
@@ -113,28 +137,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                          location.reload()
                       }, 800);
                     });
-                    request.fail(function(data) {
-                      toast("success", data.msg);
-                      setTimeout(function() {
-                        window.location.replace('/');
-                      }, 600);
+
+
+                    // If error display the error message
+                    request.fail(function (jqXHR, textStatus) {
+                      console.log(jqXHR, textStatus)
                     });
                   }
                 });
             }
           });
-          request.fail(function(data) {
-            toast("success", data.msg);
-            setTimeout(function() {
-              window.location.replace('/');
-            }, 600);
+          // If error display the error message
+          request.fail(function (jqXHR, textStatus) {
+            console.log(jqXHR, textStatus)
           });
         });
 
+        // When clicking on the 'start as a doctor' button
         $("#start-doctor").on("click", async function() {
+
+          // Display the user button with a loading animation and disabled
           $("#doctor-loader").toggle()
+          $('#start-doctor').attr('disabled', true);
+
+          // Instantiate the WebLN instance
           let webln;
           try {
+
+            // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
             // Handle users without WebLN
@@ -148,8 +178,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             // Call webln function
             auth = await webln.getInfo();
 
+            // Get the pubkey from the user WebLN provider
             if (auth.node.pubkey) {
-              $("#doctor-loader").toggle()
+              
+              // do htttp request to send the user pubkey to the backend
               var request = $.ajax({
                 url: "/api/v0/demo/doctor",
                 type: "post",
@@ -161,10 +193,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 },
                 dataType: "json"
               });
+
+              // re-activate the doctor button
+              $("#doctor-loader").toggle()
+              $('#start-doctor').attr('disabled', false);
+
+              // If successful display the login button and a message from the backend
               request.done(function(data) {
                 $("#login").fadeIn();
                 toast(data.type, data.msg);
               });
+
+              // If error display the error message
               request.fail(function(data1, data2) {
                 console.log(data1, data2)
               });
@@ -172,10 +212,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           }
         });
 
+          // When clicking on the 'start as a doctor' button
         $("#start-admin").on("click", async function() {
+
+          // Display the user button with a loading animation and disabled
           $("#admin-loader").toggle()
+          $('#start-admin').attr('disabled', true);
+
+          // Instantiate the WebLN instance
           let webln;
+
           try {
+
+            // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
             // Handle users without WebLN
@@ -189,8 +238,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             // Call webln function
             auth = await webln.getInfo();
 
+            // Get the pubkey from the user WebLN provider
             if (auth.node.pubkey) {
-              $("#admin-loader").toggle()
               var request = $.ajax({
                 url: "/api/v0/demo/admin",
                 type: "post",
@@ -202,15 +251,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 },
                 dataType: "json"
               });
+
+              // re-activate the doctor button
+              $("#admin-loader").toggle()
+              $('#start-admin').attr('disabled', false);
+
+              // If successful display the login button and a message from the backend
               request.done(function(data) {
                 $("#login").fadeIn();
                 toast(data.type, data.msg);
               });
-              request.fail(function(data) {
-                toast("success", data.msg);
-                setTimeout(function() {
-                  // window.location.replace('/');
-                }, 600);
+
+              // If error display the error message
+              request.fail(function(data1, data2) {
+                console.log(data1, data2)
               });
             }
           }
