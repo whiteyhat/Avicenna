@@ -1,3 +1,13 @@
+/**
+Copyright 2019 Carlos Roldan Torregrosa
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 "use strict";
 const Logger = use("Logger");
 const edge = require("edge.js");
@@ -12,8 +22,9 @@ const lnService = require("ln-service");
 const createInvoice = require("ln-service/createInvoice");
 const Invoices = use("App/Models/Invoice");
 
-var FormData = require("form-data");
-
+/**
+Class to perform
+ */ 
 class UserController {
   /**
    * Controller to log out from the auth middleware
@@ -31,16 +42,22 @@ class UserController {
       });
     }
   }
-
-  async passportView({ request, view, response, auth }){
-     try {
+  /**
+  Controller that returns the passport creator view if the user is identified
+   */
+  async passportView({ request, view, response, auth }) {
+    try {
+      // Get user by id
       const user = await User.findBy("id", auth.user.id);
       if (user) {
+        // If the user is found get his/her clinic
         const clinic = await Clinic.findBy("id", user.clinic_id);
 
+        // return the passport generator view
         return view.render("index", { user, clinic });
       } else {
-        response.send({ msg: "You do not have the permissions" });
+        // If the user has no permissions return an error message
+        response.send({ error: "You do not have the permissions" });
       }
     } catch (error) {
       Logger.error(error);
@@ -102,17 +119,24 @@ class UserController {
     }
   }
 
+  /**
+  Controller that returns the staff view if the user is identified
+   */
   async staff({ auth, view, response }) {
     try {
+      // if the user has a pubkey
       if (auth.user.wallet) {
+        // Get the names, roles and pubkeys from all the users in the platform
         const users = await Database.select("name", "role", "wallet").from(
           "users"
         );
-        edge.global("contract", Env.get("CONTRACT_ADDRESS"));
+
+        // render the staff view
         return view.render("staff", { users });
       } else {
+        // if the user has no permissions return an error messagee
         response.send({
-          msg: "You do not have the permission to view the admin panel"
+          error: "You do not have the permission to view the admin panel"
         });
       }
     } catch (error) {
@@ -120,11 +144,15 @@ class UserController {
     }
   }
 
+  /**
+  Controller that returms the donate view for clinics
+   */
   async donate({ view, response, params }) {
     try {
+      // get the clinic name from the dynamic route
       const clinicName = params.wallet;
 
-      // Get the user instance to use for the final certification
+      // find the clinic by its name
       const clinic = await Clinic.findBy("name", clinicName);
       if (clinic) {
         // Instantiate lnd instance. This is required for evey lightning call
@@ -141,8 +169,10 @@ class UserController {
           expires_at: t
         });
 
+        // Split the coordinates by the symbol ',' for syntax
         const coordinates = clinic.location.split(",");
 
+        // render the view with a custom PR request and clinic details
         return view.render("donation", {
           pr: pr.request,
           clinic,
@@ -150,16 +180,22 @@ class UserController {
           y: coordinates[1]
         });
       } else {
-        response.send({ msg: "No clinic registered with this publick key" });
+        // If no clinic is found with this name return an error messagge
+        response.send({ error: "No clinic registered with this name" });
       }
     } catch (error) {
       Logger.error(error);
     }
   }
 
+  /**
+  Controller that returns an admin view for admins
+   */
   async admin({ auth, view, response }) {
     try {
+      // If the user has admin permissiones
       if (auth.user.admin) {
+        // get all of the user main details from the DB
         const users = await Database.select(
           "name",
           "id",
@@ -170,12 +206,16 @@ class UserController {
           "wallet",
           "created_at"
         ).from("users");
+
+        // Get all health-care facilities from the DB
         const clinics = await Database.select("*").from("clinics");
 
+        // Render the view with the clinics and user list
         return view.render("admin", { users, clinics });
       } else {
+        // If the user has no admini permissions return an error message
         response.send({
-          msg: "You do not have the permission to view the admin panel"
+          error: "You do not have the permission to view the admin panel"
         });
       }
     } catch (error) {
@@ -183,23 +223,36 @@ class UserController {
     }
   }
 
+  /**
+  Controller that returns the profile view for the healthh-care practitioner
+   */
   async profile({ view, auth, response }) {
     try {
+      // Find the user by his/her session id
       const user = await User.findBy("id", auth.user.id);
       if (user) {
+        // Get the user clinic
         const clinic = await Clinic.findBy("id", user.clinic_id);
+
+        // Get all the clinic name registered in the DB
         const clinics = await Database.select("name").from("clinics");
 
+        // Return the profile view with the user clinic and the rest of clinics
         return view.render("profile", { clinic, clinics });
       } else {
-        response.send({ msg: "You do not have the permissions" });
+        // If the users is not authenticated returns an error message
+        response.send({ error: "You do not have the permissions" });
       }
     } catch (error) {
       Logger.error(error);
     }
   }
 
-  async noCustodial({ auth, request, response }) {
+  /**
+  Controller to update the donation page
+   */
+  async updateDonationPage({ auth, request, response }) {
+    // Get the request body
     const {
       grpc,
       tls,
@@ -209,8 +262,8 @@ class UserController {
       about,
       name
     } = request.all();
-
     try {
+      // Parse the FormData into JSON data
       const grpcJson = JSON.parse(grpc);
       const tlsJson = JSON.parse(tls);
       const macaroonJson = JSON.parse(macaroon);
@@ -219,17 +272,25 @@ class UserController {
       const aboutJson = JSON.parse(about);
       const nameJson = JSON.parse(name);
 
+      // Get the images from the request
       const image1 = request.file("image1");
       const image2 = request.file("image2");
 
+      // If no donation details are provided return an error
       if (!grpc || !tls || !macaroon) {
         return response.send({
           error: "GRPC, TLS CERT or MACAROON must be provided"
         });
       }
+
+      // If the user has a session id
       if (auth.user.id) {
+        // Find the user by his/her session id
         const user = await User.findBy("id", auth.user.id);
+
+        // If the user has staff permissions
         if (user.staff) {
+          // Find the clinic by the user id
           const clinic = await Clinic.findBy("user_id", user.id);
 
           // Add lightning details
@@ -243,34 +304,42 @@ class UserController {
           clinic.target = targetJson;
           clinic.about = aboutJson;
 
-          const name1 = Date.now().toString() + ".jpg";
+          // Create a temporary image with a timestamp
+          const tempImage = Date.now().toString() + ".jpg";
 
-          await image1.move(Helpers.publicPath("img/donation-pictures/"), {
-            name: name1,
+          // move the image to the public folder where the donation pictures are
+          await tempImage.move(Helpers.publicPath("img/donation-pictures/"), {
+            name: tempImage,
             overwrite: true
           });
 
-          if (!image1.moved()) {
+          // if error display it in the console log
+          if (!tempImage.moved()) {
             logger.error("error when moving image");
           }
 
-          const name2 = Date.now().toString() + ".jpg";
+          // Create a second temporary image with a timestamp
+          const secondTempImage = Date.now().toString() + ".jpg";
 
+          // move the image to the public folder where the donation pictures are
           await image2.move(Helpers.publicPath("img/donation-pictures/"), {
-            name: name2,
+            name: secondTempImage,
             overwrite: true
           });
 
+          // if error display it in the console log
           if (!image2.moved()) {
             logger.error("error when moving image");
           }
 
-          // Save path images
-          clinic.image1 = "/img/donation-pictures/" + name1;
-          clinic.image2 = "/img/donation-pictures/" + name2;
+          // Save path images in the DB
+          clinic.image1 = "/img/donation-pictures/" + tempImage;
+          clinic.image2 = "/img/donation-pictures/" + secondTempImage;
 
           // Save clinic
           await clinic.save();
+
+          // Return a notification message to update the user
           return response.send({
             type: "success",
             msg: "Donation page updated"
@@ -282,8 +351,13 @@ class UserController {
     }
   }
 
+  /**
+  Controller to generate a safe gateway to serve the encrypted passport
+  when it has been certified using the Blockstream Satellite
+   */
   async satelliteComplete({ request, response, auth }) {
     try {
+      // Get the body request
       const {
         patient,
         report,
@@ -297,8 +371,8 @@ class UserController {
         wallet,
         uuid,
         ipfshash,
-        authToken      
-        } = request.all();
+        authToken
+      } = request.all();
 
       // Get the user instance to use for the final certification
       const user = await User.findBy("id", auth.user.id);
@@ -353,7 +427,10 @@ class UserController {
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
         .then(function(result) {
+          // Display the IPFS HASH in the console log
           Logger.info("IPFS HASH: " + result.hash);
+
+          // Return the IPFS hash gateway to the user
           return response.send({ hash: result.hash, path });
         })
         .catch(function(error) {
@@ -364,8 +441,13 @@ class UserController {
     }
   }
 
+  /**
+  Controller to generate a safe gateway to serve the encrypted passport
+  when it has been certified using Open Time Stamps
+   */
   async otsComplete({ request, response, auth }) {
     try {
+      // Get the  body request
       const {
         patient,
         report,
@@ -381,7 +463,7 @@ class UserController {
         verification
       } = request.all();
 
-      // Get the user instance to use for the final certification
+      // Find the user by his/her session id
       const user = await User.findBy("id", auth.user.id);
 
       let data = null;
@@ -434,7 +516,10 @@ class UserController {
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
         .then(function(result) {
+          // Display the IPFS HASH in the console log
           Logger.info("IPFS HASH: " + result.hash);
+
+          // Return the IPFS hash gateway to the user
           return response.send({ hash: result.hash, path });
         })
         .catch(function(error) {
@@ -445,43 +530,23 @@ class UserController {
     }
   }
 
+  /**
+  Controller to provide a payment gateway to the user for using
+  the Blockstream Satellite stamping certification
+   */
   async paySatellite({ auth, request, response }) {
     try {
+      // If the user has a session id
       if (auth.user.id) {
-        const {
-          patient,
-          report,
-          allergy,
-          immunisation,
-          social,
-          medication,
-          password,
-          signature,
-          message,
-          wallet,
-          ipfshash,
-          socket
-        } = request.all();
+        // Get the request body
+        const { ipfshash, socket } = request.all();
 
-        // Get the user instance to use for the final certification
+        // Find the user by his/her session id
         const user = await User.findBy("id", auth.user.id);
 
-        // Parse the form data objects
-        const image = request.file("image");
-        const jsonPatient = JSON.parse(patient);
+        // Parse the FormData objects into JSON
         const hash = JSON.parse(ipfshash);
-        const reportJson = JSON.parse(report);
-        const allergyJson = JSON.parse(allergy);
-        const immunisationJson = JSON.parse(immunisation);
-        const socialJson = JSON.parse(social);
-        const medicationJson = JSON.parse(medication);
-        const passwordJson = JSON.parse(password);
         const socketId = JSON.parse(socket);
-        const signatureJson = JSON.parse(signature);
-        const messageJson = JSON.parse(message);
-
-        Logger.info(signatureJson);
-        Logger.info(message);
 
         // Instantiate lnd instance. This is required for evey lightning call
         const lnd = LightningService.getLndInstance();
@@ -512,43 +577,26 @@ class UserController {
     }
   }
 
+  /**
+  Controller to provide a payment gateway to the user for using
+  the Open Time Stamps stamping certification
+   */
   async payOpenTimeStamps({ auth, request, response }) {
     try {
+      // If the user has a session id
       if (auth.user.id) {
-        const {
-          patient,
-          report,
-          allergy,
-          immunisation,
-          social,
-          medication,
-          password,
-          signature,
-          message,
-          wallet,
-          ipfshash,
-          socket,
-          filename
-        } = request.all();
+        // Get the body request
+        const { ipfshash, socket, filename } = request.all();
 
-        // Get the user instance to use for the final certification
+        // Find the user by his/her session id
         const user = await User.findBy("id", auth.user.id);
 
-        // Parse the form data objects
-        const image = request.file("image");
-        const jsonPatient = JSON.parse(patient);
+        // Parse the FormData objects into JSON
         const hash = JSON.parse(ipfshash);
-        const reportJson = JSON.parse(report);
-        const allergyJson = JSON.parse(allergy);
-        const immunisationJson = JSON.parse(immunisation);
-        const socialJson = JSON.parse(social);
-        const medicationJson = JSON.parse(medication);
-        const passwordJson = JSON.parse(password);
         const socketId = JSON.parse(socket);
-        const signatureJson = JSON.parse(signature);
-        const messageJson = JSON.parse(message);
         const filenameJson = JSON.parse(filename);
 
+        // Split the filename to generate a file id
         const split = filenameJson.split(".");
         const fileId = split[0];
 
@@ -582,9 +630,15 @@ class UserController {
     }
   }
 
+  /**
+  Controller to generate the inital raw data from the passport to later on
+  be certified
+   */
   async newPassport({ auth, request, response }) {
     try {
+      // If the user has a session id
       if (auth.user.id) {
+        // Get the body request
         const {
           patient,
           report,
@@ -598,10 +652,10 @@ class UserController {
           wallet
         } = request.all();
 
-        // Get the user instance to use for the final certification
+        // Find the user by his/her session id
         const user = await User.findBy("id", auth.user.id);
 
-        // Parse the form data objects
+        // Parse the FormData objects into JSON
         const image = request.file("image");
         const jsonPatient = JSON.parse(patient);
         const reportJson = JSON.parse(report);
@@ -629,64 +683,76 @@ class UserController {
         // craete the full relative path
         const relativePath = "public/temp/" + path;
 
-            // automate the self-destruction operation
-            PdfService.autoDeletePdf(relativePath);
+        // automate the self-destruction operation
+        PdfService.autoDeletePdf(relativePath);
 
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath)
           .then(function(result) {
-
+            // Display the IPFS HASH in the console log
             Logger.info("IPFS HASH: " + result.hash);
+
+            // Return the IPFS hash gateway to the user
             return response.send({ hash: result.hash, filename: path });
           })
           .catch(function(error) {
             console.log("Failed!", error);
           });
       } else {
-        Logger.info("Not an identified doctor");
-        response.send({ msg: "Not an identified doctor" });
+        // If the user does not have a session id return an error message
+        response.send({ error: "Not an authorized user" });
       }
     } catch (error) {
       Logger.error(error);
     }
   }
 
-  async getPassport({ auth, request, response }) {
-    try {
-      const { uid, auth_token } = request.all();
-      if (auth.user) {
-        axios
-          .get("https://api.blockstream.space/order/" + uid, {
-            auth_token
-          })
-          .then(function(response) {})
-          .catch(function(error) {
-            console.log(error);
-          });
-      }
-    } catch (error) {
-      Logger.error(error);
-    }
-  }
-
+  /**
+  Controller to create a new user in the system
+   */
   async createUser({ auth, request, response }) {
     try {
+      // Get the request body
       const { wallet, staff, admin } = request.all();
 
+      // If the user has admin persmissions
       if (auth.user.admin) {
+        // Generate a random nonce
         const nonce = Math.floor(Math.random() * 10000);
+
+        // Instantiate response variables
         let msg = "";
         let type = "";
-        const user = await User.create({ wallet: wallet.toLowerCase(), nonce, clinic_id: (Math.floor(Math.random() * 10))});
+
+        // Create a new user with the request details and the previous random nonce
+        const user = await User.create({
+          wallet: wallet.toLowerCase(),
+          nonce,
+          clinic_id: Math.floor(Math.random() * 10)
+        });
+
+        // If the user created needs to have staff permisssions
         if (staff === "true") {
+          // Grant the previous generated user with staff permissions
           user.staff = 1;
+
+          // Save the user
           await user.save();
         }
+
+        // If the user created needs to have admin permisssions
         if (admin === "true") {
+          // Grant the previous generated user with admins permissions
           user.admin = 1;
+
+          // save the user
           await user.save();
         }
+
+        // If the user was successfully created and updated send a response message
+        // If there was any error send an error message
         if (user) {
+          // Update the response variables
           msg = "New user added";
           type = "success";
         } else {
@@ -706,34 +772,49 @@ class UserController {
     }
   }
 
+  /**
+  Controller to add a user to a clinic
+   */
   async addUserToClinic({ auth, request, response }) {
     try {
+      // Get the request body
       const { name, wallet } = request.all();
 
+      // If the user has admin permissions
       if (auth.user.admin) {
+        // Instantiate the response body
         let msg = "";
         let type = "";
+
+        // Get the user by the pubkey
         const user = await User.findBy({ wallet: wallet.toLowerCase() });
+
+        // Get the clinic by name
         const clinic = await Clinic.findBy({ name });
+
+        // If the user and clinic exist
         if (user && clinic) {
+          // Update the reponse body
           msg = "New user added";
           type = "success";
 
+          // User to clinic
           user.clinic_id = clinic.id;
-          clinic.user_id = user.id;
 
-          await clinic.save();
+          // Save the user
           await user.save();
         } else {
+          // If an error is present send an error message
           msg = "No clinic or user selected";
           type = "error";
         }
 
-        response.send({ type, msg });
+        // send the reponse body to the user
+        return response.send({ type, msg });
       } else {
         response.send({
           type: "error",
-          msg: "You do not have the permission to create"
+          msg: "You do not have the permission to create users"
         });
       }
     } catch (error) {
@@ -741,28 +822,43 @@ class UserController {
     }
   }
 
+  /**
+  Controller to remove user from the clinic
+   */
   async removeUserFromClinic({ auth, request, response }) {
     try {
+      // Get the request body
       const { name, wallet } = request.all();
 
+      // If the user has admin permissions
       if (auth.user.admin) {
+        // Instantiate the response body
         let msg = "";
         let type = "";
+
+        // Get the user by the pubkey
         const user = await User.findBy({ wallet: wallet.toLowerCase() });
+
+        // Get the clinic by name
         const clinic = await Clinic.findBy({ name });
+
+        // If the user and clinic exist
         if (user && clinic) {
           msg = "New user added";
           type = "success";
 
+          // remove from the clinic ids
           user.clinic_id = 0;
 
-          await clinic.save();
+          // Save the user
           await user.save();
         } else {
+          // If an error is present send an error message
           msg = "No clinic or user selected";
           type = "error";
         }
 
+        // send the reponse body to the user
         response.send({ type, msg });
       } else {
         response.send({
@@ -775,22 +871,40 @@ class UserController {
     }
   }
 
+  /**
+  Controller to create a clinic
+   */
   async createClinic({ auth, request, response }) {
     try {
+      // Get ther request body
       const { name } = request.all();
 
+      // if the user has admin permissions
       if (auth.user.admin) {
+        // Instantiate the response body
         let msg = "";
         let type = "";
-        const clinic = await Clinic.create({ name });
+
+        // Get the clinic by name
+        const clinic = await Clinic.findBy({ name });
+
+        // If the clinic already exisits send an error message
+        // If the clinic does not exists, create the clinic
         if (clinic) {
-          msg = "New clinic added";
-          type = "success";
-        } else {
-          msg = "There was an error when adding a new user";
+          // Update respose error body
+          msg = "This clinic already exists";
           type = "error";
+        } else {
+          // Create clinic
+          const clinic = await Clinic.create({ name });
+
+          // Update respose success body
+          msg = "Clinic successfully created";
+          type = "success";
         }
-        response.send({ type, msg });
+
+        // Return response to the user
+        return response.send({ type, msg });
       } else {
         response.send({
           type: "error",
@@ -802,56 +916,98 @@ class UserController {
     }
   }
 
+  /**
+  Controller to start the demo as an admin
+   */
   async demoAdmin({ auth, request, response }) {
     try {
+      // Get the request body
       const { wallet } = request.all();
+
+      // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
+
+      // Find the user by the pubkey
       const user = await User.findBy("wallet", wallet);
 
+      // If user already exists in the DB
       if (user) {
+        // Delete user auth tokens
+        await Database.table("tokens")
+          .where("user_id", user.id)
+          .delete();
+
+        // Delete user
         await user.delete();
+
+        // Create a new user
         await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true });
 
-        response.send({
+        // Return response body
+        return response.send({
+          type: "info",
+          msg: "Demo started. Please click on log in on the top right button"
+        });
+
+        // If the user does not exist in the DB
+      } else {
+        // Create a new user
+        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true });
+
+        // Return response body to the user
+        return response.send({
           type: "info",
           msg: "Demo started. Please click on log in on the top right button"
         });
       }
-      if (auth.user) {
-        await auth.logout();
-        return response.send({
-          type: "info",
-          msg:
-            "You are already in Hippocrates, please log in on the top right button"
-        });
-      } else {
-        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true });
-
-        const msg =
-          "Demo started. Please click on log in on the top right button";
-        const type = "info";
-
-        response.send({ type, msg });
-      }
-    } catch (error) {}
+    } catch (error) {
+      Logger.error(error);
+    }
   }
 
+  /**
+  Controller to start the demo as a doctor
+   */
   async demoDoctor({ auth, request, response }) {
     try {
+      // Get the request body
       const { wallet } = request.all();
+
+      // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
+
+      // Find the user by the pubkey
       const user = await User.findBy("wallet", wallet);
 
+      // If user already exists in the DB
       if (user) {
+        // Delete user tokens
         await Database.table("tokens")
           .where("user_id", user.id)
           .delete();
+
+        // Delete user
         await user.delete();
-        await User.create({ wallet: wallet.toLowerCase(), nonce, clinic_id: (Math.floor(Math.random() * 10))});
+
+        // Creaate a new user
+        await User.create({
+          wallet: wallet.toLowerCase(),
+          nonce,
+          clinic_id: Math.floor(Math.random() * 10)
+        });
+
+        // If the user does not exist in the DB
       } else {
-        await User.create({ wallet: wallet.toLowerCase(), nonce , clinic_id: (Math.floor(Math.random() * 10))});
+        // Create a new user
+        await User.create({
+          wallet: wallet.toLowerCase(),
+          nonce,
+          clinic_id: Math.floor(Math.random() * 10)
+        });
       }
-      response.send({
+
+      // Return response body to the user
+      return response.send({
         type: "info",
         msg: "Demo started. Please click on log in on the top right button"
       });
@@ -860,38 +1016,62 @@ class UserController {
     }
   }
 
+  /**
+   Controller to edit the user profile
+    */
   async edit({ auth, request, response }) {
+    // Get the request body parameters
     const { role, name, email, phone, clinic, address } = request.all();
     try {
+      // If the user is authentified
       if (auth.user.wallet) {
+        // Get the user by the pubkey
         const user = await User.findBy("wallet", auth.user.wallet);
+
+        // If role param has been provided
         if (role != undefined) {
+          // Update the user role
           user.role = role;
         }
-        user.role = role;
+
+        // If name param has been provided
         if (name != undefined) {
+          // Update the user name
           user.name = name;
         }
+
+        // If role param has been provided
         if (address != undefined) {
+          // Update the user address
           user.address = address;
         }
 
+        // If role param has been provided
         if (email != undefined) {
+          // Update the user email
           user.email = email;
         }
 
+        // If role param has been provided
         if (phone != undefined) {
+          // Update the user phone
           user.phone = phone;
         }
 
+        // If role param has been provided
         if (clinic != undefined) {
+          // Update the user clinic
           user.clinic = clinic;
         }
 
+        // Save the user
         await user.save();
-        response.send({ msg: "Profile saved", type: "success" });
+
+        // Return the response body
+        return response.send({ msg: "Profile saved", type: "success" });
       } else {
-        response.send({
+        // Send an error message in case of not having permissions to update the profile
+        return response.send({
           msg: "You do not have the permissions",
           type: "error"
         });
@@ -1004,64 +1184,3 @@ class UserController {
 }
 
 module.exports = UserController;
-
-//*********************************************
-//**************** TESTING CODE ***************
-//*********************************************
-// const data = {patient: {
-//   name: "carlos",
-//   dob: "23/02/1992",
-// },report:[{
-//   condition: "Active",
-//   year: "2018"
-// }],allergy:[{
-//   title: "Active",
-//   year: "2018"
-// }],immunisation:[{
-//   title: "Active",
-//   year: "2018"
-// }],social:{
-//   mobility:"independent",
-//   eating:"independent"
-// },password: "123456",medication:[{
-//   title: "Insulin",
-//   dose: "3gr",
-//   plan:"Take 2 daily"
-// }]
-// }
-//*********************************************
-//*********************************************
-//*********************************************
-
-//*********************************************
-//**************** TESTING CODE ***************
-//*********************************************
-// const data = {
-//   patient: {
-//     name: "carlos",
-//     dob: "23/02/1992",
-//   },report:[{
-//     condition: "Active",
-//     year: "2018"
-//   }],allergy:[{
-//     title: "Active",
-//     year: "2018"
-//   }],immunisation:[{
-//     title: "Active",
-//     year: "2018"
-//   }],social:{
-//     mobility:"independent",
-//     eating:"independent"
-//   },password: "123456",medication:[{
-//     title: "Insulin",
-//     dose: "3gr",
-//     plan:"Take 2 daily"
-//   }],
-//   satellite:{
-//     uuid, authToken, hash:result.hash, signature, message, wallet
-//   },
-//   doctor: user
-//   }
-//*********************************************
-//*********************************************
-//*********************************************
