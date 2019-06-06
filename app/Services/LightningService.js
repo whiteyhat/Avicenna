@@ -126,6 +126,24 @@ class LightningService {
   }
 
   /**
+   * Service to get the LND instance
+   */
+   nonCustodialLndInstance(clinic) {
+     try { 
+      if (lndInstance == null) {
+        lndInstance = lnService.lightningDaemon({
+          socket: clinic.grpc,
+          macaroon: clinic.macaroon,
+          cert: clinic.tls
+        });
+      }
+      return lndInstance;
+    } catch (error) {
+       Logger.error(error)
+     }
+  }
+
+  /**
    * Service to get the node address
    */
   getNodeAddress() {
