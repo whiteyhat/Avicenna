@@ -12,100 +12,102 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 const axios = require("axios");
 const sha256 = require("hash.js/lib/hash/sha/256");
 const Logger = use("Logger");
+const Env = use("Env");
 
 /**
 Class to perform validation optiion for the Blockstream Satellite certification
  */
 class ValidateController {
 
-    /**
-    Controller to validate the Blocstream Satellite data outputs
-     */
+  /**
+  Controller to validate the Blocstream Satellite data outputs
+   */
   async validate({ request, response }) {
 
-      try {
+    try {
 
-    // Get the body request
-    const { uuid, authtoken, filehash } = request.all();
+      // Get the body request
+      const { uuid, authtoken, filehash } = request.all();
 
-    // Instantiate teh response body
-    let res = {
-      message: "",
-      satellite: {
-        txFound: false,
-        isPaid: false
-      },
-      ipfs: {
-        isSha256Ok: false
-      }
-    };
-
-    // HTTP Request to resolve the data body from the satellite
-    const result = await axios.get(
-      `https://api.blockstream.space/order/${uuid}`,
-      {
-        //   use the auth token within for the auth headers
-        headers: {
-          "X-Auth-Token": authtoken
+      // Instantiate teh response body
+      let res = {
+        message: "",
+        satellite: {
+          txFound: false,
+          isPaid: false
         },
-        validateStatus: function(status) {
-          return true;
+        ipfs: {
+          isSha256Ok: false
         }
-      }
-    );
+      };
 
-    // Get the data status
-    const data = result.data;
+      // HTTP Request to resolve the data body from the satellite
+      const result = await axios.get(
+        `${Env.get('BLOCKSTREAM_API_URL')}/order/${uuid}`,
+        {
+          //   use the auth token within for the auth headers
+          headers: {
+            "X-Auth-Token": authtoken
+          },
+          validateStatus: function (status) {
+            return true;
+          }
+        }
+      );
 
-    // AAdd the data status within the response body
-    res.message = data.message;
+      // Get the data status
+      const data = result.data;
 
-    // If there is any error in the HTTP request
-    if (result.status !== 200) {
-    
+      // AAdd the data status within the response body
+      res.message = data.message;
+
+      // If there is any error in the HTTP request
+      if (result.status !== 200) {
+
         // Add the error log in the response body
-      res.message = data.errors[0].detail;
+        res.message = data.errors[0].detail;
 
         // Return the response body
-      return response.status(200).send(res);
-    }
+        return response.status(200).send(res);
+      }
 
-    // If the Blockstream Satellite has a tx 
-    // update the response body 
-    res.satellite.txFound = true;
+      // If the Blockstream Satellite has a tx 
+      // update the response body 
+      res.satellite.txFound = true;
 
-    // If there was any error within the satellite payment (lightning)
-    if (data.status !== "sent") {
+      // If there was any error within the satellite payment (lightning)
+      if (data.status !== "sent") {
 
         // Update the response body
-      res.message = "Satellite tx not paid";
+        res.message = "Satellite tx not paid";
 
         // Return the response body
-      return response.status(200).send(res);
-    }
+        return response.status(200).send(res);
+      }
 
-    // If the Blockstream Satellite was paid (using lightning)
-    // update the response body
-    res.satellite.isPaid = true;
+      // If the Blockstream Satellite was paid (using lightning)
+      // update the response body
+      res.satellite.isPaid = true;
 
-    // Make a hash (SHA-256) of the IPFS HASH obtained in the request body
-    const filehash256 = sha256().update(filehash).digest("hex");
+      // Make a hash (SHA-256) of the IPFS HASH obtained in the request body
+      const filehash256 = sha256().update(filehash).digest("hex");
 
-    // If there is an exact match between the SHA-256 hash from the 
-    // blockstream satellite and the IPFS hashed hash, then the 
-    // validation has been successful 
-    if (data.message_digest === filehash256) {
+      // If there is an exact match between the SHA-256 hash from the 
+      // blockstream satellite and the IPFS hashed hash, then the 
+      // validation has been successful 
+      if (data.message_digest === filehash256) {
 
         // Update the response body with successful details
-      res.ipfs.isSha256Ok = true;
-      res.message = "Successfully validated";
+        res.ipfs.isSha256Ok = true;
+        res.message = "Successfully validated";
+      }
+
+      // Return the response body to the user
+      return response.status(200).send(res);
+
     }
-
-    // Return the response body to the user
-    return response.status(200).send(res);
-
-    catch(error){
-        Logger.error(error)
+    catch (error) {
+      Logger.error(error)
     }
   }
 }
