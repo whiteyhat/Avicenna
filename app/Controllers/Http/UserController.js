@@ -616,7 +616,7 @@ class UserController {
         let payRequest = null;
         const description = "Certify Avicenna's Passport using Open Time Stamps | " + fileId;
 
-        if (Env.get('OPEN_NODE_PROVIDER')) {
+        if (Env.get('OPEN_NODE_PROVIDER') == true) {
           const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: 5, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
           const data = response.data.data;
           payRequest = data.lightning_invoice.payreq;
@@ -627,8 +627,7 @@ class UserController {
             satoshis: data.amount,
             socketId
           });
-        }
-        else {
+        } else {
           // Instantiate lnd instance. This is required for evey lightning call
           const lnd = LightningService.getLndInstance();
 
@@ -652,7 +651,7 @@ class UserController {
             socketId
           });
 
-          payRequest = invoice.request;
+          payRequest = pr.request;
         }
 
 
