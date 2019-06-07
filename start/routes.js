@@ -31,6 +31,7 @@ Route.on('/passport/validate').render('validate').middleware(['auth'])
 */
 
 Route.post('/opentimestampsinvoice/paid', 'OpenNodeController.opentimestampsInvoicePaid')
+Route.post('satelliteinvoice/paid', 'OpenNodeController.satelliteInvoicePaid')
 
 
 /*

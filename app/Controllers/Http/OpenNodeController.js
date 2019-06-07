@@ -25,6 +25,14 @@ class OpenNodeController {
         return response.status(200).send('succeed')
     }
 
+    async satelliteInvoicePaid({ request, response }) {
+        const { status } = request.all();
+        if (status == 'paid') {
+            PaymentService.satellite(request.all())
+        }
+        return response.status(200).send('succeed')
+    }
+
 }
 
 module.exports = OpenNodeController;

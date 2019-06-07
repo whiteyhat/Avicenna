@@ -561,29 +561,50 @@ class UserController {
         const hash = JSON.parse(ipfshash);
         const socketId = JSON.parse(socket);
 
-        // Instantiate lnd instance. This is required for evey lightning call
-        const lnd = LightningService.getLndInstance();
+        let payRequest = null;
+        const description = "Upload Avicenna's Passport to Blockstream Satellite";
 
-        // Time to be cancelled the invoice. After 60 seconds
-        var t = new Date();
-        t.setSeconds(t.getSeconds() + 60 * 3);
+        if (Env.get('OPEN_NODE_PROVIDER') == "true" || Env.get('OPEN_NODE_PROVIDER') === true) {
+          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: 15, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/satelliteinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
+          const data = response.data.data;
+          payRequest = data.lightning_invoice.payreq;
+          // create an invoice to the DB with the current resources
+          await Invoices.create({
+            invoiceId: data.id,
+            ipfs_hash: hash,
+            satoshis: data.amount,
+            socketId
+          });
+        } else {
+          // Instantiate lnd instance. This is required for evey lightning call
+          const lnd = LightningService.getLndInstance();
 
-        // Create invoice with respective time
-        const pr = await createInvoice({
-          lnd,
-          tokens: 15,
-          description: "Upload Avicenna's Passport to Blockstream Satellite",
-          expires_at: t
-        });
-        // create an invoice to the DB with the current resources
-        await Invoices.create({
-          invoiceId: pr.id,
-          ipfs_hash: hash,
-          satoshis: pr.tokens,
-          socketId
-        });
+          // Time to be cancelled the invoice. After 60 seconds
+          var t = new Date();
+          t.setSeconds(t.getSeconds() + 60 * 3);
+
+          // Create invoice with respective time
+          const pr = await createInvoice({
+            lnd,
+            tokens: 15,
+            description,
+            expires_at: t
+          });
+          // create an invoice to the DB with the current resources
+          await Invoices.create({
+            invoiceId: pr.id,
+            ipfs_hash: hash,
+            satoshis: pr.tokens,
+            socketId
+          });
+
+          payRequest = pr.request;
+        }
+
+
+
         // Send invoice request and public key
-        return response.send({ pr: pr.request });
+        return response.send({ pr: payRequest });
       }
     } catch (error) {
       Logger.error(error);
@@ -616,7 +637,7 @@ class UserController {
         let payRequest = null;
         const description = "Certify Avicenna's Passport using Open Time Stamps | " + fileId;
 
-        if (Env.get('OPEN_NODE_PROVIDER') == true) {
+        if (Env.get('OPEN_NODE_PROVIDER') == "true" || Env.get('OPEN_NODE_PROVIDER') === true) {
           const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: 5, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
           const data = response.data.data;
           payRequest = data.lightning_invoice.payreq;
@@ -985,7 +1006,7 @@ class UserController {
         // If the user does not exist in the DB
       } else {
         // Create a new user
-        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true, name:"Admin" });
+        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true, name: "Admin" });
 
         // Return response body to the user
         return response.send({

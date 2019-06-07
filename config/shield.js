@@ -134,7 +134,7 @@ module.exports = {
   csrf: {
     enable: true,
     methods: ['POST', 'PUT', 'DELETE'],
-    filterUris: ['/opentimestampsinvoice/paid'],
+    filterUris: ['/opentimestampsinvoice/paid', '/satelliteinvoice/paid'],
     cookieOptions: {
       httpOnly: false,
       sameSite: true,
