@@ -669,11 +669,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                       request.done(function(result) {
                         setTimeout(function() {
 
-                          // display notification to the user
-                          toast(
-                            "info",
-                            "Uploading IPFS Passport to the Blockstream Satellite"
-                          );
+
+
+                          // after 1.75 seconds
+                          setTimeout(() => {
+
+                            // display an informative message about the amount to pay using lightning
+                            toast(
+                              "info",
+                              "Pay " +result.price+" satoshis to certify the passport using the Blockstream Satellite"
+                            );
+                          }, 1750);
 
                           // display payment request as a QR code with a clickable lightning prefix
                           showPR(result, "#pr", "#invoiceRoute", "#pr-string");
@@ -682,7 +688,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                           copyInvoice("#pr-string", "#copy-invoice");
 
                           // display the costs
-                          $("#sats").text("15 sats");
+                          $("#sats").text(result.price+"sats");
 
                           // display the modal
                           $("#payreq").modal("show");
@@ -826,7 +832,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                             // display an informative message about the amount to pay using lightning
                             toast(
                               "info",
-                              "Pay 5 satoshis to certify the passport using Open Time Stamps"
+                              "Pay " +result.price+" satoshis to certify the passport using Open Time Stamps"
                             );
                           }, 1750);
 
@@ -837,7 +843,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                           copyInvoice("#pr-string", "#copy-invoice");
 
                           // display the costs
-                          $("#sats").text("5 sats");
+                          $("#sats").text(result.price+" sats");
+
 
                           // hide modal
                           $("#payreq").modal("show");
