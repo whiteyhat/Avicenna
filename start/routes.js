@@ -44,6 +44,7 @@ Route.group(() => {
   Route.post('auth/verify-signature', 'UserController.digitalSignature')
   Route.post('demo/doctor', 'UserController.demoDoctor')
   Route.post('demo/admin', 'UserController.demoAdmin')
+  Route.post('demo/staff', 'UserController.demoStaff')
   Route.post('auth/logout', 'UserController.logout')
   Route.post('auth/login', 'UserController.login')
   Route.post('passport/new', 'UserController.newPassport')
