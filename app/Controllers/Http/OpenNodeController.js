@@ -17,6 +17,11 @@ Class to perform webhook opennode
  */
 class OpenNodeController {
 
+    /**
+    Controller to verify when a payment using Open Node to
+    certify the data using open time stamps has been
+    successgully paid
+    */
     async opentimestampsInvoicePaid({ request, response }) {
         const { status } = request.all();
         if (status == 'paid') {
@@ -25,6 +30,11 @@ class OpenNodeController {
         return response.status(200).send('succeed')
     }
 
+    /**
+    Controller to verify when a payment using Open Node to
+    certify the data using open time stamps has been
+    successgully paid
+    */
     async satelliteInvoicePaid({ request, response }) {
         const { status } = request.all();
         if (status == 'paid') {
