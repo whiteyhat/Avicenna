@@ -1076,6 +1076,7 @@ class UserController {
   async edit({ auth, request, response }) {
     // Get the request body parameters
     const { role, name, email, phone, clinic, address } = request.all();
+
     try {
       // If the user is authentified
       if (auth.user.wallet) {
@@ -1114,8 +1115,16 @@ class UserController {
 
         // If role param has been provided
         if (clinic != undefined) {
-          // Update the user clinic
-          user.clinic = clinic;
+
+          // Get the clinic id by the clinic name
+          const clinica = await Clinic.findBy("name", clinic);
+
+          // If the clinic exists
+          if (clinica) {
+
+             // Update the user clinic
+            user.clinic_id = clinica.id;
+          }
         }
 
         // Save the user
