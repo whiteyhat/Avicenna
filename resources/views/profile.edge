@@ -94,7 +94,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <div id="clinic" style="display:none">
                     <div class="form-group">
                         <label for="sel1">Select Clinic: </label>
-                        <select style="width:30%" sclass="form-control" id="sel1">
+                        <select style="width:30%" sclass="form-control" id="clinicSel">
+                            <option value="Select" selected>Choose Clinic</option>
                             @each(clinica in clinics)
                             <option>{{clinica.name}}</option>
                             @endeach
@@ -566,7 +567,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 name: $("#name").val(),
                 phone: $("#phone").val(),
                 email: $("#email").val(),
-                clinic: $("#clinic").val()
+                clinic: $("#clinicSel").val()
             },
             headers: {
                 'x-csrf-token': $('[name=_csrf]').val()
