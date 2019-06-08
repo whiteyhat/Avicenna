@@ -562,12 +562,17 @@ class UserController {
         const socketId = JSON.parse(socket);
 
         let payRequest = null;
+        let price = 0;
+
         const description = "Upload Avicenna's Passport to Blockstream Satellite";
 
         if (Env.get('OPEN_NODE_PROVIDER') == "true" || Env.get('OPEN_NODE_PROVIDER') === true) {
-          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: 15, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/satelliteinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
+          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: Env.get('LIGHTNING_FEE') + 10, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/satelliteinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
           const data = response.data.data;
+
           payRequest = data.lightning_invoice.payreq;
+          price = data.amount;
+
           // create an invoice to the DB with the current resources
           await Invoices.create({
             invoiceId: data.id,
@@ -586,7 +591,7 @@ class UserController {
           // Create invoice with respective time
           const pr = await createInvoice({
             lnd,
-            tokens: 15,
+            tokens: 10 + Env.get('LIGHTNING_FEE'),
             description,
             expires_at: t
           });
@@ -599,12 +604,13 @@ class UserController {
           });
 
           payRequest = pr.request;
+          price = pr.tokens;
         }
 
 
 
         // Send invoice request and public key
-        return response.send({ pr: payRequest });
+        return response.send({ pr: payRequest, price });
       }
     } catch (error) {
       Logger.error(error);
@@ -635,12 +641,14 @@ class UserController {
         const fileId = split[0];
 
         let payRequest = null;
+        let price = 0;
         const description = "Certify Avicenna's Passport using Open Time Stamps | " + fileId;
 
         if (Env.get('OPEN_NODE_PROVIDER') == "true" || Env.get('OPEN_NODE_PROVIDER') === true) {
-          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: 5, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
+          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: Env.get('LIGHTNING_FEE'), callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
           const data = response.data.data;
           payRequest = data.lightning_invoice.payreq;
+          price = data.amount;
           // create an invoice to the DB with the current resources
           await Invoices.create({
             invoiceId: data.id,
@@ -659,7 +667,7 @@ class UserController {
           // Create invoice with respective time
           const pr = await createInvoice({
             lnd,
-            tokens: 5,
+            tokens: Env.get('LIGHTNING_FEE'),
             description,
             expires_at: t
           });
@@ -673,11 +681,12 @@ class UserController {
           });
 
           payRequest = pr.request;
+          price = pr.tokens;
         }
 
 
         // Send invoice request and public key
-        return response.send({ pr: payRequest });
+        return response.send({ pr: payRequest, price });
       }
     } catch (error) {
       Logger.error(error);
