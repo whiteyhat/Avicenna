@@ -212,6 +212,65 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           }
         });
 
+        // When clicking on the 'start as a clinic staff' button
+        $("#start-staff").on("click", async function() {
+
+          // Display the user button with a loading animation and disabled
+          $("#doctor-loader").toggle()
+          $('#start-staff').attr('disabled', true);
+
+          // Instantiate the WebLN instance
+          let webln;
+          try {
+
+            // Get the WebLN instance from the request provider
+            webln = await requestProvider.requestProvider();
+          } catch (err) {
+            // Handle users without WebLN
+            toast(
+              "error",
+              "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
+            );
+          }
+          // Elsewhere in the code...
+          if (webln) {
+            // Call webln function
+            auth = await webln.getInfo();
+
+            // Get the pubkey from the user WebLN provider
+            if (auth.node.pubkey) {
+              
+              // do htttp request to send the user pubkey to the backend
+              var request = $.ajax({
+                url: "/api/v0/demo/staff",
+                type: "post",
+                data: {
+                  wallet: auth.node.pubkey
+                },
+                headers: {
+                  "x-csrf-token": $("[name=_csrf]").val()
+                },
+                dataType: "json"
+              });
+
+              // re-activate the doctor button
+              $("#doctor-loader").toggle()
+              $('#start-staff').attr('disabled', false);
+
+              // If successful display the login button and a message from the backend
+              request.done(function(data) {
+                $("#login").fadeIn();
+                toast(data.type, data.msg);
+              });
+
+              // If error display the error message
+              request.fail(function(data1, data2) {
+                console.log(data1, data2)
+              });
+            }
+          }
+        });
+
           // When clicking on the 'start as a doctor' button
         $("#start-admin").on("click", async function() {
 
