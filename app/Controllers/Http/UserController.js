@@ -1009,7 +1009,7 @@ class UserController {
         // Return response body
         return response.send({
           type: "info",
-          msg: "Demo started. Please click on log in on the top right button"
+          msg: "Demo started as an admin. Please click on log in on the top right button"
         });
 
         // If the user does not exist in the DB
@@ -1020,7 +1020,7 @@ class UserController {
         // Return response body to the user
         return response.send({
           type: "info",
-          msg: "Demo started. Please click on log in on the top right button"
+          msg: "Demo started as an admin. Please click on log in on the top right button"
         });
       }
     } catch (error) {
@@ -1072,7 +1072,60 @@ class UserController {
       // Return response body to the user
       return response.send({
         type: "info",
-        msg: "Demo started. Please click on log in on the top right button"
+        msg: "Demo started as a doctor. Please click on log in on the top right button"
+      });
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  /**
+  Controller to start the demo as a doctor staff / clinic staff
+   */
+  async demoStaff({ auth, request, response }) {
+    try {
+      // Get the request body
+      const { wallet } = request.all();
+
+      // Generate a random nonce
+      const nonce = Math.floor(Math.random() * 10000);
+
+      // Find the user by the pubkey
+      const user = await User.findBy("wallet", wallet);
+
+      // If user already exists in the DB
+      if (user) {
+        // Delete user tokens
+        await Database.table("tokens")
+          .where("user_id", user.id)
+          .delete();
+
+        // Delete user
+        await user.delete();
+
+        // Creaate a new user with staff permissions
+        await User.create({
+          wallet: wallet.toLowerCase(),
+          nonce,
+          staff: 1,
+          clinic_id: (Math.random() * (10 - 1) + 1)
+        });
+
+        // If the user does not exist in the DB
+      } else {
+        // Create a new user
+        await User.create({
+          wallet: wallet.toLowerCase(),
+          nonce,
+          staff: 1,
+          clinic_id: (Math.random() * (10 - 1) + 1)
+        });
+      }
+
+      // Return response body to the user
+      return response.send({
+        type: "info",
+        msg: "Demo started as a clinic staff. Please click on log in on the top right button"
       });
     } catch (error) {
       Logger.error(error);
