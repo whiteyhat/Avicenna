@@ -48,3 +48,6 @@ adonis migration:run
 npm run db
 ```
 6. Start the web app: `npm start`
+
+## [Project Wiki](https://github.com/whiteyhat/Avicenna/wiki)
+Hey! There is a fruitful wiki with more details about the problem we are solving, deployment instructions and additional information. 
