@@ -29,7 +29,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <a href="#addUser" data-toggle="modal" class="btn btn-primary"><i class="fas fa-plus-circle"></i> <span>Add New
                 User</span></a>&nbsp; &nbsp; <a href="#addClinic" data-toggle="modal" class="btn btn-success"><i class="fas fa-plus-circle"></i> <span>Add New
                     Clinic</span></a>&nbsp; &nbsp; <a href="#manageClinic" data-toggle="modal" class="btn btn-default"><i class="fas fa-sliders-h"></i> <span>
-                        Clinic Management</span></a>
+                        Clinic Management</span></a>&nbsp; &nbsp; 
+                        <a href="#lightning_settings" data-toggle="modal" style="background-color:#D5920A; color:white;"  class="btn btn-default"><i
+                                class="fas fa-bolt"></i> <span>
+                                Lightning Settings</span></a>
     </div>
 </div>
 <table class="table table-striped table-hover">
@@ -201,6 +204,36 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             </div>
             <div class="modal-footer">
                 <button id="addUserBtn" type="button" class="btn btn-success" data-dismiss="modal">Add</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="lightning_settings" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Lightning Settings</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+               Since this is only a demo available for the Bitcoin Games hackathon where every user can publicly log in 
+               as an admin, this option is not available from the admin dashboard.</p>
+
+               <p>
+               However, when deploying Avicenna, users can easily edit the lightning configuration settings from the <code>.ENV</code>
+                file to allow a non-custodial options, enable Open Node among other essential features.</p>
+
+                <p>
+                Currently, for this demo
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button id="addClinicBtn" type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
 
