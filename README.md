@@ -29,14 +29,15 @@ Avicenna uses and bitcoin distributed infrastructure for security, accountabilit
 * **MySQL** - for relative data management
 * **Pdfkit** - for PDF document generation
 * **Axios** - for backend http requests
-* **LN-service** - for lightning management
+* **LN-service** - for non-custodial lightning management
+* **Open Node** - For custodial lightning management
 * **Sudo-js** - for system management (Self-destruct sensitive data from the system)
 * **WebLN** - for client bitcoin management (digital signatures)
 
 ## Gettings Started
 1. Clone the repository: `sudo git clone https://github.com/whiteyhat/Avicenna`
 2. Install the dependencies: `npm i`
-3. Create a `.env` with the contents from the `.env.example` file
+3. Create a `.env` with the contents from the [.env.example](https://github.com/whiteyhat/Avicenna/blob/master/.env.example) file
 3. Customize your enviromental variables in the file `.env`
 4. Run the DB migrations to your local database 
 ```js
