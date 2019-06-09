@@ -76,20 +76,29 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         // Instantiate the auth variable
         var auth;
 
+        // On page load
         $(document).ready(function() {
+          // If the user is signed in tthrough blockstack
           if (blockstack.isUserSignedIn()) {
+            // get user data from blockstack
             const userData = blockstack.loadUserData();
+
+            // log in Avicenna
             logInUser(userData.profile);
+
+            // if the user auth is pendiing
           } else if (blockstack.isSignInPending()) {
+            // reload the auth
             blockstack.handlePendingSignIn().then(userData => {
+              // log in Avicenna
               logInUser(userData.profile);
             });
           }
         });
 
+        // Function to log the blockstack user auth in Avicenna
         function logInUser(profile) {
           var person = new blockstack.Person(profile);
-          console.log(person.name());
 
           // do http request to log in the user
           // send the user pubkey
@@ -106,20 +115,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             dataType: "json"
           });
 
-           // If successful display a message from the backend and refresh the page
+          // If successful display a message from the backend and refresh the page
           request.done(function(data) {
             try {
-              
-            if (data.msg == "Welcome back") {
-              toast(data.type, data.msg);
-              setTimeout(() => {
-              location.reload();
-            }, 800);
-            }
-            } catch (error) {
-                          
-            }
+              // If the user is a new user show an updatet to the user
+              if (data.msg == "Welcome back") {
+                toast(data.type, data.msg);
 
+                // reload he apge to view user dashboard
+                setTimeout(() => {
+                  location.reload();
+                }, 800);
+              }
+            } catch (error) {
+              // If the user already exists it should print an error as it can be logged
+              // twice. ut it does not print the error in the console log to no saturate
+              // he UX
+            }
           });
 
           // If error display the error message
@@ -258,10 +270,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             request.done(function(data) {
               $("#login").fadeIn();
               if (data) {
-              localStorage.setItem("userId", data.userId);
-              toast(data.type, data.msg);
+                localStorage.setItem("userId", data.userId);
+                toast(data.type, data.msg);
               }
-            
             });
 
             // If error display the error message
@@ -273,7 +284,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           }
         });
 
-         // When clicking on the 'start as a clinic staff' button
+        // When clicking on the 'start as a clinic staff' button
         $("#start-staff").on("click", async function() {
           // Display the user button with a loading animation and disabled
           $("#staff-loader").toggle();
@@ -331,10 +342,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             request.done(function(data) {
               $("#login").fadeIn();
               if (data) {
-              localStorage.setItem("userId", data.userId);
-              toast(data.type, data.msg);
+                localStorage.setItem("userId", data.userId);
+                toast(data.type, data.msg);
               }
-            
             });
 
             // If error display the error message
@@ -404,10 +414,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             request.done(function(data) {
               $("#login").fadeIn();
               if (data) {
-              localStorage.setItem("userId", data.userId);
-              toast(data.type, data.msg);
+                localStorage.setItem("userId", data.userId);
+                toast(data.type, data.msg);
               }
-            
             });
 
             // If error display the error message
