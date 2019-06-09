@@ -2,6 +2,9 @@
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
+const fs = use('fs')
+const Helpers = use('Helpers')
+const readFile = Helpers.promisify(fs.readFile)
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +17,10 @@ Route.get('/admin', 'UserController.admin').middleware(['isAdmin:auth'])
 Route.get('/profile', 'UserController.profile').middleware(['auth'])
 Route.get('/staff', 'UserController.staff').middleware(['auth'])
 Route.get('/donate/:wallet', 'UserController.donate')
+
+Route.get('/manifest.json', async ({ response }) => {
+  return await readFile('./manifest.json')
+})
 
 /*
 |--------------------------------------------------------------------------
