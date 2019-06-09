@@ -54,6 +54,7 @@ Route.group(() => {
   Route.post('demo/staff', 'UserController.demoStaff')
   Route.post('auth/logout', 'UserController.logout')
   Route.post('auth/login', 'UserController.login')
+  Route.post('auth/blockstack-login', 'UserController.blockstackLogin')
   Route.post('passport/new', 'UserController.newPassport')
   Route.post('profile/edit', 'UserController.edit')
   Route.post('profile/link-node', 'UserController.updateDonationPage')
