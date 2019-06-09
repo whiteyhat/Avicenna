@@ -33,8 +33,16 @@ class UserController {
    */
   async logout({ auth, response }) {
     try {
-      await auth.logout();
+      // If the user is signed in from the blockstack auth id, then log it out
+      if (auth.user.blockstack) {
+         await auth.logout();
+      return response.send({ type: "info", msg: "Bye!", blockstack: true });
+
+      // If the user is no signed in from the blockstack auth id, do a normal log out
+      } else {
+         await auth.logout();
       return response.send({ type: "info", msg: "Bye!" });
+      }
     } catch (error) {
       Logger.error(error);
       return response.send({
@@ -126,7 +134,7 @@ class UserController {
   async staff({ auth, view, response }) {
     try {
       // if the user has a pubkey
-      if (auth.user.wallet) {
+      if (auth.user) {
         // Get the names, roles and pubkeys from all the users in the platform
         const users = await Database.select("name", "role", "wallet").from(
           "users"
@@ -644,8 +652,19 @@ class UserController {
         let price = 0;
         const description = "Certify Avicenna's Passport using Open Time Stamps | " + fileId;
 
+         // instantiate satoshis amount
+          let satsAmount = 0;
+
+          // In case of having a non-profit scenario, do a minimum of 1 sat to act as a
+          // proof of payment
+          if (Env.get('LIGHTNING_FEE') == 0) {
+            satsAmount = 1
+          } else {
+            satsAmount = Env.get('LIGHTNING_FEE')
+          }
+
         if (Env.get('OPEN_NODE_PROVIDER') == "true" || Env.get('OPEN_NODE_PROVIDER') === true) {
-          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: Env.get('LIGHTNING_FEE'), callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
+          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: satsAmount, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
           const data = response.data.data;
           payRequest = data.lightning_invoice.payreq;
           price = data.amount;
@@ -665,9 +684,9 @@ class UserController {
           t.setSeconds(t.getSeconds() + 60 * 3);
 
           // Create invoice with respective time
-          const pr = await createInvoice({
+         const pr = await createInvoice({
             lnd,
-            tokens: Env.get('LIGHTNING_FEE'),
+            tokens: satsAmount,
             description,
             expires_at: t
           });
@@ -990,8 +1009,12 @@ class UserController {
       // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
 
+      let user = null
+
       // Find the user by the pubkey
-      const user = await User.findBy("wallet", wallet);
+      if (wallet != undefined) {
+      user = await User.findBy("wallet", wallet);  
+      }
 
       // If user already exists in the DB
       if (user) {
@@ -1017,7 +1040,9 @@ class UserController {
         // Create a new user
         const blocksackUser = await User.create({
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: (Math.random() * (10 - 1) + 1),
+          blockstack: true,
+          admin: true
         });
 
         // Return response body to the user
@@ -1052,8 +1077,12 @@ class UserController {
       // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
 
+      let user = null
+
       // Find the user by the pubkey
-      const user = await User.findBy("wallet", wallet);
+      if (wallet != undefined) {
+      user = await User.findBy("wallet", wallet);  
+      }
 
       // If user already exists in the DB
       if (user) {
@@ -1091,7 +1120,8 @@ class UserController {
         await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: (Math.random() * (10 - 1) + 1),
+          blockstack: true
         });
       }
 
@@ -1115,9 +1145,13 @@ class UserController {
 
       // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
+      
+      let user = null
 
       // Find the user by the pubkey
-      const user = await User.findBy("wallet", wallet);
+      if (wallet != undefined) {
+      user = await User.findBy("wallet", wallet);  
+      }
 
       // If user already exists in the DB
       if (user) {
@@ -1142,7 +1176,9 @@ class UserController {
         // Create a new user
         const blocksackUser = await User.create({
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: (Math.random() * (10 - 1) + 1),
+          blockstack: true,
+          staff: true
         });
 
         // Return response body to the user
@@ -1176,13 +1212,13 @@ class UserController {
     */
   async edit({ auth, request, response }) {
     // Get the request body parameters
-    const { role, name, email, phone, clinic, address } = request.all();
+    const { role, name, email, phone, clinic, address, wallet } = request.all();
 
     try {
       // If the user is authentified
-      if (auth.user.wallet) {
+      if (auth.user) {
         // Get the user by the pubkey
-        const user = await User.findBy("wallet", auth.user.wallet);
+        const user = await User.findBy("wallet", auth.user);
 
         // If role param has been provided
         if (role != undefined) {
@@ -1212,6 +1248,12 @@ class UserController {
         if (phone != undefined) {
           // Update the user phone
           user.phone = phone;
+        }
+
+        // If Lightning pubkey param has been provided
+        if (wallet != undefined) {
+          // Update the user phone
+          user.wallet = wallet;
         }
 
         // If role param has been provided
@@ -1288,12 +1330,18 @@ class UserController {
         });
       }
     } catch (error) {
-      Logger.error("HERE", error);
+      Logger.error(error);
     }
   }
 
   async blockstackLogin({ auth, request, response }) {
     try {
+      if (auth.user) {
+        return response.send({
+          msg: "returning",
+          type: "info"
+        });
+      }
       // Get the public ket from the client using the webln provider
       const { userId, name } = request.all();
 
@@ -1305,15 +1353,16 @@ class UserController {
         await user.save();
         await auth.remember(true).login(user);
 
-        // Send the random nonce which has been just created to the user to sign it
-        response.send({
-          nonce,
+        return response.send({
           msg: "Welcome back",
           type: "success"
         });
       }
     } catch (error) {
-      Logger.error("HERE", error);
+      return response.send({
+          msg: "returning",
+          type: "info"
+        });
     }
   }
 
