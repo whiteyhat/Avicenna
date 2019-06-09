@@ -1,7 +1,7 @@
 {
-    "name": "Hello, Blockstack",
-    "start_url": "localhost:3111",
-    "description": "A simple demo of Blockstack Auth",
+    "name": "Avicenna",
+    "start_url": "https://avicenna.casa",
+    "description": "Electronic Healhcare Record system backed by a distributed infrastructure",
     "icons": [{
       "src": "https://helloblockstack.com/icon-192x192.png",
       "sizes": "192x192",
