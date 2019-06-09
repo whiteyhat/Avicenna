@@ -29,7 +29,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <a class="navbar-brand" href="/">AVICENNA</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-            @if(!auth.user.wallet)
+            @if(!auth.user)
             <ul class="nav navbar-nav">
                 <li><a id="how" href="#how">How</a></li>
                 <li><a id="why" href="#why">Why</a></li>
@@ -38,7 +38,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             </ul>
             @endif
             <ul class="nav navbar-nav navbar-right">
-                @if(!auth.user.wallet)
+                @if(!auth.user)
                 <li><a id="login" style="color:white; display:none; background-color:teal" class="btn btn-defaul"><img style="height:24px" src="/img/joule.png" alt=""> Log in</a></li>
                 <li><a id="blockstack" style="color:white; display:none; background-color:#270E34" class="btn btn-default"><img style="height:27px" src="/img/blockstack.png" alt=""> Log in</a></li>
                 @endif
@@ -48,7 +48,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                     href="/passport/validate">Validate Passport</a></li>
                 <li><a id="logout" style="color:white" class="btn btn-danger">Log out</a> </li>
 
-                @elseif(auth.user.wallet)
+                @elseif(auth.user)
                 <li class="{{ request.match('/staff')  ? 'active':'' }}"><a href="/staff">Staff</a></li>
                 <li class="{{ request.match('/passport/new')  ? 'active':'' }}"><a href="/passport/new">Create
                         Passport</a></li>
@@ -67,9 +67,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <script>
 
-document.getElementById('blockstack').addEventListener('click', function() {
-   blockstack.redirectToSignIn()
+try {
+ $('#blockstack').click(function () {
+    blockstack.redirectToSignIn()
  })
+} catch (error) {
+    
+}
 
     // When clicking on the logout function
     $('#logout').click(function () {
@@ -88,6 +92,11 @@ document.getElementById('blockstack').addEventListener('click', function() {
         request.done(function (data) {
             if (data.msg) {
                 toast(data.type, data.msg);
+                if (data.blockstack === true) {
+                    setTimeout(() => {
+                        blockstack.signUserOut(window.location.origin)
+                    }, 800);
+                }
             }
             setTimeout(() => {
                 location.replace('/')
