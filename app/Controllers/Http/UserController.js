@@ -1013,6 +1013,19 @@ class UserController {
         });
 
         // If the user does not exist in the DB
+      } else if(wallet == undefined) {
+        // Create a new user
+        const blocksackUser = await User.create({
+          nonce,
+          clinic_id: (Math.random() * (10 - 1) + 1)
+        });
+
+        // Return response body to the user
+      return response.send({
+        type: "info",
+        msg: "Demo started as a doctor. Please click on log in on the top right button",
+        userId: blocksackUser.id
+      });
       } else {
         // Create a new user
         await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true, name: "Admin" });
@@ -1060,6 +1073,19 @@ class UserController {
         });
 
         // If the user does not exist in the DB
+      } else if(wallet == undefined) {
+        // Create a new user
+        const blocksackUser = await User.create({
+          nonce,
+          clinic_id: (Math.random() * (10 - 1) + 1)
+        });
+
+        // Return response body to the user
+      return response.send({
+        type: "info",
+        msg: "Demo started as a doctor. Please click on log in on the top right button",
+        userId: blocksackUser.id
+      });
       } else {
         // Create a new user
         await User.create({
@@ -1112,6 +1138,19 @@ class UserController {
         });
 
         // If the user does not exist in the DB
+      } else if(wallet == undefined) {
+        // Create a new user
+        const blocksackUser = await User.create({
+          nonce,
+          clinic_id: (Math.random() * (10 - 1) + 1)
+        });
+
+        // Return response body to the user
+      return response.send({
+        type: "info",
+        msg: "Demo started as a doctor. Please click on log in on the top right button",
+        userId: blocksackUser.id
+      });
       } else {
         // Create a new user
         await User.create({
@@ -1246,6 +1285,31 @@ class UserController {
           nonce,
           msg,
           type
+        });
+      }
+    } catch (error) {
+      Logger.error("HERE", error);
+    }
+  }
+
+  async blockstackLogin({ auth, request, response }) {
+    try {
+      // Get the public ket from the client using the webln provider
+      const { userId, name } = request.all();
+
+      //   Find the user by searching by the public key
+      const user = await User.findBy("id", userId);
+
+      if (user) {
+        user.name = name
+        await user.save();
+        await auth.remember(true).login(user);
+
+        // Send the random nonce which has been just created to the user to sign it
+        response.send({
+          nonce,
+          msg: "Welcome back",
+          type: "success"
         });
       }
     } catch (error) {
