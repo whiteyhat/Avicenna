@@ -35,13 +35,13 @@ class UserController {
     try {
       // If the user is signed in from the blockstack auth id, then log it out
       if (auth.user.blockstack) {
-         await auth.logout();
-      return response.send({ type: "info", msg: "Bye!", blockstack: true });
+        await auth.logout();
+        return response.send({ type: "info", msg: "Bye!", blockstack: true });
 
-      // If the user is no signed in from the blockstack auth id, do a normal log out
+        // If the user is no signed in from the blockstack auth id, do a normal log out
       } else {
-         await auth.logout();
-      return response.send({ type: "info", msg: "Bye!" });
+        await auth.logout();
+        return response.send({ type: "info", msg: "Bye!" });
       }
     } catch (error) {
       Logger.error(error);
@@ -164,17 +164,14 @@ class UserController {
       // find the clinic by its name
       const clinic = await Clinic.findBy("name", clinicName);
       if (clinic) {
-
         // Instantiate the lnd instance
-        let lnd = null
+        let lnd = null;
 
         // If the health-care facility has activated the non-custodial feature
         if (clinic.tls && clinic.grgpc && clinic.macaroon) {
-
           // Instantiate the non custodial ln instance using their invoice macaroon
           lnd = LightningService.nonCustodialLndInstance();
         } else {
-
           // Instantiate the custodial lnd instance. This is required for evey lightning call
           lnd = LightningService.getLndInstance();
         }
@@ -447,14 +444,14 @@ class UserController {
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
-        .then(function (result) {
+        .then(function(result) {
           // Display the IPFS HASH in the console log
           Logger.info("IPFS HASH: " + result.hash);
 
           // Return the IPFS hash gateway to the user
           return response.send({ hash: result.hash, path });
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log("Failed!", error);
         });
     } catch (error) {
@@ -536,14 +533,14 @@ class UserController {
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
-        .then(function (result) {
+        .then(function(result) {
           // Display the IPFS HASH in the console log
           Logger.info("IPFS HASH: " + result.hash);
 
           // Return the IPFS hash gateway to the user
           return response.send({ hash: result.hash, path });
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log("Failed!", error);
         });
     } catch (error) {
@@ -572,10 +569,23 @@ class UserController {
         let payRequest = null;
         let price = 0;
 
-        const description = "Upload Avicenna's Passport to Blockstream Satellite";
+        const description =
+          "Upload Avicenna's Passport to Blockstream Satellite";
 
-        if (Env.get('OPEN_NODE_PROVIDER') == "true" || Env.get('OPEN_NODE_PROVIDER') === true) {
-          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: Env.get('LIGHTNING_FEE') + 10, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/satelliteinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
+        if (
+          Env.get("OPEN_NODE_PROVIDER") == "true" ||
+          Env.get("OPEN_NODE_PROVIDER") === true
+        ) {
+          const response = await axios.post(
+            `${Env.get("OPEN_NODE_URL")}/v1/charges`,
+            {
+              description,
+              amount: Env.get("LIGHTNING_FEE") + 10,
+              callback_url:
+                Env.get("OPEN_NODE_WEBHOOK_URL") + "/satelliteinvoice/paid"
+            },
+            { headers: { Authorization: Env.get("OPEN_NODE_WITHDRAW_API") } }
+          );
           const data = response.data.data;
 
           payRequest = data.lightning_invoice.payreq;
@@ -599,7 +609,7 @@ class UserController {
           // Create invoice with respective time
           const pr = await createInvoice({
             lnd,
-            tokens: 10 + Env.get('LIGHTNING_FEE'),
+            tokens: 10 + Env.get("LIGHTNING_FEE"),
             description,
             expires_at: t
           });
@@ -614,8 +624,6 @@ class UserController {
           payRequest = pr.request;
           price = pr.tokens;
         }
-
-
 
         // Send invoice request and public key
         return response.send({ pr: payRequest, price });
@@ -650,21 +658,34 @@ class UserController {
 
         let payRequest = null;
         let price = 0;
-        const description = "Certify Avicenna's Passport using Open Time Stamps | " + fileId;
+        const description =
+          "Certify Avicenna's Passport using Open Time Stamps | " + fileId;
 
-         // instantiate satoshis amount
-          let satsAmount = 0;
+        // instantiate satoshis amount
+        let satsAmount = 0;
 
-          // In case of having a non-profit scenario, do a minimum of 1 sat to act as a
-          // proof of payment
-          if (Env.get('LIGHTNING_FEE') == 0) {
-            satsAmount = 1
-          } else {
-            satsAmount = Env.get('LIGHTNING_FEE')
-          }
+        // In case of having a non-profit scenario, do a minimum of 1 sat to act as a
+        // proof of payment
+        if (Env.get("LIGHTNING_FEE") == 0) {
+          satsAmount = 1;
+        } else {
+          satsAmount = Env.get("LIGHTNING_FEE");
+        }
 
-        if (Env.get('OPEN_NODE_PROVIDER') == "true" || Env.get('OPEN_NODE_PROVIDER') === true) {
-          const response = await axios.post(`${Env.get('OPEN_NODE_URL')}/v1/charges`, { description, amount: satsAmount, callback_url: Env.get('OPEN_NODE_WEBHOOK_URL') + '/opentimestampsinvoice/paid' }, { headers: { Authorization: Env.get('OPEN_NODE_WITHDRAW_API') } })
+        if (
+          Env.get("OPEN_NODE_PROVIDER") == "true" ||
+          Env.get("OPEN_NODE_PROVIDER") === true
+        ) {
+          const response = await axios.post(
+            `${Env.get("OPEN_NODE_URL")}/v1/charges`,
+            {
+              description,
+              amount: satsAmount,
+              callback_url:
+                Env.get("OPEN_NODE_WEBHOOK_URL") + "/opentimestampsinvoice/paid"
+            },
+            { headers: { Authorization: Env.get("OPEN_NODE_WITHDRAW_API") } }
+          );
           const data = response.data.data;
           payRequest = data.lightning_invoice.payreq;
           price = data.amount;
@@ -684,7 +705,7 @@ class UserController {
           t.setSeconds(t.getSeconds() + 60 * 3);
 
           // Create invoice with respective time
-         const pr = await createInvoice({
+          const pr = await createInvoice({
             lnd,
             tokens: satsAmount,
             description,
@@ -702,7 +723,6 @@ class UserController {
           payRequest = pr.request;
           price = pr.tokens;
         }
-
 
         // Send invoice request and public key
         return response.send({ pr: payRequest, price });
@@ -770,14 +790,14 @@ class UserController {
 
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath)
-          .then(function (result) {
+          .then(function(result) {
             // Display the IPFS HASH in the console log
             Logger.info("IPFS HASH: " + result.hash);
 
             // Return the IPFS hash gateway to the user
             return response.send({ hash: result.hash, filename: path });
           })
-          .catch(function (error) {
+          .catch(function(error) {
             console.log("Failed!", error);
           });
       } else {
@@ -810,7 +830,7 @@ class UserController {
         const user = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: Math.random() * (10 - 1) + 1
         });
 
         // If the user created needs to have staff permisssions
@@ -1009,11 +1029,11 @@ class UserController {
       // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
 
-      let user = null
+      let user = null;
 
       // Find the user by the pubkey
       if (wallet != undefined) {
-      user = await User.findBy("wallet", wallet);  
+        user = await User.findBy("wallet", wallet);
       }
 
       // If user already exists in the DB
@@ -1027,38 +1047,51 @@ class UserController {
         await user.delete();
 
         // Create a new user
-        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true, name: "Admin" });
+        await User.create({
+          wallet: wallet.toLowerCase(),
+          nonce,
+          admin: true,
+          name: "Admin"
+        });
 
         // Return response body
         return response.send({
           type: "info",
-          msg: "Demo started as an admin. Please click on log in on the top right button"
+          msg:
+            "Demo started as an admin. Please click on log in on the top right button"
         });
 
         // If the user does not exist in the DB
-      } else if(wallet == undefined) {
+      } else if (wallet == undefined) {
         // Create a new user
         const blocksackUser = await User.create({
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1),
+          clinic_id: Math.random() * (10 - 1) + 1,
           blockstack: true,
           admin: true
         });
 
         // Return response body to the user
-      return response.send({
-        type: "info",
-        msg: "Demo started as a doctor. Please click on log in on the top right button",
-        userId: blocksackUser.id
-      });
+        return response.send({
+          type: "info",
+          msg:
+            "Demo started as a doctor. Please click on log in on the top right button",
+          userId: blocksackUser.id
+        });
       } else {
         // Create a new user
-        await User.create({ wallet: wallet.toLowerCase(), nonce, admin: true, name: "Admin" });
+        await User.create({
+          wallet: wallet.toLowerCase(),
+          nonce,
+          admin: true,
+          name: "Admin"
+        });
 
         // Return response body to the user
         return response.send({
           type: "info",
-          msg: "Demo started as an admin. Please click on log in on the top right button"
+          msg:
+            "Demo started as an admin. Please click on log in on the top right button"
         });
       }
     } catch (error) {
@@ -1077,11 +1110,11 @@ class UserController {
       // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
 
-      let user = null
+      let user = null;
 
       // Find the user by the pubkey
       if (wallet != undefined) {
-      user = await User.findBy("wallet", wallet);  
+        user = await User.findBy("wallet", wallet);
       }
 
       // If user already exists in the DB
@@ -1098,29 +1131,30 @@ class UserController {
         await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: Math.random() * (10 - 1) + 1
         });
 
         // If the user does not exist in the DB
-      } else if(wallet == undefined) {
+      } else if (wallet == undefined) {
         // Create a new user
         const blocksackUser = await User.create({
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: Math.random() * (10 - 1) + 1
         });
 
         // Return response body to the user
-      return response.send({
-        type: "info",
-        msg: "Demo started as a doctor. Please click on log in on the top right button",
-        userId: blocksackUser.id
-      });
+        return response.send({
+          type: "info",
+          msg:
+            "Demo started as a doctor. Please click on log in on the top right button",
+          userId: blocksackUser.id
+        });
       } else {
         // Create a new user
         await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1),
+          clinic_id: Math.random() * (10 - 1) + 1,
           blockstack: true
         });
       }
@@ -1128,7 +1162,8 @@ class UserController {
       // Return response body to the user
       return response.send({
         type: "info",
-        msg: "Demo started as a doctor. Please click on log in on the top right button"
+        msg:
+          "Demo started as a doctor. Please click on log in on the top right button"
       });
     } catch (error) {
       Logger.error(error);
@@ -1145,12 +1180,12 @@ class UserController {
 
       // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
-      
-      let user = null
+
+      let user = null;
 
       // Find the user by the pubkey
       if (wallet != undefined) {
-      user = await User.findBy("wallet", wallet);  
+        user = await User.findBy("wallet", wallet);
       }
 
       // If user already exists in the DB
@@ -1168,39 +1203,41 @@ class UserController {
           wallet: wallet.toLowerCase(),
           nonce,
           staff: 1,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: Math.random() * (10 - 1) + 1
         });
 
         // If the user does not exist in the DB
-      } else if(wallet == undefined) {
+      } else if (wallet == undefined) {
         // Create a new user
         const blocksackUser = await User.create({
           nonce,
-          clinic_id: (Math.random() * (10 - 1) + 1),
+          clinic_id: Math.random() * (10 - 1) + 1,
           blockstack: true,
           staff: true
         });
 
         // Return response body to the user
-      return response.send({
-        type: "info",
-        msg: "Demo started as a doctor. Please click on log in on the top right button",
-        userId: blocksackUser.id
-      });
+        return response.send({
+          type: "info",
+          msg:
+            "Demo started as a doctor. Please click on log in on the top right button",
+          userId: blocksackUser.id
+        });
       } else {
         // Create a new user
         await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
           staff: 1,
-          clinic_id: (Math.random() * (10 - 1) + 1)
+          clinic_id: Math.random() * (10 - 1) + 1
         });
       }
 
       // Return response body to the user
       return response.send({
         type: "info",
-        msg: "Demo started as a clinic staff. Please click on log in on the top right button"
+        msg:
+          "Demo started as a clinic staff. Please click on log in on the top right button"
       });
     } catch (error) {
       Logger.error(error);
@@ -1218,7 +1255,7 @@ class UserController {
       // If the user is authentified
       if (auth.user) {
         // Get the user by the pubkey
-        const user = await User.findBy("wallet", auth.user);
+        const user = await User.findBy("id", auth.user.id);
 
         // If role param has been provided
         if (role != undefined) {
@@ -1258,14 +1295,12 @@ class UserController {
 
         // If role param has been provided
         if (clinic != undefined) {
-
           // Get the clinic id by the clinic name
           const clinica = await Clinic.findBy("name", clinic);
 
           // If the clinic exists
           if (clinica) {
-
-             // Update the user clinic
+            // Update the user clinic
             user.clinic_id = clinica.id;
           }
         }
@@ -1338,7 +1373,7 @@ class UserController {
     try {
       if (auth.user) {
         return response.send({
-          msg: "returning",
+          msg: "Already looged in",
           type: "info"
         });
       }
@@ -1347,22 +1382,39 @@ class UserController {
 
       //   Find the user by searching by the public key
       const user = await User.findBy("id", userId);
+      const previousUser = await User.findBy("name", name);
 
+      // Delete users for this demonstration
+      if (previousUser) {
+        // Delete user tokens
+        await Database.table("tokens")
+          .where("user_id", previousUser.id)
+          .delete();
+
+        // Delete user
+        await previousUser.delete();
+      }
+
+      // If new user
       if (user) {
-        user.name = name
+
+        // add the blockstack username as name
+        user.name = name;
         await user.save();
+
+        // remember the user
         await auth.remember(true).login(user);
 
         return response.send({
-          msg: "Welcome back",
+          msg: "Welcome",
           type: "success"
         });
       }
     } catch (error) {
       return response.send({
-          msg: "returning",
-          type: "info"
-        });
+        msg: "returning",
+        type: "info"
+      });
     }
   }
 
@@ -1394,7 +1446,7 @@ class UserController {
 
       //   If the signature is verified
 
-      await LightningService.verifyDigitalSignature(data).then(async function (
+      await LightningService.verifyDigitalSignature(data).then(async function(
         result
       ) {
         if (result.pubkey.signed_by.toLowerCase() === user.wallet) {
@@ -1403,7 +1455,7 @@ class UserController {
           await auth.remember(true).login(user);
 
           // Add an informative successful message
-          msg = "Welcome back";
+          msg = "Welcome";
           type = "success";
 
           return response.send({ type, msg });
