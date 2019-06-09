@@ -83,6 +83,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 </div>
 </div>
+<div style="display:none" id="pubkey-help" class="alert alert-info" role="alert">
+        <h3>Lighning Peer ID</h3>
+       The Lighning Peer ID is the first part of the lightning node URI. It can be found easily using the command line from your lightning node.
+
+        The peer id is obtained by typing in yout lightning node:
+        <ul>
+            <li><b>LND:</b> <code>lncli getinfo</code> You should get information abou your LND node, including the peer id like 
+            <code>"identity_pubkey": "036e8a8efeb26f3cffce99f4...."</code></li>
+
+            <li><b>C-lighning:</b> <code>cli/lightning-cli getinfo</code> You should get information abou your LND node, including the peer id like 
+            <code>"id": "036e8a8efeb26f3cffce99f4...."</code></li>
+        </ul>
+
+    </div>
 <table class="table table-striped table-hover">
     <tbody>
         <tr>
@@ -165,9 +179,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             @if(auth.user.wallet)
             <td>{{auth.user.wallet}}</td>
             @else
-            <td id="walletText"><p>Add a Lightning Public Key (:</p></td>
-            <td style="display:none" id="walletField"><input id="wallet" class="form-control" style="width:40%" type="wallet"
-                placeholder="Type your Lightning Public key"></td>
+            <td id="walletText"><p>Add a Lighning Peer ID (:</p></td>
+            <td style="display:none" id="walletField"><div class="input-group input-group-lg" style="width:40%;"><input id="wallet" type="text" class="form-control" placeholder="Type your lightning peer id" aria-describedby="sizing-addon1"> <span class="input-group-addon"><a id="pubkey-info"><i class="fas fa-question-circle"></i></a></span></td><div>
             @endif
         </tr>
 
@@ -393,6 +406,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </div>
 
 <script>
+
+     // When clicking on the peer id info button show help alert
+     $("#pubkey-info").on("click", function () {
+        $("#pubkey-help").toggle()
+    })
     
     // When clicking on tls show help alert
     $("#tls-btn").on("click", function () {
