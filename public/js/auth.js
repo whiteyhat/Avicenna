@@ -77,6 +77,39 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         // Instantiate the auth variable
         var auth;
 
+        $("#login").on("click", function() {
+
+          function logInUser(profile) {
+            var person = new blockstack.Person(profile)
+
+            // do http request to log in the user
+            // send the user pubkey
+            var request = $.ajax({
+              url: "/api/v0/auth/blockstack-login",
+              data: {
+                userId: localStorage.getItem("userId"),
+                name: person.name()
+              },
+              type: "post",
+              headers: {
+                "x-csrf-token": $("[name=_csrf]").val()
+              },
+              dataType: "json"
+            });
+          }
+
+          if (blockstack.isUserSignedIn()) {
+            const userData = blockstack.loadUserData()
+            logInUser(userData.profile)
+          } else if (blockstack.isSignInPending()) {
+            blockstack.handlePendingSignIn()
+            .then(userData => {
+              logInUser(userData.profile)
+            })
+        }
+
+        })
+
         // When clickin on login
         $("#login").on("click", function() {
 
@@ -167,12 +200,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
+
+            // Enable blockstack auth
+              $("#blockstack").show();
+            // re-activate the doctor button
+              $("#doctor-loader").hide()
+              $('#start-doctor').attr('disabled', false);
+
             // Handle users without WebLN
             toast(
-              "error",
+              "warning",
               "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
             );
           }
+          // Enable blockstack auth
+              $("#blockstack").fadeIn();
           // Elsewhere in the code...
           if (webln) {
             // Call webln function
@@ -202,6 +244,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               request.done(function(data) {
                 $("#login").fadeIn();
                 toast(data.type, data.msg);
+                if (data.userId) {
+                  localStorage.setItem("userId",data.userId);
+                }
               });
 
               // If error display the error message
@@ -216,19 +261,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         $("#start-staff").on("click", async function() {
 
           // Display the user button with a loading animation and disabled
-          $("#doctor-loader").toggle()
+          $("#staff-loader").toggle()
           $('#start-staff').attr('disabled', true);
 
           // Instantiate the WebLN instance
           let webln;
           try {
+            // Enable blockstack auth
+              $("#blockstack").fadeIn();
 
             // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
+              // Enable blockstack auth
+              $("#blockstack").show();
+            // re-activate the doctor button
+              $("#staff-loader").hide()
+              $('#start-staff').attr('disabled', false);
+
             // Handle users without WebLN
             toast(
-              "error",
+              "warning",
               "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
             );
           }
@@ -254,13 +307,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               });
 
               // re-activate the doctor button
-              $("#doctor-loader").toggle()
+              $("#staff-loader").toggle()
               $('#start-staff').attr('disabled', false);
 
               // If successful display the login button and a message from the backend
               request.done(function(data) {
                 $("#login").fadeIn();
                 toast(data.type, data.msg);
+                if (data.userId) {
+                  localStorage.setItem("userId",data.userId);
+                }
               });
 
               // If error display the error message
@@ -282,10 +338,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           let webln;
 
           try {
+            // Enable blockstack auth
+              $("#blockstack").fadeIn();
 
             // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
+
+            // Enable blockstack auth
+              $("#blockstack").show();
+            // re-activate the doctor button
+              $("#admin-loader").hide()
+              $('#start-admin').attr('disabled', false);
+
             // Handle users without WebLN
             toast(
               "error",
@@ -319,6 +384,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               request.done(function(data) {
                 $("#login").fadeIn();
                 toast(data.type, data.msg);
+                if (data.userId) {
+                  localStorage.setItem("userId",data.userId);
+                }
               });
 
               // If error display the error message
