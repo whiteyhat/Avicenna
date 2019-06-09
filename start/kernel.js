@@ -54,8 +54,8 @@ const namedMiddleware = {
 |
 */
 const serverMiddleware = [
-  'Adonis/Middleware/Static',
-  'Adonis/Middleware/Cors'
+  'Adonis/Middleware/Static'
+  // 'Adonis/Middleware/Cors'
 ]
 
 Server
