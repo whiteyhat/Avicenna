@@ -152,7 +152,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         // Add medical condition
         $("#add-condition").on("click", async function() {
-
           // Create report data object
           report = {
             condition: $("#condition").val(),
@@ -189,7 +188,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         // Add allergy
         $("#add-allergy").on("click", function() {
-
           // instantiate tas no risky
           let risk = "No";
 
@@ -244,7 +242,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         // Add an immunisation
         $("#add-immunisation").on("click", function() {
-
           // create the immunisation data object
           immunisation = {
             name: $("#immunisation-name").val(),
@@ -254,7 +251,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           // push the immunisation data object into the array
           immunisationArray.push(immunisation);
 
-           // add 1 more to the allergy counter
+          // add 1 more to the allergy counter
           immunisationCounter++;
 
           // display immunisation in the console log
@@ -277,30 +274,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           toast("info", "New immunisation added");
         });
 
-        // When clickin on the save button 1 
+        // When clickin on the save button 1
         $("#save1").on("click", async function() {
-          
           // instantiate the WebLN instance
           let webln;
           try {
-
             // Request WebLN provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
             // Handle users without WebLN
             toast(
               "error",
-              "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
+              "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='btn btn-primary'>Install</button></a>"
             );
           }
-          
+
           // instantiatte teh gender object
           let gender = null;
           if ($("#male").is(":checked")) {
             // if male is checked then male
             gender = "male";
           } else {
-
             // if female checked the female
             gender = "female";
           }
@@ -340,7 +334,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         // When clicking on save 2
         $("#save2").on("click", function() {
-
           // instantiate mobility data object
           let mobility = null;
 
@@ -353,7 +346,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             mobility = "dependent";
           }
 
-           // instantiate eating data object
+          // instantiate eating data object
           let eating = null;
 
           // get eating type
@@ -365,7 +358,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             eating = "dependent";
           }
 
-           // instantiate dressing data object
+          // instantiate dressing data object
           let dressing = null;
 
           // get dressing type
@@ -524,16 +517,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           toast("info", "New medication prescribed");
         });
 
-
         // Clicking on the button save 3
         $("#save3").on("click", function() {
-
           //  Display notification to the user
           toast("success", "Patient medication saved");
         });
 
         // Clicking on the button save 4 => main button to generate the passport
-        $("#save4").on("click", function() {
+        $("#save4").on("click", async function() {
 
           // create the validation checks
           var check1 = $('input[name="reg1"]:checked').length > 0;
@@ -545,15 +536,28 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
           // validation checks to ensure the user has understand the requirements
           if (check1 && check2 && check3 && pass != undefined) {
-
             // if the satellite has been chosen display a different title for the second step
             if ($("input[name='satellite']").val() === "true") {
-                $("#loading_text").text("Linking IPFS to Blockstream Satellite");
-                $("#modal_title").text("Upload to Blockstream Satellite");
-            }else{
-                $("#loading_text").text("Certifying using Open Time Stamps");
-                $("#modal_title").text("Certify Passport using Open Time Stamps");
+              $("#loading_text").text("Linking IPFS to Blockstream Satellite");
+              $("#modal_title").text("Upload to Blockstream Satellite");
+            } else {
+              $("#loading_text").text("Certifying using Open Time Stamps");
+              $("#modal_title").text("Certify Passport using Open Time Stamps");
             }
+
+            // instantiate the WebLN instance
+          let webln;
+          try {
+            // Request WebLN provider
+            webln = await requestProvider.requestProvider();
+          } catch (err) {
+            // Handle users without WebLN
+             toast(
+                "error",
+                "Sorry, an enabled WebLN Provider is required to sign the patient diagnosis in the Bicoin network. <a href='https://lightningjoule.com/'><button type='button' class='btn btn-primary'>Install</button></a>"
+              );
+              return;
+          }
 
             // switch to the loading view
             $("#loader").fadeToggle();
@@ -580,284 +584,314 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               ".";
 
               // prompt a sign message using the WebLN provider
-            webln
-              .signMessage(message, async success => {})
-              .then(function(signature) {
-
-                // if the digital signature has been successful
-                if (signature) {
-
-                  // display a notification to the user about the next step after tthe signature
-                  toast(
-                    "info",
-                    "Encrypting and uploading patient passport to IPFS"
-                  );
-
-                  // create a FormData to store data about the patient details to be sent to the backend
-                  const formData = new FormData();
-
-                  // append data to the FormData object
-                  formData.append(
-                    "image",
-                    document.querySelector("input[type=file]").files[0]
-                  );
-                  formData.append("patient", JSON.stringify(patient));
-                  formData.append("report", JSON.stringify(conditionArray));
-                  formData.append("signature",JSON.stringify(signature.signature));
-                  formData.append("message", JSON.stringify(message));
-                  formData.append("allergy", JSON.stringify(allergyArray));
-                  formData.append("immunisation",JSON.stringify(immunisationArray));
-                  formData.append("medication",JSON.stringify(medicationArray));
-                  formData.append("social", JSON.stringify(social));
-                  formData.append("password",JSON.stringify($("[name=encryptPassword]").val()));
-
-                  // do http request to the backend to send the patient data
-                  var request = $.ajax({
-                    url: "/api/v0/passport/new",
-                    data: formData,
-                    type: "post",
-                    contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-                    processData: false, // NEEDED, DON'T OMIT THIS
-                    headers: {
-                      "x-csrf-token": $("[name=_csrf]").val()
-                    }
-                  });
-
-                  // Id the http request has been successful
-                  request.done(function(data) {
-
-                    // display the a valid animation for the step 1
-                    $("#loader1").toggle();
-                    $("#valid1").toggle();
-
-                    // get the params from the response body
-                    const ipfsHash = data.hash;
-                    const filename = data.filename;
-
-                    // display a notification to the user about the outputs of the step 1 
+              webln
+                .signMessage(message, async success => {})
+                .then(function(signature) {
+                  // if the digital signature has been successful
+                  if (signature) {
+                    // display a notification to the user about the next step after tthe signature
                     toast(
                       "info",
-                      "Passport encrypted and uploaded to IPFS with the following hash: " +
-                        ipfsHash +
-                        ". <br><a href='https://ipfs.io/ipfs/" +
-                        ipfsHash +
-                        "' target='_blank''><button type='button'class='btn btn-default'>Open</button></a>"
+                      "Encrypting and uploading patient passport to IPFS"
                     );
 
-                    // append IPFS HASH, socket id, and temp file path of the user data to the FormData object
-                    formData.append("ipfshash", JSON.stringify(ipfsHash));
-                    formData.append("filename", JSON.stringify(filename));
-                    formData.append("socket",JSON.stringify($("[name=_connId]").val()));
+                    // create a FormData to store data about the patient details to be sent to the backend
+                    const formData = new FormData();
 
-                    // if the validation methhohd was the satellite
-                    if ($("input[name='satellite']").val() === "true") {
+                    // append data to the FormData object
+                    formData.append(
+                      "image",
+                      document.querySelector("input[type=file]").files[0]
+                    );
+                    formData.append("patient", JSON.stringify(patient));
+                    formData.append("report", JSON.stringify(conditionArray));
+                    formData.append(
+                      "signature",
+                      JSON.stringify(signature.signature)
+                    );
+                    formData.append("message", JSON.stringify(message));
+                    formData.append("allergy", JSON.stringify(allergyArray));
+                    formData.append(
+                      "immunisation",
+                      JSON.stringify(immunisationArray)
+                    );
+                    formData.append(
+                      "medication",
+                      JSON.stringify(medicationArray)
+                    );
+                    formData.append("social", JSON.stringify(social));
+                    formData.append(
+                      "password",
+                      JSON.stringify($("[name=encryptPassword]").val())
+                    );
 
-                      // do a http request to upload the user data into the Blockstream Satellite
-                      var request = $.ajax({
-                        url: "/api/v0/passport/satellite",
-                        data: formData,
-                        type: "post",
-                        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-                        processData: false, // NEEDED, DON'T OMIT THIS
-                        headers: {
-                          "x-csrf-token": $("[name=_csrf]").val()
-                        }
-                      });
+                    // do http request to the backend to send the patient data
+                    var request = $.ajax({
+                      url: "/api/v0/passport/new",
+                      data: formData,
+                      type: "post",
+                      contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                      processData: false, // NEEDED, DON'T OMIT THIS
+                      headers: {
+                        "x-csrf-token": $("[name=_csrf]").val()
+                      }
+                    });
 
-                      // If successful returns a payment request to pay the invoice to proceed with
-                      // the certification process
-                      request.done(function(result) {
-                        setTimeout(function() {
+                    // Id the http request has been successful
+                    request.done(function(data) {
+                      // display the a valid animation for the step 1
+                      $("#loader1").toggle();
+                      $("#valid1").toggle();
 
+                      // get the params from the response body
+                      const ipfsHash = data.hash;
+                      const filename = data.filename;
 
+                      // display a notification to the user about the outputs of the step 1
+                      toast(
+                        "info",
+                        "Passport encrypted and uploaded to IPFS with the following hash: " +
+                          ipfsHash +
+                          ". <br><a href='https://ipfs.io/ipfs/" +
+                          ipfsHash +
+                          "' target='_blank''><button type='button'class='btn btn-default'>Open</button></a>"
+                      );
 
-                          // after 1.75 seconds
-                          setTimeout(() => {
+                      // append IPFS HASH, socket id, and temp file path of the user data to the FormData object
+                      formData.append("ipfshash", JSON.stringify(ipfsHash));
+                      formData.append("filename", JSON.stringify(filename));
+                      formData.append(
+                        "socket",
+                        JSON.stringify($("[name=_connId]").val())
+                      );
 
-                            // display an informative message about the amount to pay using lightning
-                            toast(
-                              "info",
-                              "Pay " +result.price+" satoshis to certify the passport using the Blockstream Satellite"
-                            );
-                          }, 1750);
+                      // if the validation methhohd was the satellite
+                      if ($("input[name='satellite']").val() === "true") {
+                        // do a http request to upload the user data into the Blockstream Satellite
+                        var request = $.ajax({
+                          url: "/api/v0/passport/satellite",
+                          data: formData,
+                          type: "post",
+                          contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                          processData: false, // NEEDED, DON'T OMIT THIS
+                          headers: {
+                            "x-csrf-token": $("[name=_csrf]").val()
+                          }
+                        });
 
-                          // display payment request as a QR code with a clickable lightning prefix
-                          showPR(result, "#pr", "#invoiceRoute", "#pr-string");
-
-                          // Event handler to copy the invoice request when click the button copy
-                          copyInvoice("#pr-string", "#copy-invoice");
-
-                          // display the costs
-                          $("#sats").text(result.price+"sats");
-
-                          // display the modal
-                          $("#payreq").modal("show");
-
-                          // when the invoice has been paid retrieve data about the Blockstream 
-                          // Satellite order UUID + AUTH TOKEN
-                          ws.getSubscription("invoice").on(
-                            "invoicePaid",
-                            blockstream => {
-
-                              // append the UUID + AUTH TOKEN to the FormData object
-                              formData.append("uuid",JSON.stringify(blockstream.uuid));
-                              formData.append("authToken",JSON.stringify(blockstream.authToken));
-
-                              // display a notification to the user
-                              toast(
-                                "success",
-                                "Passport uploaded to Blockstream Satellite"
-                              );
-
-                              // hide the modal
-                              $("#payreq").modal("hide");
-
-                              // display the a valid animation for the step 2
-                              $("#loader2").toggle();
-                              $("#valid2").toggle();
-
-                              // display an informative notification to the user
+                        // If successful returns a payment request to pay the invoice to proceed with
+                        // the certification process
+                        request.done(function(result) {
+                          setTimeout(function() {
+                            // after 1.75 seconds
+                            setTimeout(() => {
+                              // display an informative message about the amount to pay using lightning
                               toast(
                                 "info",
-                                "Generating a Passport certification"
+                                "Pay " +
+                                  result.price +
+                                  " satoshis to certify the passport using the Blockstream Satellite"
                               );
+                            }, 1750);
 
-                              // after 1 second
-                              setTimeout(() => {
-                                
-                                // do a http request to complete the certification process to generate a new
-                                // pdf containing data ab out the patient + doctor signature + Blockstream 
-                                // Satellite outputs
-                                var request = $.ajax({
-                                  url: "/api/v0/passport/satellite/complete",
-                                  data: formData,
-                                  type: "post",
-                                  contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-                                  processData: false, // NEEDED, DON'T OMIT THIS
-                                  headers: {
-                                    "x-csrf-token": $("[name=_csrf]").val()
-                                  }
-                                });
-
-                                // If successful returns a temp path to serve quickly the passport which
-                                // it will be self-destructed in 60 approx and serve an immutable path to 
-                                // retrieve the public access for the patient passporrt using an IPFS gateway
-                                request.done(function(obj) {
-                                  // display the a valid animation for the step 3
-                                  $("#loader3").toggle();
-                                  $("#valid3").toggle();
-
-                                  // after 1 second
-                                  setTimeout(() => {
-
-                                    // switch the view for the passport access screen
-                                    $("#loader").fadeToggle();
-                                    $("#passportView").fadeToggle();
-
-                                    // display the public key of the patient passport
-                                    $("#passportQR").attr(
-                                      "src",
-                                      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
-                                        obj.hash
-                                    );
-
-                                    // set the path for a temporary quick access fo the patient's passport
-                                    $("#viewQR").attr(
-                                      "href",
-                                      "/temp/" + obj.path
-                                    );
-
-                                    // create a link to download the patient's passport public key as a QR image
-                                    $("#downloadQrCode").on("click", function() {
-                                      document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
-                                    });
-
-                                    // set the immutable path to serve the patient's passport using an IPFS gateway
-                                    $("#linkQR").attr(
-                                      "href",
-                                      "https://ipfs.io/ipfs/" + obj.hash
-                                    );
-                                  }, 1000);
-                                });
-
-                                // If error display the error message and switch the view
-                                request.fail(function(jqXHR, textStatus) {
-                                  console.log(textStatus, jqXHR);
-
-                                  // switch the view
-                                  $("#loader").fadeToggle();
-                                  $("#createPass").fadeToggle();
-                                });
-                              }, 1000);
-                            }
-                          );
-                        }, 2000);
-                      });
-
-                      // If error display the error message and switch the view
-                      request.fail(function(jqXHR, textStatus) {
-                        console.log(textStatus, jqXHR);
-
-                        // switch the view
-                        $("#loader").fadeToggle();
-                        $("#createPass").fadeToggle();
-                      });
-
-                      // If the cerrtification method chosen is Open Time Stamps
-                    } else {
-                      $("#loading_text").text("Linking IPFS to Blockstream Satellite");
-
-                      // do a http request to retrieve a payment request to proceed with the 
-                      // Open Time Stamps certification
-                      var request = $.ajax({
-                        url: "/api/v0/passport/opentimestamps",
-                        data: formData,
-                        type: "post",
-                        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-                        processData: false, // NEEDED, DON'T OMIT THIS
-                        headers: {
-                          "x-csrf-token": $("[name=_csrf]").val()
-                        }
-                      });
-
-                      // if the http request is successful returns the payment request of 5 satoshis
-                      request.done(function(result) {
-                        
-                        // after 2 seconds
-                        setTimeout(function() {
-
-                          // after 1.75 seconds
-                          setTimeout(() => {
-
-                            // display an informative message about the amount to pay using lightning
-                            toast(
-                              "info",
-                              "Pay " +result.price+" satoshis to certify the passport using Open Time Stamps"
+                            // display payment request as a QR code with a clickable lightning prefix
+                            showPR(
+                              result,
+                              "#pr",
+                              "#invoiceRoute",
+                              "#pr-string"
                             );
-                          }, 1750);
 
-                          // display payment request as a QR code with a clickable lightning prefix
-                          showPR(result, "#pr", "#invoiceRoute", "#pr-string");
+                            // Event handler to copy the invoice request when click the button copy
+                            copyInvoice("#pr-string", "#copy-invoice");
 
-                          // Event handler to copy the invoice request when click the button copy
-                          copyInvoice("#pr-string", "#copy-invoice");
+                            // display the costs
+                            $("#sats").text(result.price + "sats");
 
-                          // display the costs
-                          $("#sats").text(result.price+" sats");
+                            // display the modal
+                            $("#payreq").modal("show");
 
+                            // when the invoice has been paid retrieve data about the Blockstream
+                            // Satellite order UUID + AUTH TOKEN
+                            ws.getSubscription("invoice").on(
+                              "invoicePaid",
+                              blockstream => {
+                                // append the UUID + AUTH TOKEN to the FormData object
+                                formData.append(
+                                  "uuid",
+                                  JSON.stringify(blockstream.uuid)
+                                );
+                                formData.append(
+                                  "authToken",
+                                  JSON.stringify(blockstream.authToken)
+                                );
 
-                          // hide modal
-                          $("#payreq").modal("show");
-                          
+                                // display a notification to the user
+                                toast(
+                                  "success",
+                                  "Passport uploaded to Blockstream Satellite"
+                                );
+
+                                // hide the modal
+                                $("#payreq").modal("hide");
+
+                                // display the a valid animation for the step 2
+                                $("#loader2").toggle();
+                                $("#valid2").toggle();
+
+                                // display an informative notification to the user
+                                toast(
+                                  "info",
+                                  "Generating a Passport certification"
+                                );
+
+                                // after 1 second
+                                setTimeout(() => {
+                                  // do a http request to complete the certification process to generate a new
+                                  // pdf containing data ab out the patient + doctor signature + Blockstream
+                                  // Satellite outputs
+                                  var request = $.ajax({
+                                    url: "/api/v0/passport/satellite/complete",
+                                    data: formData,
+                                    type: "post",
+                                    contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                                    processData: false, // NEEDED, DON'T OMIT THIS
+                                    headers: {
+                                      "x-csrf-token": $("[name=_csrf]").val()
+                                    }
+                                  });
+
+                                  // If successful returns a temp path to serve quickly the passport which
+                                  // it will be self-destructed in 60 approx and serve an immutable path to
+                                  // retrieve the public access for the patient passporrt using an IPFS gateway
+                                  request.done(function(obj) {
+                                    // display the a valid animation for the step 3
+                                    $("#loader3").toggle();
+                                    $("#valid3").toggle();
+
+                                    // after 1 second
+                                    setTimeout(() => {
+                                      // switch the view for the passport access screen
+                                      $("#loader").fadeToggle();
+                                      $("#passportView").fadeToggle();
+
+                                      // display the public key of the patient passport
+                                      $("#passportQR").attr(
+                                        "src",
+                                        "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
+                                          obj.hash
+                                      );
+
+                                      // set the path for a temporary quick access fo the patient's passport
+                                      $("#viewQR").attr(
+                                        "href",
+                                        "/temp/" + obj.path
+                                      );
+
+                                      // create a link to download the patient's passport public key as a QR image
+                                      $("#downloadQrCode").on(
+                                        "click",
+                                        function() {
+                                          document.getElementById(
+                                            "download_gateway"
+                                          ).src =
+                                            "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
+                                            obj.hash;
+                                        }
+                                      );
+
+                                      // set the immutable path to serve the patient's passport using an IPFS gateway
+                                      $("#linkQR").attr(
+                                        "href",
+                                        "https://ipfs.io/ipfs/" + obj.hash
+                                      );
+                                    }, 1000);
+                                  });
+
+                                  // If error display the error message and switch the view
+                                  request.fail(function(jqXHR, textStatus) {
+                                    console.log(textStatus, jqXHR);
+
+                                    // switch the view
+                                    $("#loader").fadeToggle();
+                                    $("#createPass").fadeToggle();
+                                  });
+                                }, 1000);
+                              }
+                            );
+                          }, 2000);
+                        });
+
+                        // If error display the error message and switch the view
+                        request.fail(function(jqXHR, textStatus) {
+                          console.log(textStatus, jqXHR);
+
+                          // switch the view
+                          $("#loader").fadeToggle();
+                          $("#createPass").fadeToggle();
+                        });
+
+                        // If the cerrtification method chosen is Open Time Stamps
+                      } else {
+                        $("#loading_text").text(
+                          "Linking IPFS to Blockstream Satellite"
+                        );
+
+                        // do a http request to retrieve a payment request to proceed with the
+                        // Open Time Stamps certification
+                        var request = $.ajax({
+                          url: "/api/v0/passport/opentimestamps",
+                          data: formData,
+                          type: "post",
+                          contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                          processData: false, // NEEDED, DON'T OMIT THIS
+                          headers: {
+                            "x-csrf-token": $("[name=_csrf]").val()
+                          }
+                        });
+
+                        // if the http request is successful returns the payment request of 5 satoshis
+                        request.done(function(result) {
+                          // after 2 seconds
+                          setTimeout(function() {
+                            // after 1.75 seconds
+                            setTimeout(() => {
+                              // display an informative message about the amount to pay using lightning
+                              toast(
+                                "info",
+                                "Pay " +
+                                  result.price +
+                                  " satoshis to certify the passport using Open Time Stamps"
+                              );
+                            }, 1750);
+
+                            // display payment request as a QR code with a clickable lightning prefix
+                            showPR(
+                              result,
+                              "#pr",
+                              "#invoiceRoute",
+                              "#pr-string"
+                            );
+
+                            // Event handler to copy the invoice request when click the button copy
+                            copyInvoice("#pr-string", "#copy-invoice");
+
+                            // display the costs
+                            $("#sats").text(result.price + " sats");
+
+                            // hide modal
+                            $("#payreq").modal("show");
                           }, 2000);
 
                           // when the invoice has been paid retrieve data about the .ost stamp file
                           ws.getSubscription("invoice").on(
                             "invoicePaid",
                             ots => {
-
                               // Add the temporary path for the .ost stamp file to the FormData object
-                              formData.append( "verification", JSON.stringify(ots.verificationIpfsPath) );
+                              formData.append(
+                                "verification",
+                                JSON.stringify(ots.verificationIpfsPath)
+                              );
 
                               // display a notifcation message
                               toast(
@@ -868,11 +902,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                               // hide modal
                               $("#payreq").modal("hide");
 
-                               // display the a valid animation for the step 2
+                              // display the a valid animation for the step 2
                               $("#loader2").toggle();
                               $("#valid2").toggle();
 
-                              // display an informative message about the IPFS gateway to serve the .ots file 
+                              // display an informative message about the IPFS gateway to serve the .ots file
                               toast(
                                 "info",
                                 "Passport certified using Open Time Stamps accessible using an IPFS gateway. " +
@@ -885,11 +919,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                               document.getElementById("download_gateway").src =
                                 ots.verification;
 
-                                // after 1 second
+                              // after 1 second
                               setTimeout(() => {
-
                                 // If successful returns a temp path to serve quickly the passport which
-                                // it will be self-destructed in 60 approx and serve an immutable path to 
+                                // it will be self-destructed in 60 approx and serve an immutable path to
                                 // retrieve the public access for the patient passporrt using an IPFS gateway
                                 var request = $.ajax({
                                   url: "/api/v0/passport/ots/complete",
@@ -903,17 +936,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                 });
 
                                 // If successful returns a temp path to serve quickly the passport which
-                                // it will be self-destructed in 60 approx and serve an immutable path to 
+                                // it will be self-destructed in 60 approx and serve an immutable path to
                                 // retrieve the public access for the patient passporrt using an IPFS gateway
                                 request.done(function(obj) {
-
                                   // display the a valid animation for the step 3
                                   $("#loader3").toggle();
                                   $("#valid3").toggle();
 
                                   // after 1 second
                                   setTimeout(() => {
-
                                     // switch the view for the passport access screen
                                     $("#loader").fadeToggle();
                                     $("#passportView").fadeToggle();
@@ -932,8 +963,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                     );
 
                                     // create a link to download the patient's passport public key as a QR image
-                                    $("#downloadQrCode").on("click", function() {document.getElementById("download_gateway").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" + obj.hash;
-                                    });
+                                    $("#downloadQrCode").on(
+                                      "click",
+                                      function() {
+                                        document.getElementById(
+                                          "download_gateway"
+                                        ).src =
+                                          "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ipfs.io/ipfs/" +
+                                          obj.hash;
+                                      }
+                                    );
 
                                     // set the immutable path to serve the patient's passport using an IPFS gateway
                                     $("#linkQR").attr(
@@ -954,45 +993,43 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                               }, 1000);
                             }
                           );
-                      });
+                        });
 
-                      // If error display the error message and switch the view
-                      request.fail(function(jqXHR, textStatus) {
-                        console.log(textStatus, jqXHR);
+                        // If error display the error message and switch the view
+                        request.fail(function(jqXHR, textStatus) {
+                          console.log(textStatus, jqXHR);
 
-                        // switch the view
-                        $("#loader").fadeToggle();
-                        $("#createPass").fadeToggle();
-                      });
-                    }
-                  });
+                          // switch the view
+                          $("#loader").fadeToggle();
+                          $("#createPass").fadeToggle();
+                        });
+                      }
+                    });
 
-                  // If error display the error message and switch the view
-                  request.fail(function(jqXHR, textStatus) {
-                    console.log(textStatus, jqXHR);
+                    // If error display the error message and switch the view
+                    request.fail(function(jqXHR, textStatus) {
+                      console.log(textStatus, jqXHR);
 
-                    // switch the view
-                    $("#loader").fadeToggle();
-                    $("#createPass").fadeToggle();
-                  });
+                      // switch the view
+                      $("#loader").fadeToggle();
+                      $("#createPass").fadeToggle();
+                    });
 
-                  request.fail(function(jqXHR, textStatus) {
-                    console.log(textStatus, jqXHR);
-                    $("#loader").fadeToggle();
-                    $("#createPass").fadeToggle();
-                  });
+                    request.fail(function(jqXHR, textStatus) {
+                      console.log(textStatus, jqXHR);
+                      $("#loader").fadeToggle();
+                      $("#createPass").fadeToggle();
+                    });
 
-                  // if the message was not successfully signed
-                } else {
-
-                  // return an error notification
-                  toast("error", "Sorry, We could not get your signature");
-                }
-              });
+                    // if the message was not successfully signed
+                  } else {
+                    // return an error notification
+                    toast("error", "Sorry, We could not get your signature");
+                  }
+                });
 
             // if the user did not check the requrired input checkboxes
           } else {
-
             // return an error notification
             toast(
               "error",
@@ -1016,7 +1053,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 // function to serve the lightning payment gateway
 function showPR(result, pr, invoiceRoute, prString) {
-
   // serve the qr code image
   $(pr).attr(
     "src",
@@ -1033,7 +1069,6 @@ function showPR(result, pr, invoiceRoute, prString) {
 
 // function to copy the lightning payment request
 function copyInvoice(prString, copyBtn) {
-  
   // when clicking on the copy buttton
   $(copyBtn).on("click", function() {
     /* Get the selected text field */
