@@ -162,7 +162,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         <tr>
             <td><i style="font-size:200%" class="fas fa-wallet"></i></td>
+            @if(auth.user.wallet)
             <td>{{auth.user.wallet}}</td>
+            @else
+            <td id="walletText"><p>Add a Lightning Public Key (:</p></td>
+            <td style="display:none" id="walletField"><input id="wallet" class="form-control" style="width:40%" type="wallet"
+                placeholder="Type your Lightning Public key"></td>
+            @endif
         </tr>
 
         </tr>
@@ -550,6 +556,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         $("#role").toggle()
         $("#phone").toggle()
         $("#email").toggle()
+        $("#walletText").toggle()
+        $("#walletField").toggle()
         $("#save").toggle()
         $("#delete").toggle()
         $("#cust").toggle()
@@ -567,7 +575,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 name: $("#name").val(),
                 phone: $("#phone").val(),
                 email: $("#email").val(),
-                clinic: $("#clinicSel").val()
+                clinic: $("#clinicSel").val(),
+                wallet: $("#wallet").val()
             },
             headers: {
                 'x-csrf-token': $('[name=_csrf]').val()
