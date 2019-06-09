@@ -70,49 +70,68 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     ],
     2: [
       function(require, module, exports) {
-
         // Request WebLN provider
         var requestProvider = require("webln/lib/client");
 
         // Instantiate the auth variable
         var auth;
 
-        $("#login").on("click", function() {
-
-          function logInUser(profile) {
-            var person = new blockstack.Person(profile)
-
-            // do http request to log in the user
-            // send the user pubkey
-            var request = $.ajax({
-              url: "/api/v0/auth/blockstack-login",
-              data: {
-                userId: localStorage.getItem("userId"),
-                name: person.name()
-              },
-              type: "post",
-              headers: {
-                "x-csrf-token": $("[name=_csrf]").val()
-              },
-              dataType: "json"
+        $(document).ready(function() {
+          if (blockstack.isUserSignedIn()) {
+            const userData = blockstack.loadUserData();
+            logInUser(userData.profile);
+          } else if (blockstack.isSignInPending()) {
+            blockstack.handlePendingSignIn().then(userData => {
+              logInUser(userData.profile);
             });
           }
+        });
 
-          if (blockstack.isUserSignedIn()) {
-            const userData = blockstack.loadUserData()
-            logInUser(userData.profile)
-          } else if (blockstack.isSignInPending()) {
-            blockstack.handlePendingSignIn()
-            .then(userData => {
-              logInUser(userData.profile)
-            })
+        function logInUser(profile) {
+          var person = new blockstack.Person(profile);
+          console.log(person.name());
+
+          // do http request to log in the user
+          // send the user pubkey
+          var request = $.ajax({
+            url: "/api/v0/auth/blockstack-login",
+            data: {
+              userId: localStorage.getItem("userId"),
+              name: person.name()
+            },
+            type: "post",
+            headers: {
+              "x-csrf-token": $("[name=_csrf]").val()
+            },
+            dataType: "json"
+          });
+
+           // If successful display a message from the backend and refresh the page
+          request.done(function(data) {
+            try {
+              
+            if (data.msg == "Welcome back") {
+              toast(data.type, data.msg);
+              setTimeout(() => {
+              location.reload();
+            }, 800);
+            }
+            } catch (error) {
+                          
+            }
+
+          });
+
+          // If error display the error message
+          request.fail(function(jqXHR, textStatus) {
+            console.log(jqXHR, textStatus);
+          });
         }
 
-        })
+        $("#login").on("click", function() {});
 
         // When clickin on login
         $("#login").on("click", function() {
-
           // do http request to log in the user
           // send the user pubkey
           var request = $.ajax({
@@ -129,21 +148,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
           // If successful returns a nonce and prompts a digital signature using WebLN
           request.done(function(data) {
-
             // If there is a nonce from the response body
             if (data.nonce) {
-
               // Display a notification to the user
               toast(data.type, data.msg);
 
-              // Prompt the WebLN provider to sign a digital signature 
+              // Prompt the WebLN provider to sign a digital signature
               webln
                 .signMessage(data.nonce, async success => {})
                 .then(function(data) {
-
                   // When the user has signed a message
                   if (data) {
-
                     // do a http request to get the verification
                     // to authenticate the source of the pubkey
                     // has an identical match with the initial
@@ -167,45 +182,41 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                         toast(data.type, data.msg);
                       }
                       setTimeout(() => {
-                         location.reload()
+                        location.reload();
                       }, 800);
                     });
 
-
                     // If error display the error message
-                    request.fail(function (jqXHR, textStatus) {
-                      console.log(jqXHR, textStatus)
+                    request.fail(function(jqXHR, textStatus) {
+                      console.log(jqXHR, textStatus);
                     });
                   }
                 });
             }
           });
           // If error display the error message
-          request.fail(function (jqXHR, textStatus) {
-            console.log(jqXHR, textStatus)
+          request.fail(function(jqXHR, textStatus) {
+            console.log(jqXHR, textStatus);
           });
         });
 
         // When clicking on the 'start as a doctor' button
         $("#start-doctor").on("click", async function() {
-
           // Display the user button with a loading animation and disabled
-          $("#doctor-loader").toggle()
-          $('#start-doctor').attr('disabled', true);
+          $("#doctor-loader").toggle();
+          $("#start-doctor").attr("disabled", true);
 
           // Instantiate the WebLN instance
           let webln;
           try {
-
             // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
-
             // Enable blockstack auth
-              $("#blockstack").show();
+            $("#blockstack").show();
             // re-activate the doctor button
-              $("#doctor-loader").hide()
-              $('#start-doctor').attr('disabled', false);
+            $("#doctor-loader").hide();
+            $("#start-doctor").attr("disabled", false);
 
             // Handle users without WebLN
             toast(
@@ -214,70 +225,71 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             );
           }
           // Enable blockstack auth
-              $("#blockstack").fadeIn();
+          $("#blockstack").fadeIn();
+
+          let wallet;
           // Elsewhere in the code...
           if (webln) {
             // Call webln function
             auth = await webln.getInfo();
+            wallet = auth.node.pubkey;
+          }
 
-            // Get the pubkey from the user WebLN provider
-            if (auth.node.pubkey) {
-              
-              // do htttp request to send the user pubkey to the backend
-              var request = $.ajax({
-                url: "/api/v0/demo/doctor",
-                type: "post",
-                data: {
-                  wallet: auth.node.pubkey
-                },
-                headers: {
-                  "x-csrf-token": $("[name=_csrf]").val()
-                },
-                dataType: "json"
-              });
+          // Get the pubkey from the user WebLN provider
+          try {
+            // do htttp request to send the user pubkey to the backend
+            var request = $.ajax({
+              url: "/api/v0/demo/doctor",
+              type: "post",
+              data: {
+                wallet
+              },
+              headers: {
+                "x-csrf-token": $("[name=_csrf]").val()
+              },
+              dataType: "json"
+            });
 
-              // re-activate the doctor button
-              $("#doctor-loader").toggle()
-              $('#start-doctor').attr('disabled', false);
+            // re-activate the doctor button
+            $("#doctor-loader").toggle();
+            $("#start-doctor").attr("disabled", false);
 
-              // If successful display the login button and a message from the backend
-              request.done(function(data) {
-                $("#login").fadeIn();
-                toast(data.type, data.msg);
-                if (data.userId) {
-                  localStorage.setItem("userId",data.userId);
-                }
-              });
+            // If successful display the login button and a message from the backend
+            request.done(function(data) {
+              $("#login").fadeIn();
+              if (data) {
+              localStorage.setItem("userId", data.userId);
+              toast(data.type, data.msg);
+              }
+            
+            });
 
-              // If error display the error message
-              request.fail(function(data1, data2) {
-                console.log(data1, data2)
-              });
-            }
+            // If error display the error message
+            request.fail(function(data1, data2) {
+              console.log(data1, data2);
+            });
+          } catch (error) {
+            console.log(error);
           }
         });
 
-        // When clicking on the 'start as a clinic staff' button
+         // When clicking on the 'start as a clinic staff' button
         $("#start-staff").on("click", async function() {
-
           // Display the user button with a loading animation and disabled
-          $("#staff-loader").toggle()
-          $('#start-staff').attr('disabled', true);
+          $("#staff-loader").toggle();
+          $("#start-staff").attr("disabled", true);
 
           // Instantiate the WebLN instance
           let webln;
           try {
-            // Enable blockstack auth
-              $("#blockstack").fadeIn();
-
             // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
-              // Enable blockstack auth
-              $("#blockstack").show();
-            // re-activate the doctor button
-              $("#staff-loader").hide()
-              $('#start-staff').attr('disabled', false);
+            // Enable blockstack auth
+            $("#blockstack").show();
+            // re-activate the staff button
+            $("#staff-loader").hide();
+            $("#start-staff").attr("disabled", false);
 
             // Handle users without WebLN
             toast(
@@ -285,115 +297,125 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
             );
           }
+          // Enable blockstack auth
+          $("#blockstack").fadeIn();
+
+          let wallet;
           // Elsewhere in the code...
           if (webln) {
             // Call webln function
             auth = await webln.getInfo();
+            wallet = auth.node.pubkey;
+          }
 
-            // Get the pubkey from the user WebLN provider
-            if (auth.node.pubkey) {
-              
-              // do htttp request to send the user pubkey to the backend
-              var request = $.ajax({
-                url: "/api/v0/demo/staff",
-                type: "post",
-                data: {
-                  wallet: auth.node.pubkey
-                },
-                headers: {
-                  "x-csrf-token": $("[name=_csrf]").val()
-                },
-                dataType: "json"
-              });
+          // Get the pubkey from the user WebLN provider
+          try {
+            // do htttp request to send the user pubkey to the backend
+            var request = $.ajax({
+              url: "/api/v0/demo/staff",
+              type: "post",
+              data: {
+                wallet
+              },
+              headers: {
+                "x-csrf-token": $("[name=_csrf]").val()
+              },
+              dataType: "json"
+            });
 
-              // re-activate the doctor button
-              $("#staff-loader").toggle()
-              $('#start-staff').attr('disabled', false);
+            // re-activate the staff button
+            $("#staff-loader").toggle();
+            $("#start-staff").attr("disabled", false);
 
-              // If successful display the login button and a message from the backend
-              request.done(function(data) {
-                $("#login").fadeIn();
-                toast(data.type, data.msg);
-                if (data.userId) {
-                  localStorage.setItem("userId",data.userId);
-                }
-              });
+            // If successful display the login button and a message from the backend
+            request.done(function(data) {
+              $("#login").fadeIn();
+              if (data) {
+              localStorage.setItem("userId", data.userId);
+              toast(data.type, data.msg);
+              }
+            
+            });
 
-              // If error display the error message
-              request.fail(function(data1, data2) {
-                console.log(data1, data2)
-              });
-            }
+            // If error display the error message
+            request.fail(function(data1, data2) {
+              console.log(data1, data2);
+            });
+          } catch (error) {
+            console.log(error);
           }
         });
 
-          // When clicking on the 'start as a doctor' button
+        // When clicking on the 'start as a admin' button
         $("#start-admin").on("click", async function() {
-
           // Display the user button with a loading animation and disabled
-          $("#admin-loader").toggle()
-          $('#start-admin').attr('disabled', true);
+          $("#admin-loader").toggle();
+          $("#start-admin").attr("disabled", true);
 
           // Instantiate the WebLN instance
           let webln;
-
           try {
-            // Enable blockstack auth
-              $("#blockstack").fadeIn();
-
             // Get the WebLN instance from the request provider
             webln = await requestProvider.requestProvider();
           } catch (err) {
-
             // Enable blockstack auth
-              $("#blockstack").show();
-            // re-activate the doctor button
-              $("#admin-loader").hide()
-              $('#start-admin').attr('disabled', false);
+            $("#blockstack").show();
+            // re-activate the admin button
+            $("#admin-loader").hide();
+            $("#start-admin").attr("disabled", false);
 
             // Handle users without WebLN
             toast(
-              "error",
+              "warning",
               "Download the extension of Lightning Joule to connect your lightning node <a href='https://lightningjoule.com/'><button type='button' id='okBtn' class='nes-btn -btn-primary'>Install</button></a>"
             );
           }
+          // Enable blockstack auth
+          $("#blockstack").fadeIn();
+
+          let wallet;
           // Elsewhere in the code...
           if (webln) {
             // Call webln function
             auth = await webln.getInfo();
+            wallet = auth.node.pubkey;
+          }
 
-            // Get the pubkey from the user WebLN provider
-            if (auth.node.pubkey) {
-              var request = $.ajax({
-                url: "/api/v0/demo/admin",
-                type: "post",
-                data: {
-                  wallet: auth.node.pubkey
-                },
-                headers: {
-                  "x-csrf-token": $("[name=_csrf]").val()
-                },
-                dataType: "json"
-              });
+          // Get the pubkey from the user WebLN provider
+          try {
+            // do htttp request to send the user pubkey to the backend
+            var request = $.ajax({
+              url: "/api/v0/demo/admin",
+              type: "post",
+              data: {
+                wallet
+              },
+              headers: {
+                "x-csrf-token": $("[name=_csrf]").val()
+              },
+              dataType: "json"
+            });
 
-              // re-activate the doctor button
-              $("#admin-loader").toggle()
-              $('#start-admin').attr('disabled', false);
+            // re-activate the admin button
+            $("#admin-loader").toggle();
+            $("#start-admin").attr("disabled", false);
 
-              // If successful display the login button and a message from the backend
-              request.done(function(data) {
-                $("#login").fadeIn();
-                toast(data.type, data.msg);
-                if (data.userId) {
-                  localStorage.setItem("userId",data.userId);
-                }
-              });
+            // If successful display the login button and a message from the backend
+            request.done(function(data) {
+              $("#login").fadeIn();
+              if (data) {
+              localStorage.setItem("userId", data.userId);
+              toast(data.type, data.msg);
+              }
+            
+            });
 
-              // If error display the error message
-              request.fail(function(data1, data2) {
-                console.log(data1, data2)
-              });
-            }
+            // If error display the error message
+            request.fail(function(data1, data2) {
+              console.log(data1, data2);
+            });
+          } catch (error) {
+            console.log(error);
           }
         });
       },
