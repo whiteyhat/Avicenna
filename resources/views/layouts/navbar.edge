@@ -11,6 +11,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     #logout:hover {
         background-color: black;
     }
+
+    #blockstack:hover {
+        background-color: white;
+    }
 </style>
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
@@ -35,7 +39,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             @endif
             <ul class="nav navbar-nav navbar-right">
                 @if(!auth.user.wallet)
-                <li><a id="login" style="color:white; display:none" class="btn btn-primary">Log in</a></li>
+                <li><a id="login" style="color:white; display:none; background-color:teal" class="btn btn-defaul"><img style="height:24px" src="/img/joule.png" alt=""> Log in</a></li>
+                <li><a id="blockstack" style="color:white; display:none; background-color:#270E34" class="btn btn-default"><img style="height:27px" src="/img/blockstack.png" alt=""> Log in</a></li>
                 @endif
                 @if(auth.user.admin)
                 <li class="{{ request.match('/admin')  ? 'active':'' }}"><a href="/admin">Admin</a></li>
@@ -61,6 +66,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </nav>
 
 <script>
+
+document.getElementById('blockstack').addEventListener('click', function() {
+   blockstack.redirectToSignIn()
+ })
 
     // When clicking on the logout function
     $('#logout').click(function () {
