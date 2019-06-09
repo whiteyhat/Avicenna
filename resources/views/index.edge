@@ -76,6 +76,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 @elseif(!auth.user.role)
                               <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your clinic role in your <a href='/profile'>profile</a></div>
   
+                @elseif(!auth.user.wallet)
+                              <div class="alert alert-warning" role="alert"><b>Warning!</b> Please, add your Lightning Public Key in your <a href='/profile'>profile</a></div>
+  
                 @endif
               </center>
               <h3>PATIENT DETAILS </h3>
