@@ -38,16 +38,16 @@ Avicenna uses and bitcoin distributed infrastructure for security, accountabilit
 1. Clone the repository: `sudo git clone https://github.com/whiteyhat/Avicenna`
 2. Install the dependencies: `npm i`
 3. Create a `.env` with the contents from the [.env.example](https://github.com/whiteyhat/Avicenna/blob/master/.env.example) file
-3. Customize your enviromental variables in the file `.env`
-4. Run the DB migrations to your local database 
+4. Customize your enviromental variables in the file `.env`
+5. Run the DB migrations to your local database 
 ```js
 adonis migration:run
 ```
-5. Run the DB seeder to your local database 
+6. Run the DB seeder to your local database 
 ```js
 npm run db
 ```
-6. Start the web app: `npm start`
+7. Start the web app: `npm start`
 
 ## [Project Wiki](https://github.com/whiteyhat/Avicenna/wiki)
 Hey! There is a fruitful wiki with more details about the problem we are solving, deployment instructions and additional information. 
