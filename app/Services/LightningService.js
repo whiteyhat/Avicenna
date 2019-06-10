@@ -122,6 +122,40 @@ class LightningService {
     }
   }
 
+   async checkSandardSignature(data) {
+    try {
+        return new Promise((resolve, reject) => {
+          try {
+            // Verify signature using the bitcoin instance, the message and the signature
+            lnService.verifyMessage(
+              {
+                lnd: this.getLndInstance(),
+                message: data.message,
+                signature: data.signature
+              },
+              (err, pubkey) => {
+                // Get the pubkey from the signature
+                // message + signature = pubkey
+                if (pubkey) {
+                  resolve({
+                    // send the publey in the promise
+                    pubkey
+                  });
+                }
+                if (err) {
+                  console.log(err)
+                }
+              }
+            );
+          } catch (error) {
+            Logger.error(error);
+          }
+        });
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   /**
    * Service to get the LND instance
    */
