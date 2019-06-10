@@ -573,8 +573,7 @@ class UserController {
           "Upload Avicenna's Passport to Blockstream Satellite";
 
         if (
-          Env.get("OPEN_NODE_PROVIDER") == "true" ||
-          Env.get("OPEN_NODE_PROVIDER") === true
+          Env.get("OPEN_NODE_PROVIDER") == "true"
         ) {
           const response = await axios.post(
             `${Env.get("OPEN_NODE_URL")}/v1/charges`,
@@ -673,8 +672,7 @@ class UserController {
         }
 
         if (
-          Env.get("OPEN_NODE_PROVIDER") == "true" ||
-          Env.get("OPEN_NODE_PROVIDER") === true
+          Env.get("OPEN_NODE_PROVIDER") == "true"
         ) {
           const response = await axios.post(
             `${Env.get("OPEN_NODE_URL")}/v1/charges`,
