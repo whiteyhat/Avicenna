@@ -366,7 +366,7 @@ class PdfService {
         })
         .moveDown()
         .font('public/fonts/roboto.ttf', 13)
-        .text( "This medical passport has been emitted by " + data.doctor.name + ", " + data.doctor.role + " at the " + data.doctor.clinic + ". This institution is located at " + data.doctor.clinicAddress + " and can be reachable via email ("+data.doctor.email+") or phone ("+data.doctor.phone+"). Avicenna certifies that the Declaration Terms represented in the next parargraph have been signed digitally using the following Bitcoin public key: ",{
+        .text( "This medical passport has been emitted by " + data.doctor.name + ", " + data.doctor.role + " at the " + data.doctor.clinic + ". This institution is located at " + data.doctor.clinicAddress + " and can be reachable via email ("+data.doctor.email+") or phone ("+data.doctor.phone+"). Avicenna certifies that the Declaration Terms represented in the next parargraph have been signed digitally using the following Bitcoin Lightning peer id: ",{
           width: 470,
           align: 'justify',
           indent: 30,
@@ -376,7 +376,7 @@ class PdfService {
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
         .text(data.certification.wallet,{
-          link: "https://tools.qz.sg/",
+          link: "https://avicenna.casa/validate",
           underline: true,
           continued: true
         })
@@ -393,7 +393,7 @@ class PdfService {
         .fillColor('blue')
         .font('public/fonts/roboto.ttf', 13)
         .text(data.certification.signature,{
-          link: "https://tools.qz.sg/",
+          link: "https://avicenna.casa/validate",
           underline: true
         })
         .moveDown()
