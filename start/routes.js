@@ -68,5 +68,6 @@ Route.group(() => {
   Route.post('passport/satellite/complete', 'UserController.satelliteComplete')
   Route.post('passport/ots/complete', 'UserController.otsComplete')
   Route.post('passport/satellite/validate', 'ValidateController.validate')
+  Route.post('passport/signature/validate', 'ValidateController.validateSignature')
 
 }).prefix('api/v0')
