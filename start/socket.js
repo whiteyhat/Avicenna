@@ -207,9 +207,8 @@ const deleteInvoices = async () => {
 
 // Since BTCPay Server closes WS every 90 seconds it must be looped recursively
 try {
-  const isOpenNodeProvider = Env.get('OPEN_NODE_PROVIDER');
-  if (!isOpenNodeProvider) {
-    initWS();
+  if ( Env.get('OPEN_NODE_PROVIDER') != "true") {
+     initWS();
   }
 } catch (error) {
   Logger.error(error);
