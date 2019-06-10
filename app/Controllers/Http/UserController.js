@@ -35,6 +35,17 @@ class UserController {
     try {
       // If the user is signed in from the blockstack auth id, then log it out
       if (auth.user.blockstack) {
+        const user = await User.findBy("id", auth.user.id);
+
+        // Delete user tokens
+        await Database.table("tokens")
+          .where("user_id", user.id)
+          .delete();
+
+        // Delete user
+        await user.delete();
+
+        // logg out user
         await auth.logout();
         return response.send({ type: "info", msg: "Bye!", blockstack: true });
 
@@ -572,9 +583,7 @@ class UserController {
         const description =
           "Upload Avicenna's Passport to Blockstream Satellite";
 
-        if (
-          Env.get("OPEN_NODE_PROVIDER") == "true"
-        ) {
+        if (Env.get("OPEN_NODE_PROVIDER") == "true") {
           const response = await axios.post(
             `${Env.get("OPEN_NODE_URL")}/v1/charges`,
             {
@@ -671,9 +680,7 @@ class UserController {
           satsAmount = Env.get("LIGHTNING_FEE");
         }
 
-        if (
-          Env.get("OPEN_NODE_PROVIDER") == "true"
-        ) {
+        if (Env.get("OPEN_NODE_PROVIDER") == "true") {
           const response = await axios.post(
             `${Env.get("OPEN_NODE_URL")}/v1/charges`,
             {
@@ -1022,17 +1029,18 @@ class UserController {
   async demoAdmin({ auth, request, response }) {
     try {
       // Get the request body
-      const { wallet } = request.all();
+      const { wallet, blockstackAuth } = request.all();
 
       // Generate a random nonce
       const nonce = Math.floor(Math.random() * 10000);
 
       let user = null;
 
-      // Find the user by the pubkey
       if (wallet != undefined) {
         user = await User.findBy("wallet", wallet);
       }
+
+      let newOne = null;
 
       // If user already exists in the DB
       if (user) {
@@ -1045,7 +1053,7 @@ class UserController {
         await user.delete();
 
         // Create a new user
-        await User.create({
+        newOne = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
           admin: true,
@@ -1060,28 +1068,12 @@ class UserController {
         });
 
         // If the user does not exist in the DB
-      } else if (wallet == undefined) {
-        // Create a new user
-        const blocksackUser = await User.create({
-          nonce,
-          clinic_id: Math.random() * (10 - 1) + 1,
-          blockstack: true,
-          admin: true
-        });
-
-        // Return response body to the user
-        return response.send({
-          type: "info",
-          msg:
-            "Demo started as a doctor. Please click on log in on the top right button",
-          userId: blocksackUser.id
-        });
       } else {
         // Create a new user
-        await User.create({
+        newOne = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          admin: true,
+          admin: 1,
           name: "Admin"
         });
 
@@ -1089,7 +1081,8 @@ class UserController {
         return response.send({
           type: "info",
           msg:
-            "Demo started as an admin. Please click on log in on the top right button"
+            "Demo started as an admin. Please click on log in on the top right button",
+          userId: newOne.id
         });
       }
     } catch (error) {
@@ -1110,10 +1103,11 @@ class UserController {
 
       let user = null;
 
-      // Find the user by the pubkey
       if (wallet != undefined) {
         user = await User.findBy("wallet", wallet);
       }
+
+      let newOne = null;
 
       // If user already exists in the DB
       if (user) {
@@ -1126,34 +1120,19 @@ class UserController {
         await user.delete();
 
         // Creaate a new user
-        await User.create({
+        newOne = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
           clinic_id: Math.random() * (10 - 1) + 1
         });
 
         // If the user does not exist in the DB
-      } else if (wallet == undefined) {
-        // Create a new user
-        const blocksackUser = await User.create({
-          nonce,
-          clinic_id: Math.random() * (10 - 1) + 1
-        });
-
-        // Return response body to the user
-        return response.send({
-          type: "info",
-          msg:
-            "Demo started as a doctor. Please click on log in on the top right button",
-          userId: blocksackUser.id
-        });
       } else {
         // Create a new user
-        await User.create({
+        newOne = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
-          clinic_id: Math.random() * (10 - 1) + 1,
-          blockstack: true
+          clinic_id: Math.random() * (10 - 1) + 1
         });
       }
 
@@ -1161,7 +1140,8 @@ class UserController {
       return response.send({
         type: "info",
         msg:
-          "Demo started as a doctor. Please click on log in on the top right button"
+          "Demo started as a doctor. Please click on log in on the top right button",
+        userId: newOne.id
       });
     } catch (error) {
       Logger.error(error);
@@ -1181,10 +1161,11 @@ class UserController {
 
       let user = null;
 
-      // Find the user by the pubkey
       if (wallet != undefined) {
         user = await User.findBy("wallet", wallet);
       }
+
+      let newOne = null;
 
       // If user already exists in the DB
       if (user) {
@@ -1197,7 +1178,7 @@ class UserController {
         await user.delete();
 
         // Creaate a new user with staff permissions
-        await User.create({
+        newOne = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
           staff: 1,
@@ -1205,25 +1186,9 @@ class UserController {
         });
 
         // If the user does not exist in the DB
-      } else if (wallet == undefined) {
-        // Create a new user
-        const blocksackUser = await User.create({
-          nonce,
-          clinic_id: Math.random() * (10 - 1) + 1,
-          blockstack: true,
-          staff: true
-        });
-
-        // Return response body to the user
-        return response.send({
-          type: "info",
-          msg:
-            "Demo started as a doctor. Please click on log in on the top right button",
-          userId: blocksackUser.id
-        });
       } else {
         // Create a new user
-        await User.create({
+        newOne = await User.create({
           wallet: wallet.toLowerCase(),
           nonce,
           staff: 1,
@@ -1235,7 +1200,8 @@ class UserController {
       return response.send({
         type: "info",
         msg:
-          "Demo started as a clinic staff. Please click on log in on the top right button"
+          "Demo started as a clinic staff. Please click on log in on the top right button",
+        userId: newOne.id
       });
     } catch (error) {
       Logger.error(error);
@@ -1380,24 +1346,12 @@ class UserController {
 
       //   Find the user by searching by the public key
       const user = await User.findBy("id", userId);
-      const previousUser = await User.findBy("name", name);
-
-      // Delete users for this demonstration
-      if (previousUser) {
-        // Delete user tokens
-        await Database.table("tokens")
-          .where("user_id", previousUser.id)
-          .delete();
-
-        // Delete user
-        await previousUser.delete();
-      }
 
       // If new user
       if (user) {
-
         // add the blockstack username as name
         user.name = name;
+        user.blockstack = 1;
         await user.save();
 
         // remember the user
