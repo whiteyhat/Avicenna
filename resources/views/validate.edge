@@ -22,6 +22,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <ul class="nav nav-tabs" role="tablist">
                     <li role="presentation" class="active"><a href="#howto" aria-controls="howto" role="tab" data-toggle="tab">How
                             to</a></li>
+                    <li role="presentation"><a href="#signature" aria-controls="signature" role="tab" data-toggle="tab">Diagnosis Verification</a></li>
                     <li role="presentation"><a href="#validate_satellite" aria-controls="validate_satellite" role="tab"
                         data-toggle="tab">Satellite</a></li>
                         <li role="presentation"><a href="https://opentimestamps.org" target="_blank"> Open Time Stamps</a></li>
@@ -90,36 +91,41 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
                     </div>
 
-                    <div role="tabpanel" class="tab-pane" id="validate_ots">
-
-                            <div class="col-md-6">
+                    <div role="tabpanel" class="tab-pane" id="signature">
+                        <br>
+                        <center>
+                        <div style="display:none" id="verified" class="alert alert-success" role="alert">
+                                <h1 style="color:white">Diagnosis Verified</h1>
+                            </div></center>
                                 <div class="form-horizontal">
                                     <div class="form-group">
-                                        <label for="data_file" class="col-md-6 control-label">Patient raw data</label>
-                                        <div class="col-md-6">
-                                            <input type="file" name="raw_data" />
+                                        <div class="input-group input-group-lg">
+                                                <span class="input-group-addon" id="sizing-addon1">Lighning Peer ID</span>
+                                                <input id="pubkey" type="text" class="form-control" placeholder="e4ad543fac45a.."
+                                                    aria-describedby="sizing-addon1">
                                         </div>
                                     </div>
-                                                            <div class="form-group">
-                                                                <label for="ost_file" class="col-md-6 control-label">.ots file</label>
-                                                                <div class="col-md-6">
-                                                                        <input type="file" name="ots" />
-                                                                </div>
-                                                            </div>
-
-
                                     <div class="form-group">
-                                            <div class="col-md-12 text-right">
-                                                <button class="btn btn-primary" id="btn-validate-stamp">Validate</button>
-                                                <a href="https://opentimestamps.org/" target="_blank"><button class="btn btn-secondary" id="btn-validate-stamp">Validate in OTS</button></a>
+                                            <div class="input-group input-group-lg">
+                                                    <span class="input-group-addon" id="sizing-addon1">Signature</span>
+                                                    <input id="signature-hash" type="text" class="form-control" placeholder="d9b1aofx4okdc9gp....."
+                                                        aria-describedby="sizing-addon1">
                                             </div>
+                                    </div>
+                                    <div class="form-group">
+                                            <div class="input-group input-group-lg">
+                                                    <span class="input-group-addon" id="sizing-addon1">Message</span>
+                                                    <input id="signed-message" type="text" class="form-control" placeholder="As a doctor of the..."
+                                                        aria-describedby="sizing-addon1">
+                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 text-right">
+                                            <button class="btn btn-primary" id="signature-validate">Validate</button>
                                         </div>
-                                </div>
+                                    </div>
                             </div>
-
                         </div>
-
-
 
                     <div role="tabpanel" class="tab-pane active" id="howto">
                         <div class="container">
@@ -157,14 +163,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                             <h2 id="verifysignatureauthenticity">verify signature authenticity</h2>
                             <legend></legend>
                             
-                            <p><img style="max-width: 100%" src="https://user-images.githubusercontent.com/31220861/58959800-1ea59600-87a6-11e9-94f6-6c9e0f3e61e8.png" alt="SIGNATURE VERIF" /></p>
-                            <h6 id="openpictureinfullscreenhttpsuserimagesgithubusercontentcom31220861589598001ea5960087a611e994f66c9e0f3e61e8png"><a target="_blank" href="https://user-images.githubusercontent.com/31220861/58959800-1ea59600-87a6-11e9-94f6-6c9e0f3e61e8.png">Open Picture in full screen</a></h6>
+                            <p><img style="max-width: 100%" src="https://user-images.githubusercontent.com/31220861/59166331-d0d3b980-8b28-11e9-8429-c68623b1351c.png" alt="SIGNATURE VERIF" /></p>
+                            <h6 id="openpictureinfullscreenhttpsuserimagesgithubusercontentcom31220861589598001ea5960087a611e994f66c9e0f3e61e8png"><a target="_blank" href="https://user-images.githubusercontent.com/31220861/59166331-d0d3b980-8b28-11e9-8429-c68623b1351c.png">Open Picture in full screen</a></h6>
                             
                             <ol>
-                            <li> <p> Go to <a href="https://tools.qz.sg/">https://tools.qz.sg/</a>.</p></li>
+                            <li> <p> Go to the <code>Diagnosis Verification</code> tab.</p></li>
                             
-                            <li><p>Paste the <code>ADDRESS</code>, <code>SIGNATURE</code> and <code>MESSAGE</code> from the Avicenna's passport.</p></li>
-                            </ol>
+                            <li><p>Copy & Paste the <code>LIGHTNING PEER ID</code>, <code>SIGNATURE</code> and <code>MESSAGE</code> from the Avicenna's passport.</p></li>
+                            <li>
+                                <p>Click on verify.</p></li>    
+                        </ol>
                             <br><br><br>
                             <h2 id="validatemedicalrecordauthenticity">Validate medical record authenticity</h2>
                             <legend></legend>
@@ -204,7 +212,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 </div>
 
-
 <script type="text/javascript">
     $(document).ready(function () {
 
@@ -214,8 +221,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             // hide component
             $('#validateresult').hide();
 
-            // load button aanimation
-            lockButton();
+            // load button animation
+            lockButton('#btn-validate');
 
             // create data object containing the main essentail validator parameters
             var data = {
@@ -244,14 +251,55 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 $('#validateresult').show();
 
                 // Unload the button animation
-                unlockButton();
+                unlockButton('#btn-validate');
 
             });
 
             // If error display the error message
             request.fail(function (jqXHR, textStatus) {
                 toast('error', textStatus + jqXHR);
-                unlockButton();
+                unlockButton('#btn-validate');
+            });
+        });
+
+        // When clicking on add a validate blockstream satellite
+        $('#signature-validate').click(function () {
+
+            // load button animation
+            // lockButton('#signature-validate');
+
+            console.log($('#pubkey').val())
+            console.log($('#signed-message').val())
+            console.log($('#signature-hash').val())
+
+            // do http request to validate the inputs from the passport
+            var request = $.ajax({
+                url: "/api/v0/passport/signature/validate",
+                type: 'post',
+                data: {
+                    pubkey: $('#pubkey').val(),
+                    message: $('#signed-message').val(),
+                    signature: $('#signature-hash').val()
+                },
+                headers: {
+                    'x-csrf-token': $('[name=_csrf]').val()
+                },
+                dataType: 'json'
+            })
+
+            // If successful display the validation details
+            request.done(function (data) {
+                toast(data.type, data.msg)
+                if (data.type === "success") {
+                    $('#verified').fadeToggle()
+                }
+                // unlockButton('#signature-validate');
+            });
+
+            // If error display the error message
+            request.fail(function (jqXHR, textStatus) {
+                // unlockButton('#signature-validate');
+                console.log(jqXHR, textStatus);
             });
         });
 
@@ -261,15 +309,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         }
 
         // Function for the loading the button animation
-        function lockButton(){
-            $('#btn-validate').attr('disabled', true);
-            $('#btn-validate').html('Validate <i class="fas fa-circle-notch fa-spin"></i>');
+        function lockButton(btn) {
+            $(btn).attr('disabled', true);
+            $(btn).html('Validate <i class="fas fa-circle-notch fa-spin"></i>');
         }
 
         // Function to unlock the loading animation
-        function unlockButton(){
-            $('#btn-validate').attr('disabled', false);
-            $('#btn-validate').html('Validate');
+        function unlockButton(btn) {
+            $(btn).attr('disabled', false);
+            $(btn).html('Validate');
         }
     });
 </script>
