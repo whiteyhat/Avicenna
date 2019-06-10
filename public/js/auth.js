@@ -75,6 +75,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         // Instantiate the auth variable
         var auth;
+        
+        // Instantiate the blockstack auth variable
+        var blockstackAuth = "false";
 
         // On page load
         $(document).ready(function() {
@@ -82,6 +85,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           if (blockstack.isUserSignedIn()) {
             // get user data from blockstack
             const userData = blockstack.loadUserData();
+
+            blockstackAuth = "true";
 
             // log in Avicenna
             logInUser(userData.profile);
@@ -99,6 +104,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         // Function to log the blockstack user auth in Avicenna
         function logInUser(profile) {
           var person = new blockstack.Person(profile);
+
+          console.log(person.name())
 
           // do http request to log in the user
           // send the user pubkey
@@ -119,7 +126,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           request.done(function(data) {
             try {
               // If the user is a new user show an updatet to the user
-              if (data.msg == "Welcome back") {
+              if (data.msg == "Welcome") {
                 toast(data.type, data.msg);
 
                 // reload he apge to view user dashboard
@@ -140,7 +147,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           });
         }
 
-        $("#login").on("click", function() {});
 
         // When clickin on login
         $("#login").on("click", function() {
@@ -254,7 +260,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               url: "/api/v0/demo/doctor",
               type: "post",
               data: {
-                wallet
+                wallet,
+                blockstackAuth
               },
               headers: {
                 "x-csrf-token": $("[name=_csrf]").val()
@@ -326,7 +333,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               url: "/api/v0/demo/staff",
               type: "post",
               data: {
-                wallet
+                wallet,
+                blockstackAuth
               },
               headers: {
                 "x-csrf-token": $("[name=_csrf]").val()
@@ -398,7 +406,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               url: "/api/v0/demo/admin",
               type: "post",
               data: {
-                wallet
+                wallet,
+                blockstackAuth
               },
               headers: {
                 "x-csrf-token": $("[name=_csrf]").val()
