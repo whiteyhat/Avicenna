@@ -1054,7 +1054,7 @@ class UserController {
 
         // Create a new user
         newOne = await User.create({
-          wallet: wallet.toLowerCase(),
+          wallet,
           nonce,
           admin: true,
           name: "Admin"
@@ -1064,14 +1064,15 @@ class UserController {
         return response.send({
           type: "info",
           msg:
-            "Demo started as an admin. Please click on log in on the top right button"
+            "Demo started as an admin. Please click on log in on the top right button",
+            userId: newOne.id
         });
 
         // If the user does not exist in the DB
       } else {
         // Create a new user
         newOne = await User.create({
-          wallet: wallet.toLowerCase(),
+          wallet,
           nonce,
           admin: 1,
           name: "Admin"
@@ -1121,7 +1122,7 @@ class UserController {
 
         // Creaate a new user
         newOne = await User.create({
-          wallet: wallet.toLowerCase(),
+          wallet,
           nonce,
           clinic_id: Math.random() * (10 - 1) + 1
         });
@@ -1130,7 +1131,7 @@ class UserController {
       } else {
         // Create a new user
         newOne = await User.create({
-          wallet: wallet.toLowerCase(),
+          wallet,
           nonce,
           clinic_id: Math.random() * (10 - 1) + 1
         });
@@ -1179,17 +1180,25 @@ class UserController {
 
         // Creaate a new user with staff permissions
         newOne = await User.create({
-          wallet: wallet.toLowerCase(),
+          wallet,
           nonce,
           staff: 1,
           clinic_id: Math.random() * (10 - 1) + 1
+        });
+
+        // Return response body
+        return response.send({
+          type: "info",
+          msg:
+            "Demo started as an admin. Please click on log in on the top right button",
+            userId: newOne.id
         });
 
         // If the user does not exist in the DB
       } else {
         // Create a new user
         newOne = await User.create({
-          wallet: wallet.toLowerCase(),
+          wallet,
           nonce,
           staff: 1,
           clinic_id: Math.random() * (10 - 1) + 1
