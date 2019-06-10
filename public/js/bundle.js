@@ -571,15 +571,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
               $("[name=doctorRole]").val() +
               " of the " +
               $("[name=doctorClinic]").val() +
-              ", I can confirm that the accuracy of this medical record is my responsibility and/or " +
+              ", I can validate that the accuracy of this medical record is my responsibility and/or " +
               $("[name=doctorClinic]").val() +
-              "'s responsibility. This medical record is confidential and belongs uniquely to " +
+              "'s responsibility. This medical record belongs uniquely to " +
               patient.name +
               " or his/her or legal guardian. This data has been encrypted with a password provided by " +
               patient.name +
-              " or his/her legal guardian. \n\n Me, " +
+              " or his/her legal guardian. Me, " +
               $("[name=doctorName]").val() +
-              ", I agree with these terms and use my public keys from my bitcoin wallet to sign this legitimate document, today, " +
+              ", I agree with these terms and use my public keys from my lightning peer id to sign this document, today, " +
               formatDate(new Date()) +
               ".";
 
