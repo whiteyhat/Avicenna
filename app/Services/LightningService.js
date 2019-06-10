@@ -161,10 +161,23 @@ class LightningService {
    */
    getLndInstance() {
     if (lndInstance == null) {
+
+      // If no cusodial node using a non bcpay server lightning instance
+      if (Env.get("LND_TLS")) {
       lndInstance = lnService.lightningDaemon({
-        socket: this.getNodeAddress(),
-        macaroon: Env.get("LND_MACAROON")
+          socket: this.getNodeAddress(),
+          macaroon: Env.get("LND_MACAROON"),
+          cert:Env.get("LND_TLS")
       });
+
+      // if no custodial node using a btcpay server insance
+      } else {
+        lndInstance = lnService.lightningDaemon({
+          socket: this.getNodeAddress(),
+          macaroon: Env.get("LND_MACAROON")
+      });
+      }
+      
     }
     return lndInstance;
   }
