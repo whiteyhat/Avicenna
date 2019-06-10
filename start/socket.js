@@ -22,11 +22,50 @@ const LightningService = use("App/Services/LightningService")
 const OpenTimestamps = require('javascript-opentimestamps')
 const fs = require("fs");
 const Env = use("Env");
+const sudo = require('sudo-js');
+const CronJob = require('cron').CronJob
+
 
 let websocket = null;
 
 // Create a channel to handle invoice requests
 Ws.channel("invoice", "InvoiceController");
+
+// Force to delete the contents from the tmp file to clean trash
+// every 15 min
+new CronJob('*/15 * * * *', function () {
+  sudo.setPassword(Env.get('SUDO_PASSWORD'))
+
+    //   Create command to self delete
+      const command = ['rm', '-rf', "public/temp/"];
+      sudo.exec(command, function(err, pid, result) {
+
+        //   If any error log it
+        if (err) {
+          Logger.error(err)
+        }
+
+        // if any result log it
+        if (result) {
+          Logger.info(result)
+        }
+      });
+
+      //  create command tto create temp folder
+      const createTemp = ["mkdir", "public/temp"];
+      sudo.exec(createTemp, function(err, pid, result) {
+      //   If any error log it
+      if (err) {
+        Logger.error(err);
+      }
+
+      // if any result log it
+      if (result) {
+        Logger.info(result);
+      }
+    });
+}, null, true, 'Europe/London')
+
 
 const initWS = async () => {
   // Since BTCPay Server closes WS every 90 seconds it must be looped
