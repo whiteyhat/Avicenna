@@ -13,19 +13,19 @@ const axios = require("axios");
 const sha256 = require("hash.js/lib/hash/sha/256");
 const Logger = use("Logger");
 const Env = use("Env");
+const lnService = require("ln-service");
+const LightningService = use("App/Services/LightningService");
+const User = use("App/Models/User");
 
 /**
 Class to perform validation optiion for the Blockstream Satellite certification
  */
 class ValidateController {
-
   /**
   Controller to validate the Blocstream Satellite data outputs
    */
   async validate({ request, response }) {
-
     try {
-
       // Get the body request
       const { uuid, authtoken, filehash } = request.all();
 
@@ -43,13 +43,13 @@ class ValidateController {
 
       // HTTP Request to resolve the data body from the satellite
       const result = await axios.get(
-        `${Env.get('BLOCKSTREAM_API_URL')}/order/${uuid}`,
+        `${Env.get("BLOCKSTREAM_API_URL")}/order/${uuid}`,
         {
           //   use the auth token within for the auth headers
           headers: {
             "X-Auth-Token": authtoken
           },
-          validateStatus: function (status) {
+          validateStatus: function(status) {
             return true;
           }
         }
@@ -63,7 +63,6 @@ class ValidateController {
 
       // If there is any error in the HTTP request
       if (result.status !== 200) {
-
         // Add the error log in the response body
         res.message = data.errors[0].detail;
 
@@ -71,13 +70,12 @@ class ValidateController {
         return response.status(200).send(res);
       }
 
-      // If the Blockstream Satellite has a tx 
-      // update the response body 
+      // If the Blockstream Satellite has a tx
+      // update the response body
       res.satellite.txFound = true;
 
       // If there was any error within the satellite payment (lightning)
       if (data.status !== "sent") {
-
         // Update the response body
         res.message = "Satellite tx not paid";
 
@@ -90,13 +88,14 @@ class ValidateController {
       res.satellite.isPaid = true;
 
       // Make a hash (SHA-256) of the IPFS HASH obtained in the request body
-      const filehash256 = sha256().update(filehash).digest("hex");
+      const filehash256 = sha256()
+        .update(filehash)
+        .digest("hex");
 
-      // If there is an exact match between the SHA-256 hash from the 
-      // blockstream satellite and the IPFS hashed hash, then the 
-      // validation has been successful 
+      // If there is an exact match between the SHA-256 hash from the
+      // blockstream satellite and the IPFS hashed hash, then the
+      // validation has been successful
       if (data.message_digest === filehash256) {
-
         // Update the response body with successful details
         res.ipfs.isSha256Ok = true;
         res.message = "Successfully validated";
@@ -104,10 +103,48 @@ class ValidateController {
 
       // Return the response body to the user
       return response.status(200).send(res);
-
+    } catch (error) {
+      Logger.error(error);
     }
-    catch (error) {
-      Logger.error(error)
+  }
+
+  async validateSignature({ request, response }) {
+    // Get the request body
+    const { signature, message, pubkey } = request.all();
+
+    console.log(signature);
+
+    const validSignature = signature.replace(/\s/g, '');
+
+    console.log(message);
+    try {
+      const user = await User.findBy("wallet", pubkey);
+
+      if (!user) {
+        // Send a successful notification to the user
+        return response.send({
+          type: "error",
+          msg: "Lightning peer id no registered in Avicenna platfom"
+        });
+      }
+
+      const data = {
+        signature: validSignature,
+        message
+      }
+
+      // Verify signature using the bitcoin instance, the message and the signature
+      await LightningService.checkSandardSignature(data).then(function(
+        result
+      ) {
+        if (!result.pubkey.signed_by) {
+          return response.send({type:"error", msg:"Diagnosis not signed by the given peer id. Please, double check the message body or rhe singature"})
+        } else{
+          return response.send({type:"success", msg:"Diagnosis signed by the given peer id. Diagnosis successfully verified"})
+        }
+      });
+    } catch (error) {
+      Logger.error(error);
     }
   }
 }
