@@ -1,6 +1,8 @@
 # Avicenna
 ###### A healthcare system backed by a distributed infrastructure and Bitcoin technology
 
+[![video avicenna](https://user-images.githubusercontent.com/31220861/60285068-6636c200-990d-11e9-9689-1b4a085331dd.png)](https://youtu.be/QeHas3-4gb8)
+
 ## Background - Insight of a specific case
 
 The Lebanese Association of the Order of Malta (LAKM) is the primary health provider via 4 mobile clinics for more than 200,000 individuals, including up to 40,000 in Akkar.
