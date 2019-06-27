@@ -75,13 +75,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         // Instantiate the auth variable
         var auth;
-        
+
         // Instantiate the blockstack auth variable
         var blockstackAuth = "false";
 
         // On page load
         $(document).ready(function() {
-          // If the user is signed in tthrough blockstack
+          // If the user is signed in through blockstack
           if (blockstack.isUserSignedIn()) {
             // get user data from blockstack
             const userData = blockstack.loadUserData();
@@ -104,8 +104,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         // Function to log the blockstack user auth in Avicenna
         function logInUser(profile) {
           var person = new blockstack.Person(profile);
-
-          console.log(person.name())
 
           // do http request to log in the user
           // send the user pubkey
@@ -146,7 +144,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             console.log(jqXHR, textStatus);
           });
         }
-
 
         // When clickin on login
         $("#login").on("click", function() {
