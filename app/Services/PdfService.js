@@ -255,7 +255,7 @@ class PdfService {
         .font('public/fonts/roboto.ttf', 13)
         .moveDown()
         // Add body
-        .text("Avicenna certifies that the atached file identified with the IPFS gateway hash ", {
+        .text("Avicenna certifies that the attached file identified with the IPFS gateway hash ", {
           width: 470,
           align: 'justify',
           indent: 30,
@@ -273,7 +273,7 @@ class PdfService {
         .fillColor('black')
         .font('public/fonts/roboto.ttf', 13)
         if (data.certification.satellite) {
-        pdf.text(" saved in the Blockstream Satellite with the Tramsission ID: ", {
+        pdf.text(" saved in the Blockstream Satellite with the Transmission ID: ", {
           width: 470,
           align: 'justify',
           indent: 30,
