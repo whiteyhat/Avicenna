@@ -787,7 +787,7 @@ class UserController {
         // Create the initial medical health record
         let path = PdfService.generatePDF(data, Date.now().toString());
 
-        // craete the full relative path
+        // create the full relative path
         const relativePath = "public/temp/" + path;
 
         // automate the self-destruction operation
