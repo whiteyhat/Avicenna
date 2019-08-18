@@ -38,7 +38,7 @@
     "javascript-opentimestamps": "^0.4.3",
     "ln-service": "^34.7.2",
     "mysql": "^2.17.1",
-    "pdfkit": "^0.9.1",
+    "pdfkit": "^0.10.0",
     "sudo-js": "^1.0.2",
     "voilab-pdf-table": "^0.4.1",
     "webln": "^0.2.1"
