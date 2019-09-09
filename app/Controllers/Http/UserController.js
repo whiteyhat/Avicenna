@@ -451,7 +451,7 @@ class UserController {
       const relativePath = "public/temp/" + path;
 
       // automate the self-destruction operation
-      PdfService.autoDeletePdf(relativePath);
+      // PdfService.autoDeletePdf(relativePath);
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
@@ -540,7 +540,7 @@ class UserController {
       const relativePath = "public/temp/" + path;
 
       // automate the self-destruction operation
-      PdfService.autoDeletePdf(relativePath);
+      // PdfService.autoDeletePdf(relativePath);
 
       // Upload the initial medical health record to IPFS
       await LightningService.uploadToIPFS(relativePath)
@@ -791,7 +791,7 @@ class UserController {
         const relativePath = "public/temp/" + path;
 
         // automate the self-destruction operation
-        PdfService.autoDeletePdf(relativePath);
+        // PdfService.autoDeletePdf(relativePath);
 
         // Upload the initial medical health record to IPFS
         await LightningService.uploadToIPFS(relativePath)

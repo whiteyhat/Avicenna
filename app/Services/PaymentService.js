@@ -67,8 +67,8 @@ class PaymentService {
             .then(function (result) {
 
               // automate the self-destruction operation from both paths
-              PdfService.autoDeletePdf(verificationPath);
-              PdfService.autoDeletePdf(frontPath);
+              // PdfService.autoDeletePdf(verificationPath);
+              // PdfService.autoDeletePdf(frontPath);
 
               // Log the IPFS hash gateway
               Logger.info("IPFS HASH: " + result.hash);
